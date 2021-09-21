@@ -1,6 +1,7 @@
 #include "ft_vector.hpp"
 #include <iostream>
 #include <algorithm>
+#include <vector>
 
 int main()
 {
@@ -41,6 +42,25 @@ int main()
 	std::cout << std::endl;
 
 	std::cout << v[3] << std::endl;
-	 
+
+	try
+	{
+		std::cout << v.at(23) << std::endl;
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+	std::cout << "front(): " << v.front() << std::endl;
+	std::cout << "back(): " << v.back() << std::endl;
+
+	// ft::vector<int> vec2;
+	// std::cout << "back(): " << vec2.back() << std::endl;
+
+	std::vector<int> vec2;
+	std::cout << vec2.get_allocator().max_size() << std::endl;
+	std::cout << vec2.max_size() << std::endl;
+
+
 
 }
