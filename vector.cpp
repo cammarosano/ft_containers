@@ -43,4 +43,17 @@ int main()
 	int *p1 = p + 1;
 
 	std::cout << p1 - p << std::endl;
+	std::vector<int>::reverse_iterator rit = vector.rbegin();
+	std::vector<int>::reverse_iterator rite = vector.rend();
+	while (rit < rite)
+		std::cout << *rit++ << " ";
+	std::cout << std::endl;
+
+	// std::cout << *rit++ << std::endl;
+	// std::cout << *rit++ << std::endl;
+	// std::cout << *rit++ << std::endl;
+	// std::vector<int>::reverse_iterator rit2 = rit;
+	// rit += 5;
+	// std::cout << *rit << std::endl;
+	// std::cout << "> operator: " << (rit > rit2) << std::endl;
 }

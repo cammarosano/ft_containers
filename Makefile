@@ -1,6 +1,6 @@
 SRC = main.cpp
 OBJ = $(SRC:.cpp=.o)
-HEADER = ft_vector.hpp
+HEADER = ft_vector.hpp iterator.hpp
 CC = clang++
 CFLAGS = -Wall -Wextra -Werror -std=c++98
 NAME = a.out

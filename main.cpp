@@ -39,4 +39,8 @@ int main()
 		++it;
 	}
 	std::cout << std::endl;
+
+	std::cout << v[3] << std::endl;
+	 
+
 }
