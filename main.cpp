@@ -61,6 +61,16 @@ int main()
 	std::cout << vec2.get_allocator().max_size() << std::endl;
 	std::cout << vec2.max_size() << std::endl;
 
+	v.resize(2);
+	for (size_t i = 0; i < v.size(); i++)
+		std::cout << v[i] << " ";
+	std::cout << std::endl;
+	v.resize(20, 66);
+	for (size_t i = 0; i < v.size(); i++)
+		std::cout << v[i] << " ";
+	std::cout << std::endl;
+	v.resize(20, 66);
+	
 
 
 }

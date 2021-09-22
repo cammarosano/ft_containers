@@ -49,11 +49,16 @@ int main()
 		std::cout << *rit++ << " ";
 	std::cout << std::endl;
 
-	// std::cout << *rit++ << std::endl;
-	// std::cout << *rit++ << std::endl;
-	// std::cout << *rit++ << std::endl;
-	// std::vector<int>::reverse_iterator rit2 = rit;
-	// rit += 5;
-	// std::cout << *rit << std::endl;
-	// std::cout << "> operator: " << (rit > rit2) << std::endl;
+	std::cout << "size: " << vector.size() 
+			<< ", capacity: " << vector.capacity() << std::endl;
+	vector.resize(1, 66);
+	for (size_t i = 0; i < vector.size(); i++)
+		std::cout << vector[i] << " ";
+	std::cout << std::endl;
+	std::cout << "size: " << vector.size() 
+			<< ", capacity: " << vector.capacity() << std::endl;
+	vector.push_back(0);
+	std::cout << "size: " << vector.size() 
+			<< ", capacity: " << vector.capacity() << std::endl;
+
 }

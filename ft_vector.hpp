@@ -27,9 +27,9 @@ private:
 	value_type *		_array;
 	size_type			_size;
 	size_type			_capacity;
-	std::allocator<value_type>	_allocator;
+	std::allocator<T>	_allocator;
 
-	void increase_capacity(void);
+	void reallocate(size_type new_capacity);
 
 public:
 	// TODO: default constructor, copy constructor, =op overload
@@ -54,8 +54,13 @@ public:
 
 	void push_back(value_type const & val)
 	{
-		if (_size == _capacity)
-			increase_capacity();
+		// reallocate if necessary
+		if (_size == 0)
+			reallocate(1);
+		else if (_size == _capacity)
+			reallocate(2 * _capacity);
+
+		// construct new element at the end
 		_allocator.construct(&_array[_size], val);
 		_size += 1;
 	}	
@@ -72,12 +77,32 @@ public:
 		return (_allocator.max_size());
 	}
 
-	// TODO : resize
+	void resize(size_type n, value_type val = value_type())
+	{
+		if (n < _size)
+		{
+			for (size_type i = n; i < _size; ++i)
+				_allocator.destroy(&_array[i]);
+		}
+		else
+		{
+			if (n > _capacity)
+				reallocate(n);
+			for (size_type i = _size; i < n; ++i)
+				_allocator.construct(&_array[i], val);
+		}
+		_size = n;
+	}
 
 	size_type capacity(void) const
 	{
 		return (_capacity);
 	}
+
+	// TODO
+	// empty
+	// reserve
+
 
 	/* Iterators */
 
@@ -135,26 +160,28 @@ public:
 	
 };
 
-template <typename T>
-void ft::vector<T>::increase_capacity(void)
-{
-	if (_capacity == 0)
-	{
-		_array = _allocator.allocate(1);
-		_capacity = 1;
-		return ;
-	}
-	T * new_array = _allocator.allocate(_capacity * 2);
 
-	for (unsigned int i = 0; i < _size; i++)
+template <typename T>
+void ft::vector<T>::reallocate(size_type new_capacity)
+{
+	if (!(new_capacity > _capacity))
+		return ;
+
+	// allocate new array
+	T * new_array = _allocator.allocate(new_capacity);
+
+	// copy elements to new array and destroy them
+	for (size_type i = 0; i < _size; i++)
 	{
 		_allocator.construct(&new_array[i], _array[i]);
 		_allocator.destroy(&_array[i]);
 	}
-	_allocator.deallocate(_array, _capacity);
-	_capacity *= 2;
+	// deallocate old array
+	if (_array)
+		_allocator.deallocate(_array, _capacity);
+	// update _capacity and _array
+	_capacity = new_capacity;
 	_array = new_array;
 }
-
 
 #endif
