@@ -96,18 +96,36 @@ int main()
 	std::cout << v.capacity() << std::endl;
 
 	// assign(n, val)
+	// v.assign(static_cast<size_t>(0), 15);
 	v.assign(0, 15);
 	std::cout << v.capacity() << std::endl;
 	std::cout << v.empty() << std::endl;
 	std::cout << v.size() << std::endl;
+	// v.assign(static_cast<size_t>(42), 42);
 	v.assign(42, 42);
 	std::cout << v.capacity() << std::endl;
 	std::cout << v.empty() << std::endl;
 	std::cout << v.size() << std::endl;
-	v.assign(150, -1);
+	v.assign(static_cast<size_t>(150), -1);
 	std::cout << v.capacity() << std::endl;
 	std::cout << v.empty() << std::endl;
 	std::cout << v.size() << std::endl;
 
+	// assign(range)
+	{
+		std::vector<int> std_vector;
+		std_vector.push_back(2);
+		std_vector.push_back(4);
+		std_vector.push_back(8);
+		std_vector.push_back(16);
+		std::vector<int>::iterator it, ite;
+		it = std_vector.begin();
+		ite = std_vector.end();
+		v.assign(it, ite);
+		for (size_t i = 0; i < v.size(); i++)
+			std::cout << v[i] << " ";
+		std::cout << std::endl;
+		
+	}
 
 }

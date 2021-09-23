@@ -5,10 +5,23 @@
 # include <iostream> // debug messages
 # include "iterator.hpp"
 # include <stdexcept>
+# include <iterator> // iterator_traits
+# include <typeinfo> // type_info
+# include "ft_is_integral.hpp"
 
 namespace ft
 {
 	template <typename T> class vector;
+
+	template<typename InputIterator>
+	typename std::iterator_traits<InputIterator>::difference_type
+	distance(InputIterator first, InputIterator last);
+
+	// enable_if
+	template<bool Cond, typename T>
+	struct enable_if {};// "type" is not defined
+	template<typename T>
+	struct enable_if<true, T> {typedef T type;}; // template specialization
 }
 
 template <typename T>
@@ -160,8 +173,6 @@ public:
 	
 	/* Modifiers */
 
-	// TODO assign (range)
-
 	void assign(size_type n, value_type const & val)
 	{
 		// destroy original elems
@@ -183,6 +194,44 @@ public:
 
 		// update _size
 		_size = n;
+	}
+
+	//  watch out for self assignation?? check reference (I think it's undefined behaviour)
+	template < typename InputIterator >
+	void assign(
+		typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type first,
+		InputIterator last)
+	{
+		// destroy original elems
+		for (size_type i = 0; i < _size; i++)
+			_allocator.destroy(&_array[i]);
+		_size = 0;
+		
+		// if iterator is not at least forward_iterator, push one by one
+		if (typeid(typename std::iterator_traits<InputIterator>::iterator_category) == typeid(std::input_iterator_tag))
+		{
+			std::cout << "Iterator has type input_iterator\n";
+			while (first != last)
+				push_back(*first++);
+		}
+		else // should I test for fwd, bidir or rand_acc iterator??
+		{
+			size_type n = ft::distance(first, last);
+
+			if (n > _capacity)
+			{
+				if (_array)
+					_allocator.deallocate(_array, _capacity);
+				_array = _allocator.allocate(n);
+				_capacity = n;
+			}
+			while (first != last)
+			{
+				_allocator.construct(&_array[_size], *first);
+				++_size;
+				++first;
+			}
+		}
 	}
 
 	void push_back(value_type const & val)
@@ -233,5 +282,31 @@ void ft::vector<T>::reallocate(size_type new_capacity)
 	_capacity = new_capacity;
 	_array = new_array;
 }
+
+
+// my implementation of std::distance
+
+template<typename InputIterator>
+typename std::iterator_traits<InputIterator>::difference_type
+ft::distance(InputIterator first, InputIterator last)
+{
+	if (typeid(typename std::iterator_traits<InputIterator>::iterator_category)
+		== typeid(std::random_access_iterator_tag))
+	{
+		std::cout << "Iterator of type random-access\n";
+		return (last - first);
+	}
+	
+	typename std::iterator_traits<InputIterator>::difference_type n;
+
+	n = 0;
+	while (first != last)
+	{
+		++n;
+		++first;
+	}
+	return (n);
+}
+
 
 #endif
