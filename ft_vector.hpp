@@ -52,19 +52,6 @@ public:
 		}
 	}
 
-	void push_back(value_type const & val)
-	{
-		// reallocate if necessary
-		if (_size == 0)
-			reallocate(1);
-		else if (_size == _capacity)
-			reallocate(2 * _capacity);
-
-		// construct new element at the end
-		_allocator.construct(&_array[_size], val);
-		_size += 1;
-	}	
-
 	/* Capacity: */
 
 	size_type size(void) const
@@ -99,10 +86,20 @@ public:
 		return (_capacity);
 	}
 
-	// TODO
-	// empty
-	// reserve
+	bool empty(void) const
+	{
+		return (_size == 0);
+	}
 
+	void reserve(size_type n)
+	{
+		if (n > _capacity)
+		{
+			if (n > max_size())
+				throw std::length_error("ft_vector: length error");
+			reallocate(n);
+		}
+	}
 
 	/* Iterators */
 
@@ -115,6 +112,9 @@ public:
 	{
 		return (iterator(_array + _size));
 	}
+	
+	// TODO rbegin, rend 
+
 
 	/* Element access */
 
@@ -157,6 +157,56 @@ public:
 	{
 		return (_array[_size - 1]);
 	}
+	
+	/* Modifiers */
+
+	// TODO assign (range)
+
+	void assign(size_type n, value_type const & val)
+	{
+		// destroy original elems
+		for (size_type i = 0; i < _size; i++)
+			_allocator.destroy(&_array[i]);
+		
+		// increase capacity if needed (deallocate and allocate)
+		if (n > _capacity)
+		{
+			if (_array)
+				_allocator.deallocate(_array, _capacity);
+			_array = _allocator.allocate(n);
+			_capacity = n;
+		}
+
+		// construct new elems
+		for (size_type i = 0; i < n; i++)
+			_allocator.construct(&_array[i], val);
+
+		// update _size
+		_size = n;
+	}
+
+	void push_back(value_type const & val)
+	{
+		// reallocate if necessary
+		if (_size == 0)
+			reallocate(1);
+		else if (_size == _capacity)
+			reallocate(2 * _capacity);
+
+		// construct new element at the end
+		_allocator.construct(&_array[_size], val);
+		_size += 1;
+	}	
+
+	void pop_back(void)
+	{
+		if (_size == 0) // STL vector has undefined behavior for popping an empty container
+			return ;
+		_allocator.destroy(&_array[_size - 1]);
+		_size -= 1;
+	}
+
+
 	
 };
 

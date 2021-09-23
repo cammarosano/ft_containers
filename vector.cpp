@@ -60,5 +60,11 @@ int main()
 	vector.push_back(0);
 	std::cout << "size: " << vector.size() 
 			<< ", capacity: " << vector.capacity() << std::endl;
+	vector.reserve(17);
+	std::cout << "size: " << vector.size() 
+			<< ", capacity: " << vector.capacity() << std::endl;
+	vector.assign(0, 42);
+	std::cout << "size: " << vector.size() 
+			<< ", capacity: " << vector.capacity() << std::endl;
 
 }
