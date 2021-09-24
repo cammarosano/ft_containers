@@ -44,6 +44,7 @@ private:
 public:
 	// TODO: default constructor, copy constructor, =op overload
 	// other constructors
+	// explicit keyword for constructors
 
 
 
@@ -51,6 +52,26 @@ public:
 	{
 		// _array is initialized to a NULL pointer
 	} 
+
+	vector(size_type n, value_type const & val = value_type()):
+	_array(0), _size(0), _capacity(0)
+	{
+		assign(n, val);
+	}
+
+	template<typename I>
+	vector(typename ft::enable_if<!ft::is_integral<I>::value, I>::type first,
+			I last): _array(0), _size(0), _capacity(0)
+	{
+		assign(first, last);
+	}
+
+	vector(vector const & x):
+	_array(0), _size(0), _capacity(0)
+	{
+		// assign(x.begin(), x.end()); // I need a const iterator for that
+		(void)x;
+	}
 
 	~vector()
 	{

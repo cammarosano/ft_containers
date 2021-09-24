@@ -70,4 +70,9 @@ int main()
 	std::cout << "size: " << vector.size() 
 			<< ", capacity: " << vector.capacity() << std::endl;
 
+	{
+		std::vector<int> vector(5, 42);
+		std::cout << "size: " << vector.size() 
+			<< ", capacity: " << vector.capacity() << std::endl;
+	}
 }

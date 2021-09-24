@@ -230,4 +230,28 @@ int main()
 		std::cout << std::endl;
 
 	}
+
+	{
+		ft::vector<int> v(5, 42);
+		for (size_t i = 0; i < v.size(); i++)
+			std::cout << v[i] << " ";
+		std::cout << std::endl;
+		std::cout << "size: " << v.size() << "| capacity: " << v.capacity() << std::endl;
+
+	}
+	{
+		ft::vector<int> ve(v.begin(), v.begin() + 5);
+		for (size_t i = 0; i < ve.size(); i++)
+			std::cout << ve[i] << " ";
+		std::cout << std::endl;
+		std::cout << "size: " << ve.size() << "| capacity: " << ve.capacity() << std::endl;
+	}
+	// need to implement const iterator first
+	// {
+	// 	ft::vector<int> ve(v);
+	// 	for (size_t i = 0; i < ve.size(); i++)
+	// 		std::cout << ve[i] << " ";
+	// 	std::cout << std::endl;
+	// 	std::cout << "size: " << ve.size() << "| capacity: " << ve.capacity() << std::endl;
+	// }
 }
