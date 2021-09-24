@@ -3,6 +3,8 @@
 
 namespace ft
 {
+	/* is_integral */
+
 	struct intTrue {static bool const value = true;};
 
 	template <typename T>
@@ -23,10 +25,17 @@ namespace ft
 	template <>	struct is_integral<unsigned long> : intTrue {};
 	template <>	struct is_integral<long long> : intTrue {};
 	template <>	struct is_integral<unsigned long long> : intTrue {};
-	
+	// TODO: const and volatile ?
+
+
+	/* enable_if */
+
+	template<bool Cond, typename T = void>
+	struct enable_if {};// "type" is not defined
+	template<typename T>
+	struct enable_if<true, T> {typedef T type;}; // template specialization
 }
 
-// TODO: const and volatile ?
 
 
 #endif

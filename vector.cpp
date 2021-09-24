@@ -63,7 +63,10 @@ int main()
 	vector.reserve(17);
 	std::cout << "size: " << vector.size() 
 			<< ", capacity: " << vector.capacity() << std::endl;
-	vector.assign(0, 42);
+	vector.assign(17, 42);
+	std::cout << "size: " << vector.size() 
+			<< ", capacity: " << vector.capacity() << std::endl;
+	vector.insert(vector.begin(), 300);
 	std::cout << "size: " << vector.size() 
 			<< ", capacity: " << vector.capacity() << std::endl;
 

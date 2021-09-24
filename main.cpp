@@ -125,7 +125,74 @@ int main()
 		for (size_t i = 0; i < v.size(); i++)
 			std::cout << v[i] << " ";
 		std::cout << std::endl;
-		
 	}
+
+	// clear
+	v.clear();
+	std::cout << "size: " << v.size() << std::endl;
+
+	// erase(position)
+	v.push_back(0);
+	v.push_back(1);
+	v.push_back(2);
+	v.push_back(3);
+	for (size_t i = 0; i < v.size(); i++)
+		std::cout << v[i] << " ";
+	std::cout << std::endl;
+
+	it = v.begin() + 3;
+	ft::vector<int>::iterator itx = v.erase(it);
+	std::cout << *itx << std::endl;
+	for (size_t i = 0; i < v.size(); i++)
+		std::cout << v[i] << " ";
+	std::cout << std::endl;
+
+	// v.erase(it); // segfaults
+
+	{	// STL
+		std::vector<int> vec;
+		vec.push_back(0);
+		vec.push_back(1);
+		vec.push_back(2);
+		vec.push_back(3);
+		for (size_t i = 0; i < vec.size(); i++)
+			std::cout << vec[i] << " ";
+		std::cout << std::endl;
+
+		std::vector<int>::iterator it = vec.begin() + 3;
+		std::vector<int>::iterator itx = vec.erase(it);
+		std::cout << *itx << std::endl;
+		for (size_t i = 0; i < vec.size(); i++)
+			std::cout << vec[i] << " ";
+		std::cout << std::endl;
+		
+		// vec.erase(it); // segfaults
+	}
+
+	/* erase(range) */
+
+	v.push_back(10);
+	v.push_back(11);
+	v.push_back(12);
+	v.push_back(13);
+	v.push_back(14);
+	for (size_t i = 0; i < v.size(); i++)
+		std::cout << v[i] << " ";
+	std::cout << std::endl;
+	ft::vector<int>::iterator first, last;
+	first = v.begin() + 3;
+	last = first + 3;  // 10 11 12 should disappear
+	it = v.erase(first, last);
+	std::cout << *it << std::endl; // should be 13
+	for (size_t i = 0; i < v.size(); i++)
+		std::cout << v[i] << " ";
+	std::cout << std::endl;
+
+	/* insert(position, val) */
+
+	v.insert(v.end(), 66);
+	for (size_t i = 0; i < v.size(); i++)
+		std::cout << v[i] << " ";
+	std::cout << std::endl;
 
 }

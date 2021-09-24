@@ -7,7 +7,7 @@
 # include <stdexcept>
 # include <iterator> // iterator_traits
 # include <typeinfo> // type_info
-# include "ft_is_integral.hpp"
+# include "utils.hpp"
 
 namespace ft
 {
@@ -17,11 +17,7 @@ namespace ft
 	typename std::iterator_traits<InputIterator>::difference_type
 	distance(InputIterator first, InputIterator last);
 
-	// enable_if
-	template<bool Cond, typename T>
-	struct enable_if {};// "type" is not defined
-	template<typename T>
-	struct enable_if<true, T> {typedef T type;}; // template specialization
+
 }
 
 template <typename T>
@@ -173,11 +169,16 @@ public:
 	
 	/* Modifiers */
 
-	void assign(size_type n, value_type const & val)
+	void clear(void)
 	{
-		// destroy original elems
 		for (size_type i = 0; i < _size; i++)
 			_allocator.destroy(&_array[i]);
+		_size = 0;
+	}
+
+	void assign(size_type n, value_type const & val)
+	{
+		clear();
 		
 		// increase capacity if needed (deallocate and allocate)
 		if (n > _capacity)
@@ -197,18 +198,15 @@ public:
 	}
 
 	//  watch out for self assignation?? check reference (I think it's undefined behaviour)
-	template < typename InputIterator >
+	template < typename I >
 	void assign(
-		typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type first,
-		InputIterator last)
+		typename ft::enable_if<!ft::is_integral<I>::value, I>::type first,
+		I last)
 	{
-		// destroy original elems
-		for (size_type i = 0; i < _size; i++)
-			_allocator.destroy(&_array[i]);
-		_size = 0;
+		clear();
 		
 		// if iterator is not at least forward_iterator, push one by one
-		if (typeid(typename std::iterator_traits<InputIterator>::iterator_category) == typeid(std::input_iterator_tag))
+		if (typeid(typename std::iterator_traits<I>::iterator_category) == typeid(std::input_iterator_tag))
 		{
 			std::cout << "Iterator has type input_iterator\n";
 			while (first != last)
@@ -255,7 +253,72 @@ public:
 		_size -= 1;
 	}
 
+	iterator erase(iterator position)
+	{
+		pointer ptr = &(*position);
+		iterator it = position + 1;
+		iterator ite = end();
 
+		// destroy element pointed by position
+		_allocator.destroy(ptr);
+		_size -= 1;
+		
+		// shift following elements by 1
+		while (it != ite)
+		{
+			_allocator.construct(ptr, *it);
+			++ptr;
+			_allocator.destroy(ptr);
+			++it;
+		}
+		return (position);
+	}
+
+	iterator erase (iterator first, iterator last)
+	{
+		pointer ptr = &(*first);
+		iterator it = first;
+		iterator ite = end();
+
+		while (it != last)
+		{
+			_allocator.destroy(&(*it++));
+			_size -= 1;
+		}
+		while (it != ite)
+		{
+			_allocator.construct(ptr, *it);
+			_allocator.destroy(&(*it));
+			ptr++;
+			it++;
+		}
+		return (first);
+	}
+
+	iterator insert(iterator position, const value_type& val)
+	{
+		pointer ptr = _array + _size; // pointer to end
+		pointer insert_pos = &(*position);
+
+		// reallocate if necessary
+		if (_size == _capacity) // INEFICIENT!! coping twice a lot of stuff...
+		{
+			if (_capacity == 0)
+				reallocate(1);
+			else
+				reallocate(2 * _capacity);
+		}
+
+		while (ptr != insert_pos)
+		{
+			_allocator.construct(ptr, *(ptr - 1));
+			_allocator.destroy(ptr - 1);
+			--ptr;
+		}
+		_allocator.construct(ptr, val);
+		_size += 1;
+		return (position);
+	}
 	
 };
 
