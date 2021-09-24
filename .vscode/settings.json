@@ -1,6 +1,16 @@
 {
 	"files.associations": {
 		"iostream": "cpp",
-		"numeric": "cpp"
+		"numeric": "cpp",
+		"algorithm": "cpp",
+		"functional": "cpp",
+		"iterator": "cpp",
+		"locale": "cpp",
+		"string": "cpp",
+		"unordered_map": "cpp",
+		"vector": "cpp",
+		"__split_buffer": "cpp",
+		"istream": "cpp",
+		"sstream": "cpp"
 	}
 }

@@ -106,7 +106,7 @@ int main()
 	std::cout << v.capacity() << std::endl;
 	std::cout << v.empty() << std::endl;
 	std::cout << v.size() << std::endl;
-	v.assign(static_cast<size_t>(150), -1);
+	v.assign(static_cast<size_t>(42), -1);
 	std::cout << v.capacity() << std::endl;
 	std::cout << v.empty() << std::endl;
 	std::cout << v.size() << std::endl;
@@ -160,12 +160,11 @@ int main()
 		std::cout << std::endl;
 
 		std::vector<int>::iterator it = vec.begin() + 3;
-		std::vector<int>::iterator itx = vec.erase(it);
-		std::cout << *itx << std::endl;
 		for (size_t i = 0; i < vec.size(); i++)
 			std::cout << vec[i] << " ";
 		std::cout << std::endl;
 		
+		(void)it;
 		// vec.erase(it); // segfaults
 	}
 
@@ -194,5 +193,41 @@ int main()
 	for (size_t i = 0; i < v.size(); i++)
 		std::cout << v[i] << " ";
 	std::cout << std::endl;
+	std::cout << "capacity: " << v.capacity() << std::endl;
+	v.assign(99, 42);
+	std::cout << "capacity: " << v.capacity() << std::endl;
+	v.pop_back();
+	it = v.insert(v.end() - 2, 66);
+	for (size_t i = 0; i < v.size(); i++)
+		std::cout << v[i] << " ";
+	std::cout << std::endl;
+	std::cout << *it << std::endl;
+	std::cout << "capacity: " << v.capacity() << std::endl;
 
+	/* insert(position, n , val) */
+	v.insert(v.begin() + 2, 5, -1);
+	for (size_t i = 0; i < v.size(); i++)
+		std::cout << v[i] << " ";
+	std::cout << std::endl;
+
+	/* insert(position, first , last) */
+	{
+		std::vector<int> std_vec;
+		std_vec.push_back(0);
+		std_vec.push_back(2);
+		std_vec.push_back(4);
+		std_vec.push_back(6);
+
+		ft::vector<int> ve;
+		ve.push_back(1);
+		ve.push_back(3);
+		ve.push_back(5);
+		
+		std::cout << "size: " << ve.size() << "| capacity: " << ve.capacity() << std::endl;
+		ve.insert(ve.begin(), std_vec.begin(), std_vec.end());
+		for (size_t i = 0; i < ve.size(); i++)
+			std::cout << ve[i] << " ";
+		std::cout << std::endl;
+
+	}
 }

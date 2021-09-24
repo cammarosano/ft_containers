@@ -2,7 +2,7 @@ SRC = main.cpp
 OBJ = $(SRC:.cpp=.o)
 HEADER = ft_vector.hpp iterator.hpp
 CC = clang++
-CFLAGS = -Wall -Wextra -Werror -std=c++98
+CFLAGS = -Wall -Wextra -Werror -std=c++98 -g -fsanitize=address
 NAME = a.out
 
 all:	$(NAME)

@@ -39,6 +39,7 @@ private:
 	std::allocator<T>	_allocator;
 
 	void reallocate(size_type new_capacity);
+	pointer shift_right (iterator position, size_type n);
 
 public:
 	// TODO: default constructor, copy constructor, =op overload
@@ -197,7 +198,7 @@ public:
 		_size = n;
 	}
 
-	//  watch out for self assignation?? check reference (I think it's undefined behaviour)
+	// cppreference: The behavior is undefined if either argument is an iterator into *this.
 	template < typename I >
 	void assign(
 		typename ft::enable_if<!ft::is_integral<I>::value, I>::type first,
@@ -214,7 +215,7 @@ public:
 		}
 		else // should I test for fwd, bidir or rand_acc iterator??
 		{
-			size_type n = ft::distance(first, last);
+			size_type n = ft::distance(first, last); // SHOULD IT BE ptrdiff_t ?? (signed integer!)
 
 			if (n > _capacity)
 			{
@@ -255,26 +256,10 @@ public:
 
 	iterator erase(iterator position)
 	{
-		pointer ptr = &(*position);
-		iterator it = position + 1;
-		iterator ite = end();
-
-		// destroy element pointed by position
-		_allocator.destroy(ptr);
-		_size -= 1;
-		
-		// shift following elements by 1
-		while (it != ite)
-		{
-			_allocator.construct(ptr, *it);
-			++ptr;
-			_allocator.destroy(ptr);
-			++it;
-		}
-		return (position);
+		return (erase(position, position + 1));
 	}
 
-	iterator erase (iterator first, iterator last)
+	iterator erase(iterator first, iterator last)
 	{
 		pointer ptr = &(*first);
 		iterator it = first;
@@ -289,37 +274,58 @@ public:
 		{
 			_allocator.construct(ptr, *it);
 			_allocator.destroy(&(*it));
-			ptr++;
-			it++;
+			++ptr;
+			++it;
 		}
 		return (first);
 	}
 
-	iterator insert(iterator position, const value_type& val)
+	iterator insert(iterator position, value_type const & val)
 	{
-		pointer ptr = _array + _size; // pointer to end
-		pointer insert_pos = &(*position);
+		pointer insert_position;
 
-		// reallocate if necessary
-		if (_size == _capacity) // INEFICIENT!! coping twice a lot of stuff...
-		{
-			if (_capacity == 0)
-				reallocate(1);
-			else
-				reallocate(2 * _capacity);
-		}
+		insert_position = shift_right(position, 1);
+		_allocator.construct(insert_position, val);
+		return (insert_position);
+	}
 
-		while (ptr != insert_pos)
+	void insert(iterator position, size_type n, value_type const & val)
+	{
+		pointer insert_position;
+		
+		insert_position = shift_right(position, n);
+		while (n--)
+			_allocator.construct(insert_position++, val);
+	}
+
+	template <typename I>
+	void insert(iterator position,
+		typename ft::enable_if<!ft::is_integral<I>::value, I>::type first, I last)
+	{
+		if (typeid(typename std::iterator_traits<I>::iterator_category)
+			== typeid(std::input_iterator_tag)) // shifting (coping) elements at every cycle :(
 		{
-			_allocator.construct(ptr, *(ptr - 1));
-			_allocator.destroy(ptr - 1);
-			--ptr;
+			while (first != last)
+			{
+				position = insert(position, *first++); // position is updated in case of reallocation
+				position++;
+			}
 		}
-		_allocator.construct(ptr, val);
-		_size += 1;
-		return (position);
+		else 	// assuming it's an iterator of cat at least forward_iterator
+		{
+			ptrdiff_t n;
+			pointer insert_pos;
+
+			n = ft::distance(first, last);
+			if (n <= 0)
+				return ;
+			insert_pos = shift_right(position, static_cast<size_type>(n));
+			while (n--)
+				_allocator.construct(insert_pos++, *first++);
+		}
 	}
 	
+		
 };
 
 
@@ -371,5 +377,79 @@ ft::distance(InputIterator first, InputIterator last)
 	return (n);
 }
 
+// Shifts elements from position by n, making room for future insertion
+// Returns pointer to begining of insertion place
+template<typename T>
+T * ft::vector<T>::shift_right(iterator position, size_type n)
+{
+	if (_size + n <= _capacity) // shift elements by n (no realloc)
+	{
+		pointer dst, src, insert_pos;
+
+		src = _array + (_size - 1); // last element of original array
+		dst = _array + (_size - 1 + n); // last element of extended array
+		if (position == end())
+		{
+			insert_pos = _array + _size;
+			_size += n;		// update size
+			return (insert_pos);
+		}
+		insert_pos = &(*position);
+		while (src >= insert_pos)
+		{
+			_allocator.construct(dst, *src);
+			_allocator.destroy(src);
+			--dst;
+			--src;
+		}
+		_size += n;		// update size
+		return (insert_pos);
+	}
+	// new allocation needed
+	pointer new_array, insert_pos;
+	size_type i, new_capacity;
+	iterator it, ite;
+
+	// allocate new array
+	new_capacity = _capacity * 2;
+	if (new_capacity < _size + n)
+		new_capacity = _size + n;
+	new_array = _allocator.allocate(new_capacity);
+
+	// copy elements up to insertion position
+	it = begin();
+	i = 0;
+	while (it != position)
+	{
+		_allocator.construct(new_array + i, *it);
+		++i;
+		_allocator.destroy(&(*it));
+		++it;
+	}
+	insert_pos = new_array + i; // save insert position address
+
+	// make room
+	i += n;
+	
+	//copy elements up to end
+	ite = end();
+	while (it != ite)
+	{
+		_allocator.construct(new_array + i, *it);
+		++i;
+		_allocator.destroy(&(*it));
+		++it;
+	}
+
+	// deallocate old array
+	if (_array)
+		_allocator.deallocate(_array, _capacity);
+
+	// update private members
+	_capacity = new_capacity;
+	_array = new_array;
+	_size += n;		// update size
+	return (insert_pos);
+} 
 
 #endif
