@@ -68,7 +68,7 @@ public:
 			ptr -= 1;
 			return (temp);
 		}
-		iterator operator+(int n) const // maybe a template for any integer type?
+		iterator operator+(int n) const // maybe a template for any integer type? OR JUST USE difference_type
 		{
 			return (iterator(ptr + n));
 			// TODO: non-member function overload for the inverser order of operands

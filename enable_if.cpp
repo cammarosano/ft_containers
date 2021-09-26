@@ -54,7 +54,7 @@ template <>
 struct is_integral<int> {static bool const value = true;};
 
 
-#include "ft_is_integral.hpp"
+#include "utils.hpp"
 int main()
 {
 	// foo(2, 3);

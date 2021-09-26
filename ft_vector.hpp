@@ -31,6 +31,7 @@ public:
 	typedef value_type const &			const_reference;
 	typedef value_type *				pointer;
 	typedef value_type const *			const_pointer;
+	typedef typename ft::iterator<T>::difference_type difference_type;
 
 private:
 	value_type *		_array;
@@ -221,24 +222,25 @@ public:
 
 	// cppreference: The behavior is undefined if either argument is an iterator into *this.
 	template < typename I >
-	void assign(
-		typename ft::enable_if<!ft::is_integral<I>::value, I>::type first,
-		I last)
+	typename ft::enable_if<!ft::is_integral<I>::value, void>::type	// return type: void
+	assign(I first, I last)
 	{
 		clear();
 		
 		// if iterator is not at least forward_iterator, push one by one
-		if (typeid(typename std::iterator_traits<I>::iterator_category) == typeid(std::input_iterator_tag))
+		if (typeid(typename std::iterator_traits<I>::iterator_category)
+			== typeid(std::input_iterator_tag))
 		{
-			std::cout << "Iterator has type input_iterator\n";
+			std::cout << "Iterator has type input_iterator\n";	// debug message
 			while (first != last)
 				push_back(*first++);
 		}
 		else // should I test for fwd, bidir or rand_acc iterator??
 		{
-			size_type n = ft::distance(first, last); // SHOULD IT BE ptrdiff_t ?? (signed integer!)
-
-			if (n > _capacity)
+			difference_type n = ft::distance(first, last); // check for negative value?
+			if (n <= 0)
+				return ;
+			if (static_cast<size_type>(n) > _capacity)
 			{
 				if (_array)
 					_allocator.deallocate(_array, _capacity);
@@ -320,8 +322,8 @@ public:
 	}
 
 	template <typename I>
-	void insert(iterator position,
-		typename ft::enable_if<!ft::is_integral<I>::value, I>::type first, I last)
+	typename ft::enable_if<!ft::is_integral<I>::value, void>::type	// return type: void
+	insert(iterator position, I first, I last)
 	{
 		if (typeid(typename std::iterator_traits<I>::iterator_category)
 			== typeid(std::input_iterator_tag)) // shifting (coping) elements at every cycle :(
@@ -334,13 +336,14 @@ public:
 		}
 		else 	// assuming it's an iterator of cat at least forward_iterator
 		{
-			ptrdiff_t n;
+			difference_type n;
 			pointer insert_pos;
 
 			n = ft::distance(first, last);
 			if (n <= 0)
 				return ;
-			insert_pos = shift_right(position, static_cast<size_type>(n));
+			// insert_pos = shift_right(position, static_cast<size_type>(n));
+			insert_pos = shift_right(position, n);
 			while (n--)
 				_allocator.construct(insert_pos++, *first++);
 		}
