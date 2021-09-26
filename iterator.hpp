@@ -68,12 +68,12 @@ public:
 			ptr -= 1;
 			return (temp);
 		}
-		iterator operator+(int n) const // maybe a template for any integer type? OR JUST USE difference_type
+		iterator operator+(difference_type n) const 
 		{
 			return (iterator(ptr + n));
 			// TODO: non-member function overload for the inverser order of operands
 		}
-		iterator operator-(int n) const // maybe a template for any integer type?
+		iterator operator-(difference_type n) const 
 		{
 			return (iterator(ptr - n));
 			// TODO: non-member function overload for the inverser order of operands
@@ -106,17 +106,17 @@ public:
 		{
 			return (ptr <= rhs.ptr);
 		}
-		iterator & operator+=(int n) // not sure about the int
+		iterator & operator+=(difference_type n)
 		{
 			ptr = ptr + n;
 			return (*this);
 		}	
-		iterator & operator-=(int n) // not sure about the int
+		iterator & operator-=(difference_type n)
 		{
 			ptr = ptr - n;
 			return (*this);
 		}	
-		value_type & operator[](int i) // or size_t ? 
+		value_type & operator[](difference_type i)
 		{
 			return (ptr[i]);
 		}
