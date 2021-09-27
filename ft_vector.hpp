@@ -39,14 +39,98 @@ private:
 	size_type			_capacity;
 	std::allocator<T>	_allocator;
 
-	void reallocate(size_type new_capacity);
-	pointer shift_right (iterator position, size_type n);
+	void reallocate(size_type new_capacity)
+	{
+		if (!(new_capacity > _capacity))
+			return ;
+
+		// allocate new array
+		T * new_array = _allocator.allocate(new_capacity);
+
+		// copy elements to new array and destroy them
+		for (size_type i = 0; i < _size; i++)
+		{
+			_allocator.construct(&new_array[i], _array[i]);
+			_allocator.destroy(&_array[i]);
+		}
+		// deallocate old array
+		if (_array)
+			_allocator.deallocate(_array, _capacity);
+		// update _capacity and _array
+		_capacity = new_capacity;
+		_array = new_array;
+	}
+
+	// dst points to allocated unitialized memory
+	void move_to_new_block(pointer dst, pointer src, size_type n)
+	{
+		while (n--)
+		{
+			_allocator.construct(dst++, *src);
+			_allocator.destroy(src++);
+		}
+	}
+
+	// capacity must be >= _size + shift
+	void shift_right(pointer src, size_type shift)
+	{
+		pointer dst = src + shift;
+		size_type n = _array + _size - src;  // number of elements to be moved
+		while (n--)
+		{
+			_allocator.construct(dst + n, src[n]);
+			_allocator.destroy(src + n);
+		}
+	}
+
+	// returns pointer to inserion position
+	pointer reallocate4insertion(pointer src, size_type shift)
+	{
+		size_type	new_capacity, n_1st_part;
+		pointer		new_array, insert_pos;
+
+		// allocate new array
+		new_capacity = _capacity * 2;
+		if (new_capacity < _size + shift)
+			new_capacity = _size + shift;
+		new_array = _allocator.allocate(new_capacity);
+
+		// move first part
+		n_1st_part = src - _array;
+		move_to_new_block(new_array, _array, n_1st_part);
+
+		// move second part
+		insert_pos = new_array + n_1st_part;
+		move_to_new_block(insert_pos + shift, _array + n_1st_part,
+							_size - n_1st_part);
+
+		// deallocate old array
+		_allocator.deallocate(_array, _capacity);
+		_array = new_array;
+
+		// update capacity
+		_capacity = new_capacity;
+		return (insert_pos);
+	}
+
+	// Returns pointer to begining of insertion position
+	pointer make_room4insertion(iterator it_position, size_type n)
+	{
+		pointer p_position;
+		
+		p_position = _array + (it_position - begin()); // avoiding to derefence it to end
+		if (_size + n <= _capacity) // shift elements by n (no realloc)
+			shift_right(p_position, n);
+		else
+			p_position = reallocate4insertion(p_position, n);
+		_size += n;
+		return (p_position);
+	}
 
 public:
 	// TODO: default constructor, copy constructor, =op overload
 	// other constructors
 	// explicit keyword for constructors
-
 
 
 	vector(): _array(0), _size(0), _capacity(0)
@@ -307,7 +391,7 @@ public:
 	{
 		pointer insert_position;
 
-		insert_position = shift_right(position, 1);
+		insert_position = make_room4insertion(position, 1);
 		_allocator.construct(insert_position, val);
 		return (insert_position);
 	}
@@ -316,7 +400,7 @@ public:
 	{
 		pointer insert_position;
 		
-		insert_position = shift_right(position, n);
+		insert_position = make_room4insertion(position, n);
 		while (n--)
 			_allocator.construct(insert_position++, val);
 	}
@@ -342,8 +426,8 @@ public:
 			n = ft::distance(first, last);
 			if (n <= 0)
 				return ;
-			// insert_pos = shift_right(position, static_cast<size_type>(n));
-			insert_pos = shift_right(position, n);
+			// insert_pos = make_room4insertion(position, static_cast<size_type>(n));
+			insert_pos = make_room4insertion(position, n);
 			while (n--)
 				_allocator.construct(insert_pos++, *first++);
 		}
@@ -351,30 +435,6 @@ public:
 	
 		
 };
-
-
-template <typename T>
-void ft::vector<T>::reallocate(size_type new_capacity)
-{
-	if (!(new_capacity > _capacity))
-		return ;
-
-	// allocate new array
-	T * new_array = _allocator.allocate(new_capacity);
-
-	// copy elements to new array and destroy them
-	for (size_type i = 0; i < _size; i++)
-	{
-		_allocator.construct(&new_array[i], _array[i]);
-		_allocator.destroy(&_array[i]);
-	}
-	// deallocate old array
-	if (_array)
-		_allocator.deallocate(_array, _capacity);
-	// update _capacity and _array
-	_capacity = new_capacity;
-	_array = new_array;
-}
 
 
 // my implementation of std::distance
@@ -401,79 +461,5 @@ ft::distance(InputIterator first, InputIterator last)
 	return (n);
 }
 
-// Shifts elements from position by n, making room for future insertion
-// Returns pointer to begining of insertion place
-template<typename T>
-T * ft::vector<T>::shift_right(iterator position, size_type n)
-{
-	if (_size + n <= _capacity) // shift elements by n (no realloc)
-	{
-		pointer dst, src, insert_pos;
-
-		src = _array + (_size - 1); // last element of original array
-		dst = _array + (_size - 1 + n); // last element of extended array
-		if (position == end())
-		{
-			insert_pos = _array + _size;
-			_size += n;		// update size
-			return (insert_pos);
-		}
-		insert_pos = &(*position);
-		while (src >= insert_pos)
-		{
-			_allocator.construct(dst, *src);
-			_allocator.destroy(src);
-			--dst;
-			--src;
-		}
-		_size += n;		// update size
-		return (insert_pos);
-	}
-	// new allocation needed
-	pointer new_array, insert_pos;
-	size_type i, new_capacity;
-	iterator it, ite;
-
-	// allocate new array
-	new_capacity = _capacity * 2;
-	if (new_capacity < _size + n)
-		new_capacity = _size + n;
-	new_array = _allocator.allocate(new_capacity);
-
-	// copy elements up to insertion position
-	it = begin();
-	i = 0;
-	while (it != position)
-	{
-		_allocator.construct(new_array + i, *it);
-		++i;
-		_allocator.destroy(&(*it));
-		++it;
-	}
-	insert_pos = new_array + i; // save insert position address
-
-	// make room
-	i += n;
-	
-	//copy elements up to end
-	ite = end();
-	while (it != ite)
-	{
-		_allocator.construct(new_array + i, *it);
-		++i;
-		_allocator.destroy(&(*it));
-		++it;
-	}
-
-	// deallocate old array
-	if (_array)
-		_allocator.deallocate(_array, _capacity);
-
-	// update private members
-	_capacity = new_capacity;
-	_array = new_array;
-	_size += n;		// update size
-	return (insert_pos);
-} 
 
 #endif
