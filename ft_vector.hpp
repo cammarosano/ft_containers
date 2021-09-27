@@ -17,7 +17,6 @@ namespace ft
 	typename std::iterator_traits<InputIterator>::difference_type
 	distance(InputIterator first, InputIterator last);
 
-
 }
 
 template <typename T>
@@ -133,15 +132,16 @@ public:
 	// explicit keyword for constructors
 
 
-	vector(): _array(0), _size(0), _capacity(0)
+	vector(): _array(NULL), _size(0), _capacity(0)
 	{
-		// _array is initialized to a NULL pointer
 	} 
 
 	vector(size_type n, value_type const & val = value_type()):
-	_array(0), _size(0), _capacity(0)
+	_size(n), _capacity(n)
 	{
-		assign(n, val);
+		_array = _allocator.allocate(_capacity);
+		for (size_t i = 0; i < _size; i++)
+			_allocator.construct(_array + i, val);
 	}
 
 	template<typename I>
@@ -152,10 +152,13 @@ public:
 	}
 
 	vector(vector const & x):
-	_array(0), _size(0), _capacity(0)
+	_size(x.size()), _capacity(x.size())
 	{
 		// assign(x.begin(), x.end()); // I need a const iterator for that
-		(void)x;
+
+		_array = _allocator.allocate(_capacity);
+		for (size_t i = 0; i < _size; i++)
+			_allocator.construct(_array + i, x[i]);
 	}
 
 	~vector()
@@ -315,7 +318,7 @@ public:
 		if (typeid(typename std::iterator_traits<I>::iterator_category)
 			== typeid(std::input_iterator_tag))
 		{
-			std::cout << "Iterator has type input_iterator\n";	// debug message
+			// std::cout << "Iterator has type input_iterator\n";	// debug message
 			while (first != last)
 				push_back(*first++);
 		}
@@ -445,20 +448,31 @@ ft::distance(InputIterator first, InputIterator last)
 {
 	if (typeid(typename std::iterator_traits<InputIterator>::iterator_category)
 		== typeid(std::random_access_iterator_tag))
-	{
-		std::cout << "Iterator of type random-access\n";
+		// std::cout << "Iterator of type random-access\n";
 		return (last - first);
-	}
 	
 	typename std::iterator_traits<InputIterator>::difference_type n;
 
 	n = 0;
-	while (first != last)
-	{
+	while (first++ != last)
 		++n;
-		++first;
-	}
 	return (n);
+}
+
+
+
+
+
+
+
+// overload for debug
+template<typename T>
+std::ostream & operator<<(std::ostream & out, ft::vector<T> const & v)
+{
+	for (size_t i = 0; i < v.size(); i++)
+		out << v[i] << " ";
+	out << std::endl;
+	return (out);
 }
 
 

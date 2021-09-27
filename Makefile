@@ -8,8 +8,8 @@ NAME = a.out
 all:	$(NAME)
 
 unit_test:	$(HEADER)
-			$(CC) $(CFLAGS) unit_test.cpp -lcriterion -o $@
-			./$@
+			@ $(CC) $(CFLAGS) unit_test.cpp -lcriterion -o $@
+			@ ./$@
 
 $(NAME):	$(OBJ)
 			$(CC) $(CFLAGS) $^ -o $@
