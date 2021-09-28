@@ -263,3 +263,23 @@ Test(allocator, get_allocator, .init=setup)
 	// std::cout << std::endl;
 	v.get_allocator().deallocate(p, 5);
 }
+
+Test(iterator, reverse_iterator, .init= setup)
+{
+	ft::vector<int>::reverse_iterator rit, rite;
+
+	rit = v.rbegin();
+	rite = v.rend();
+
+	cr_expect(*rit == v.back());
+	cr_expect(*(--rite)++ == v.front());
+	size_t i = 0;
+	while (rit != rite)
+	{
+		std::cout << *rit++ << " ";
+		++i;
+	}
+	cr_expect(i == v.size());
+	std::cout << std::endl;
+	
+}

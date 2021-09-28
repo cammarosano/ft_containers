@@ -4,6 +4,7 @@
 # include <memory>
 # include <iostream> // debug messages
 # include "iterator.hpp"
+# include "reverse_iterator.hpp"
 # include <stdexcept>
 # include <iterator> // iterator_traits
 # include <typeinfo> // type_info
@@ -28,6 +29,7 @@ public:
 	typedef T									value_type;
 	typedef std::allocator<T>					allocator_type;
 	typedef typename ft::iterator<T>			iterator;
+	typedef ft::reverse_iterator<iterator>		reverse_iterator;
 	typedef size_t								size_type;
 	typedef value_type &						reference;
 	typedef value_type const &					const_reference;
@@ -234,6 +236,17 @@ public:
 	{
 		return (iterator(_array + _size));
 	}
+
+	reverse_iterator rbegin(void)
+	{
+		return (reverse_iterator(end()));
+	}
+
+	reverse_iterator rend(void)
+	{
+		return (reverse_iterator(begin()));
+	}
+
 	
 	// TODO rbegin, rend 
 

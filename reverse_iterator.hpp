@@ -18,7 +18,7 @@ public:
 	typedef typename std::iterator_traits<I>::iterator_category		iterator_category;
 	typedef typename std::iterator_traits<I>::value_type			value_type;
 	typedef typename std::iterator_traits<I>::difference_type		difference_type;
-	typedef typename std::iterator_traits<I>::pointer_type			pointer_type;
+	typedef typename std::iterator_traits<I>::pointer				pointer;
 	typedef typename std::iterator_traits<I>::reference				reference;
 
 private:
@@ -27,8 +27,13 @@ private:
 public:
 	reverse_iterator(void)  {} // not sure what to do with _base
 	reverse_iterator(iterator_type it): _base(it) {}
-	reverse_iterator(reverse_iterator const & src) // copy constructor
+	reverse_iterator(reverse_iterator const & src):	 // copy constructor (DIFFERENT FROM THE REFERENCE!!)
+	_base(src._base) {}
+
+	reverse_iterator & operator=(reverse_iterator const & rhs)
 	{
+		_base = rhs._base;
+		return (*this);
 	}
 
 	iterator_type base(void) const
@@ -53,12 +58,36 @@ public:
 	{
 		reverse_iterator temp(*this); // todo: copy constructor
 		--_base;
+		return (temp);
+	}
+
+	reverse_iterator & operator--() // pre-decrement
+	{
+		++_base;
 		return (*this);
 	}
 
-
-
+	reverse_iterator operator--(int) // post-decrement
+	{
+		reverse_iterator temp(*this);
+		++_base;
+		return (temp);
+	}
 
 };
+
+template <typename I>
+bool operator==(ft::reverse_iterator<I> const & lhs,
+				ft::reverse_iterator<I> const & rhs)
+{
+	return (lhs.base() == rhs.base());
+}
+
+template <typename I>
+bool operator!=(ft::reverse_iterator<I> const & lhs,
+				ft::reverse_iterator<I> const & rhs)
+{
+	return (lhs.base() != rhs.base());
+}
 
 #endif
