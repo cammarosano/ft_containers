@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+#include <csignal>
 
 ft::vector<int> v;
 std::vector<int> stl_vector;
@@ -291,7 +292,7 @@ Test(iterator, reverse_iterator, .init= setup)
 		rit = rit + 2;
 	}
 	// std::cout << std::endl;
-	rit = v.rbegin();
+	rit = v.end();
 	while (rit < rite)
 	{
 		// std::cout << *rit << " ";
@@ -309,17 +310,63 @@ Test(iterator, overloads, .init=setup)
 	cr_expect((it + 3) - it == 3);
 }
 
-Test(iterator, reverse_it_overloads)
+Test(iterator, reverse_it_overloads, .init=setup)
 {
 	ft::vector<int>::reverse_iterator it, it2;
 
-	it = v.begin();
-	it2 = v.begin();
+	it = v.rbegin();
+	it2 = it;
 
 	++it;
 	++it;
-
 	cr_expect(it - it2 == 2);
+
+	it = v.rend();
+	it -= 4;
+	cr_assert(*it == v[3]);
+	it += 2;
+	cr_assert(*it == v[1]);
 }
 
-//TODO: test += and -= operators for reverse_iterator
+// Test(iterator, stl_vector, .signal = SIGSEGV )
+// {
+// 	std::vector<int> sv;
+
+// 	std::vector<int>::reverse_iterator rit = sv.rend();
+// 	--rit;
+	// std::cout << *rit << std::endl;  // crashes (-fsanitize=address must be disabled)
+// }
+
+Test(reverse_iterator, operator_brackets, .init=setup)
+{
+	ft::vector<int>::reverse_iterator rit = v.rbegin();
+
+	// std::cout << v;
+	// std::cout << rit[0] << std::endl;
+	// std::cout << rit[1] << std::endl;
+	cr_expect(rit[0] == v[v.size() - 1]);
+	cr_expect(rit[1] == v[v.size() - 2]);
+
+}
+
+struct hello
+{
+	int a;
+	int b;
+};
+
+Test(iterator, arrow_operator, .init=setup)
+{
+	ft::vector<hello> vec;
+	vec.push_back(hello());
+	vec.push_back(hello());
+	ft::vector<hello>::iterator it = vec.begin();
+	it->a = 5;
+	cr_expect(it->a == 5);
+
+	ft::vector<hello>::reverse_iterator rit = vec.rbegin();
+	rit++;
+	rit->b = 42;
+	cr_expect(it->b == 42);
+
+}

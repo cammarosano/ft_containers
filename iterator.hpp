@@ -118,6 +118,10 @@ public:
 		{
 			return (ptr[i]);
 		}
+		pointer	operator->() const
+		{
+			return (ptr);
+		}
 };
 
 template <typename T>

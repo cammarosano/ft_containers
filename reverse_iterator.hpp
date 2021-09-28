@@ -95,6 +95,17 @@ public:
 		_base += n;
 		return (*this);
 	}
+
+	reference operator[](difference_type n) const
+	{
+		return (base()[-1 - n]);  // base() returns a copy of _base
+	}
+
+	pointer operator->() const	// the compiler expects a pointer when this operator is used
+	{
+		return (&(operator*()));  // operator * returns a reference to the value, & gets its address
+	}
+
 };
 
 /* relational operators overloads */

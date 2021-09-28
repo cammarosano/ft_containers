@@ -1,16 +1,23 @@
 #include <vector>
 #include <iostream>
 
+struct experiment
+{
+	int a;
+	int b;
+};
+
+
 int main()
 {
-	std::vector<int> v1;
-	v1.push_back(0);
-	v1.push_back(1);
-	v1.push_back(2);
-	v1.push_back(3);
-	v1.push_back(4);
-	std::cout << v1.capacity() << std::endl;
-	std::vector<int> v2(v1);
-	std::cout << v2.capacity() << std::endl;
+	std::vector<experiment> v1;
+	v1.push_back(experiment());
+	v1.push_back(experiment());
+
+	std::vector<experiment>::iterator it = v1.begin();
+	(*it).a = 5;
+	it->b = 6;
+	std::cout << it->a << std::endl;
+	std::cout << (*it).b << std::endl;
 
 }
