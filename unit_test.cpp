@@ -215,3 +215,51 @@ Test(modify, insert, .init=setup)
 	v2.insert(v2.end(), v.begin(), v.begin() + 5);
 	cr_expect(v2.size() == 5);
 }
+
+Test(modify, swap_member, .init=setup)
+{
+	ft::vector<int> v2(5, 42);
+
+	size_t v_old_size = v.size();
+	v.swap(v2);
+	cr_expect(v.size() == 5);
+	cr_expect(v.front() == 42);
+	cr_expect(v.back() == 42);
+	cr_expect(v2.size() == v_old_size);
+
+	// std::cout << "v: " << v;
+	// std::cout << "v2: " << v2;
+}
+
+Test(modify, swap_non_member, .init=setup)
+{
+	ft::vector<int> v2(5, 42);
+
+	size_t v_old_size = v.size();
+	ft::swap(v, v2);
+	cr_expect(v.size() == 5);
+	cr_expect(v.front() == 42);
+	cr_expect(v.back() == 42);
+	cr_expect(v2.size() == v_old_size);
+
+	// std::cout << "v: " << v;
+	// std::cout << "v2: " << v2;
+
+}
+
+Test(allocator, get_allocator, .init=setup)
+{
+	int *p = v.get_allocator().allocate(5);
+
+	for (int i = 0; i < 5; i++)
+	{
+		v.get_allocator().construct(p + i, 100 + i);
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		cr_expect(p[i] == 100 + i);
+		// std::cout << p[i] << " ";
+	}
+	// std::cout << std::endl;
+	v.get_allocator().deallocate(p, 5);
+}

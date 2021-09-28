@@ -17,26 +17,29 @@ namespace ft
 	typename std::iterator_traits<InputIterator>::difference_type
 	distance(InputIterator first, InputIterator last);
 
+	template <typename T>
+	void swap(ft::vector<T> & x, ft::vector<T> & y);
 }
 
 template <typename T>
 class ft::vector
 {
 public:
-	typedef T							value_type;
-	typedef typename ft::iterator<T>	iterator;
-	typedef size_t						size_type;
-	typedef value_type &				reference;
-	typedef value_type const &			const_reference;
-	typedef value_type *				pointer;
-	typedef value_type const *			const_pointer;
+	typedef T									value_type;
+	typedef std::allocator<T>					allocator_type;
+	typedef typename ft::iterator<T>			iterator;
+	typedef size_t								size_type;
+	typedef value_type &						reference;
+	typedef value_type const &					const_reference;
+	typedef value_type *						pointer;
+	typedef value_type const *					const_pointer;
 	typedef typename ft::iterator<T>::difference_type difference_type;
 
 private:
-	value_type *		_array;
+	pointer				_array;
 	size_type			_size;
 	size_type			_capacity;
-	std::allocator<T>	_allocator;
+	allocator_type		_allocator;
 
 	void reallocate(size_type new_capacity)
 	{
@@ -435,10 +438,35 @@ public:
 				_allocator.construct(insert_pos++, *first++);
 		}
 	}
-	
+
+	void swap (vector& x)
+	{
+		pointer		tmp_array = _array;
+		size_type	tmp_size = _size;
+		size_type	tmp_capacity = _capacity;
+
+		_array = x._array;
+		x._array = tmp_array;
+
+		_size = x._size;
+		x._size = tmp_size;
+
+		_capacity = x._capacity;
+		x._capacity = tmp_capacity;
+	}
 		
+	/* allocator */
+	allocator_type get_allocator(void) const
+	{
+		return (_allocator);
+	}
 };
 
+template<typename T>
+void ft::swap(ft::vector<T> & x, ft::vector<T> & y)
+{
+	x.swap(y);
+}
 
 // my implementation of std::distance
 
@@ -465,7 +493,7 @@ ft::distance(InputIterator first, InputIterator last)
 
 
 
-// overload for debug
+// overload for debug and test
 template<typename T>
 std::ostream & operator<<(std::ostream & out, ft::vector<T> const & v)
 {
