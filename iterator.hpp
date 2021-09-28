@@ -23,7 +23,7 @@ private:
 public:
 		iterator()
 		{
-			std::cout << "iterator default constructor\n";
+			// std::cout << "iterator default constructor\n";
 		}
 		iterator(value_type *address): ptr(address)
 		{
@@ -71,14 +71,12 @@ public:
 		iterator operator+(difference_type n) const 
 		{
 			return (iterator(ptr + n));
-			// TODO: non-member function overload for the inverser order of operands
 		}
 		iterator operator-(difference_type n) const 
 		{
 			return (iterator(ptr - n));
-			// TODO: non-member function overload for the inverser order of operands
 		}
-		difference_type operator-(iterator const & rhs)
+		difference_type operator-(iterator const & rhs) const
 		{
 			return (ptr - rhs.ptr);
 		}
@@ -121,5 +119,12 @@ public:
 			return (ptr[i]);
 		}
 };
+
+template <typename T>
+ft::iterator<T> operator+(typename ft::iterator<T>::difference_type n,
+							ft::iterator<T> it)
+{
+	return (it + n);
+}
 
 #endif

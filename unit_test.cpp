@@ -276,10 +276,50 @@ Test(iterator, reverse_iterator, .init= setup)
 	size_t i = 0;
 	while (rit != rite)
 	{
-		std::cout << *rit++ << " ";
+		// std::cout << *rit << " ";
+		++rit;
 		++i;
 	}
+	// std::cout << std::endl;
 	cr_expect(i == v.size());
-	std::cout << std::endl;
 	
+	rit = v.rbegin();
+	cr_expect(rit + v.size() == v.rend());
+	while (rit < rite)
+	{
+		// std::cout << *rit << " ";
+		rit = rit + 2;
+	}
+	// std::cout << std::endl;
+	rit = v.rbegin();
+	while (rit < rite)
+	{
+		// std::cout << *rit << " ";
+		rit = 3 + rit;
+	}
+	// std::cout << std::endl;
 }
+
+Test(iterator, overloads, .init=setup)
+{
+	ft::vector<int>::iterator it;
+	it = v.begin();
+
+	cr_expect(*(3 + it) == v[3]);
+	cr_expect((it + 3) - it == 3);
+}
+
+Test(iterator, reverse_it_overloads)
+{
+	ft::vector<int>::reverse_iterator it, it2;
+
+	it = v.begin();
+	it2 = v.begin();
+
+	++it;
+	++it;
+
+	cr_expect(it - it2 == 2);
+}
+
+//TODO: test += and -= operators for reverse_iterator
