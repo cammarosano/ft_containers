@@ -183,7 +183,7 @@ Test(modify, insert, .init=setup)
 {
 	ft::vector<int>::iterator it = v.insert(v.begin() + 1, 42);
 	cr_expect(*it == 42);
-	std::cout << v;
+	// std::cout << v;
 
 	size_t old_size = v.size();
 	int n = 30;
@@ -192,13 +192,13 @@ Test(modify, insert, .init=setup)
 	it = v.begin() + 3;
 	while (n--)
 		cr_expect(*it++ == 19);
-	std::cout << v;
+	// std::cout << v;
 
 	n = 10;
 	old_size = v.size();
 	v.insert(v.end(), stl_vector.end() - n, stl_vector.end());
 	cr_expect(v.size() == old_size + n);
-	std::cout << v;
+	// std::cout << v;
 	while (n--)
 	{
 		cr_expect(v.back() == stl_vector.back());
