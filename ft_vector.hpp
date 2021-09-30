@@ -494,11 +494,55 @@ public:
 	}
 };
 
+/* Non-member functions overloads */
+
 template<typename T>
 void ft::swap(ft::vector<T> & x, ft::vector<T> & y)
 {
 	x.swap(y);
 }
+
+/* Relational operators */
+
+template <typename T>
+bool operator==(ft::vector<T> const & lhs, ft::vector<T> const & rhs)
+{
+	if (lhs.size() != rhs.size())
+		return (false);
+	return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
+}
+
+template <typename T>
+bool operator!=(ft::vector<T> const & lhs, ft::vector<T> const & rhs)
+{
+	return (!(lhs == rhs));
+}
+
+template <typename T>
+bool operator<(ft::vector<T> const & lhs, ft::vector<T> const & rhs)
+{
+	return (ft::lexicographical_compare(lhs.begin(), lhs.end(),
+										rhs.begin(), rhs.end()));
+}
+
+template <typename T>
+bool operator>(ft::vector<T> const & lhs, ft::vector<T> const & rhs)
+{
+	return (rhs < lhs);
+}
+
+template <typename T>
+bool operator<=(ft::vector<T> const & lhs, ft::vector<T> const & rhs)
+{
+	return !(rhs < lhs);
+}
+
+template <typename T>
+bool operator>=(ft::vector<T> const & lhs, ft::vector<T> const & rhs)
+{
+	return !(lhs < rhs);
+}
+
 
 // my implementation of std::distance
 

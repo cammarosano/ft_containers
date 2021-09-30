@@ -424,3 +424,45 @@ Test(iterator, const_it_construction, .init=setup)
 	// ft::vector<int>::reverse_iterator rit(crit); // does not compile (GOOD!)
 
 }
+
+Test(relational_operators, equal_less)
+{
+	ft::vector<int> v1(5, 42);
+	ft::vector<int> v2(6, 42);
+
+	cr_expect(!(v1 == v2));
+	cr_expect(v1 < v2);
+
+	v2.pop_back();
+	cr_expect(v1 == v2);
+	cr_expect(!(v1 < v2));
+
+	ft::vector<std::string> vs1;
+	ft::vector<std::string> vs2;
+
+	vs1.push_back("hello");
+	vs1.push_back("there!");
+
+	vs2.push_back("hello");
+	vs2.push_back("there");
+
+	cr_expect(!(vs1 == vs2));
+	cr_expect(vs2 < vs1);
+
+	vs2.back().append(1, '!');
+	cr_expect(vs1 == vs2);
+	cr_expect(!(vs1 < vs2));
+}
+
+Test(relational_operators, others)
+{
+	ft::vector<int> v1(2, 200);
+	ft::vector<int> v2(3, 100);
+
+	cr_expect(v1 != v2);
+	cr_expect(!(v1 == v2));
+	cr_expect(v1 > v2);
+	cr_expect(v1 >= v2);
+	cr_expect(v2 < v1);
+	cr_expect(v2 <= v1);
+}
