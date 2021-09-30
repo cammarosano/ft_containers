@@ -35,12 +35,18 @@ public:
 		~iterator()
 		{
 		}
+		// enabling implict conversion from normal it to const_iterator (cast operator)
+		operator iterator<const T>() const
+		{
+			return (iterator<const T>(ptr));
+		}
+
 		iterator & operator=(iterator const & rhs)
 		{
 			ptr = rhs.ptr;
 			return (*this);
 		}
-		value_type & operator*() // const?
+		value_type & operator*() const
 		{
 			return (*ptr);
 		}

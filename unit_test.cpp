@@ -59,6 +59,10 @@ Test(constructor, copy_constructor, .init=setup)
 	cr_expect(v2.size() == v.size());
 	cr_expect(v2.front() == v.front());
 	cr_expect(v2.back() == v.back());
+
+	ft::vector<int> v3;	// empty
+	ft::vector<int> v4(v3);
+	cr_expect(v4.size() == 0);
 }
 
 Test(constructor, range_constructor, .init=setup)
@@ -368,5 +372,50 @@ Test(iterator, arrow_operator, .init=setup)
 	rit++;
 	rit->b = 42;
 	cr_expect(it->b == 42);
+
+}
+
+Test(iterator, const_iterator)
+{
+	ft::vector<int> const v(5, 42);
+
+	ft::vector<int>::const_iterator cit = v.begin();
+
+	while (cit != v.end())
+	{
+		// std::cout << *cit << " ";
+		cr_expect(*cit == 42);
+		++cit;
+	}
+	// std::cout << std::endl;
+
+	cit = v.begin();
+	// *cit = 43; // does not compile ( = GOOD!)
+}
+
+Test(iterator, const_reverse_iterator, .init=setup)
+{
+	ft::vector<int> const vc(v);
+
+	ft::vector<int>::const_reverse_iterator crit = vc.rbegin();
+	cr_expect(*crit == vc.back());
+	while (crit != vc.rend())
+	{
+		// std::cout << *crit << " ";
+		crit++;
+	}
+	// std::cout << std::endl;
+	cr_expect(*(--crit) == vc.front());
+	crit = vc.rbegin();
+	// *crit = 42; // does not compilte ( = GOOD!)
+}
+
+Test(iterator, const_it_construction, .init=setup)
+{
+	ft::vector<int>::const_iterator cit(v.begin());
+
+	cr_expect(*cit == v[0]);
+
+	// ft::vector<int>::iterator normal_it(cit); // not possible: GOOD!
 
 }

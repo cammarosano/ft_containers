@@ -26,16 +26,18 @@ template <typename T>
 class ft::vector
 {
 public:
-	typedef T									value_type;
-	typedef std::allocator<T>					allocator_type;
-	typedef typename ft::iterator<T>			iterator;
-	typedef ft::reverse_iterator<iterator>		reverse_iterator;
-	typedef size_t								size_type;
-	typedef value_type &						reference;
-	typedef value_type const &					const_reference;
-	typedef value_type *						pointer;
-	typedef value_type const *					const_pointer;
-	typedef typename ft::iterator<T>::difference_type difference_type;
+	typedef T										value_type;
+	typedef std::allocator<T>						allocator_type;
+	typedef ft::iterator<T>							iterator;
+	typedef ft::iterator<T const>					const_iterator;
+	typedef ft::reverse_iterator<iterator>			reverse_iterator;
+	typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
+	typedef size_t									size_type;
+	typedef value_type &							reference;
+	typedef value_type const &						const_reference;
+	typedef value_type *							pointer;
+	typedef value_type const *						const_pointer;
+	typedef typename iterator::difference_type		difference_type;
 
 private:
 	pointer				_array;
@@ -157,13 +159,14 @@ public:
 	}
 
 	vector(vector const & x):
-	_size(x.size()), _capacity(x.size())
+	_array(NULL), _size(0), _capacity(0) 	// const_iterator version
+	// _size(x.size()), _capacity(x.size()) 
 	{
-		// assign(x.begin(), x.end()); // I need a const iterator for that
+		assign(x.begin(), x.end()); // I need a const iterator for that
 
-		_array = _allocator.allocate(_capacity);
-		for (size_t i = 0; i < _size; i++)
-			_allocator.construct(_array + i, x[i]);
+		// _array = _allocator.allocate(_capacity);
+		// for (size_t i = 0; i < _size; i++)
+		// 	_allocator.construct(_array + i, x[i]);
 	}
 
 	~vector()
@@ -232,9 +235,19 @@ public:
 		return (iterator(_array));
 	}
 
+	const_iterator begin(void) const
+	{
+		return (const_iterator(_array));
+	}
+
 	iterator end(void)
 	{
 		return (iterator(_array + _size));
+	}
+
+	const_iterator end(void) const
+	{
+		return (const_iterator(_array + _size));
 	}
 
 	reverse_iterator rbegin(void)
@@ -242,14 +255,20 @@ public:
 		return (reverse_iterator(end()));
 	}
 
+	const_reverse_iterator rbegin(void) const
+	{
+		return (const_reverse_iterator(end()));
+	}
+
 	reverse_iterator rend(void)
 	{
 		return (reverse_iterator(begin()));
 	}
 
-	
-	// TODO rbegin, rend 
-
+	const_reverse_iterator rend(void) const
+	{
+		return (const_reverse_iterator(begin()));
+	}
 
 	/* Element access */
 
