@@ -7,9 +7,9 @@ NAME = a.out
 
 all:	$(NAME)
 
-			@ # @ $(CC) $(CFLAGS) unit_test.cpp -lcriterion -o $@ # linux	
 unit_test:	$(HEADER)
-			@ $(CC) $(CFLAGS) unit_test.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
+			@ $(CC) $(CFLAGS) unit_test.cpp -lcriterion -o $@ # linux	
+			@# @ $(CC) $(CFLAGS) unit_test.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
 
 $(NAME):	$(OBJ)

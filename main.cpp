@@ -247,11 +247,25 @@ int main()
 		std::cout << "size: " << ve.size() << "| capacity: " << ve.capacity() << std::endl;
 	}
 	// need to implement const iterator first
-	// {
-	// 	ft::vector<int> ve(v);
-	// 	for (size_t i = 0; i < ve.size(); i++)
-	// 		std::cout << ve[i] << " ";
-	// 	std::cout << std::endl;
-	// 	std::cout << "size: " << ve.size() << "| capacity: " << ve.capacity() << std::endl;
-	// }
+	{
+		ft::vector<int> ve(v);
+		for (size_t i = 0; i < ve.size(); i++)
+			std::cout << ve[i] << " ";
+		std::cout << std::endl;
+		std::cout << "size: " << ve.size() << "| capacity: " << ve.capacity() << std::endl;
+	}
+
+	{
+		ft::vector<int>::iterator it = v.begin();
+		std::cout << *it << std::endl;
+		ft::vector<int>::const_iterator cit = it;
+		std::cout << *cit << std::endl;
+
+		v.pop_back();
+		v.pop_back();
+
+		ft::vector<int>::reverse_iterator rit = v.rbegin();
+		ft::vector<int>::const_reverse_iterator crit = rit;
+		std::cout << *crit << std::endl;
+	}
 }

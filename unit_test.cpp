@@ -414,8 +414,13 @@ Test(iterator, const_it_construction, .init=setup)
 {
 	ft::vector<int>::const_iterator cit(v.begin());
 
-	cr_expect(*cit == v[0]);
+	cr_expect(*cit == v.front());
 
 	// ft::vector<int>::iterator normal_it(cit); // not possible: GOOD!
+
+	ft::vector<int>::const_reverse_iterator crit(v.rbegin());
+	cr_expect(*crit == v.back());
+
+	// ft::vector<int>::reverse_iterator rit(crit); // does not compile (GOOD!)
 
 }

@@ -27,12 +27,19 @@ private:
 public:
 	reverse_iterator(void)  {} // not sure what to do with _base
 	reverse_iterator(iterator_type it): _base(it) {}
-	reverse_iterator(reverse_iterator const & src):	 // copy constructor (DIFFERENT FROM THE REFERENCE!!)
-	_base(src._base) {}
 
-	reverse_iterator & operator=(reverse_iterator const & rhs)
+	// the copy constructor and operator= overload are templated to
+	// allow a parameter of differente type (reverse_iterator, in case of
+	// constructing a const_reverse_iterator). The suitable conversion is allowed
+	// (or prohited) by the assignment in the list initialization or the = assigment
+	template <typename Iter>
+	reverse_iterator(reverse_iterator<Iter> const & src):
+	_base(src.base()) {}
+
+	template <typename Iter>
+	reverse_iterator & operator=(reverse_iterator<Iter> const & rhs)
 	{
-		_base = rhs._base;
+		_base = rhs.base(); // will work if const_iterator = iterator, and not otherwise
 		return (*this);
 	}
 
