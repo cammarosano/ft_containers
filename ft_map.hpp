@@ -78,10 +78,23 @@ private:
 		}
 		if (val.first < (*root)->data.first) // change < for a comp function
 			return (insert_data(&(*root)->left, val));
-		if (root->data.first < val.first)
+		if ((*root)->data.first < val.first)
 			return (insert_data(&(*root)->right, val));
 		return (false);
 	}
+
+	void clear_data(Btree **root)
+	{
+		if (*root)
+		{
+			clear_data(&(*root)->left);
+			clear_data(&(*root)->right);
+			std::cout << "deleting " << (*root)->data.first << std::endl;
+			delete (*root);
+			*root = NULL;
+		}
+	}
+
 
 public:
 	map(): _size(0), _root(NULL)
@@ -101,6 +114,13 @@ public:
 	{
 		return (insert_data(&_root, val));
 	}
+
+	void clear()
+	{
+		clear_data(&_root);
+		_size = 0;
+	}
+
 };
 
 
