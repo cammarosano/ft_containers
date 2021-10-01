@@ -8,9 +8,14 @@ NAME = a.out
 all:	$(NAME)
 
 unit_test:	$(HEADER)
-			@ $(CC) $(CFLAGS) unit_test.cpp -lcriterion -o $@ # linux	
-			@# @ $(CC) $(CFLAGS) unit_test.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
+			@	# @ $(CC) $(CFLAGS) unit_test.cpp -lcriterion -o $@ # linux	
+			@ $(CC) $(CFLAGS) unit_test.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
+
+map_test:	ft_map.hpp
+			@ $(CC) $(CFLAGS) unit_test_map.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
+			@ ./$@
+
 
 $(NAME):	$(OBJ)
 			$(CC) $(CFLAGS) $^ -o $@
@@ -22,8 +27,8 @@ clean:
 			rm -f $(OBJ)
 
 fclean:		clean
-			rm -f $(NAME) unit_test
+			rm -f $(NAME) unit_test map_test
 
 re:			fclean all
 
-.PHONY:		all clean fclean re unit_test
+.PHONY:		all clean fclean re unit_test map_test
