@@ -31,29 +31,52 @@ Test(pair, constructor)
 Test(insert, insert_pair)
 {
 	ft::map<int, std::string> m;
+	ft::pair<ft::map<int, std::string>::iterator, bool> ret;
 
 	ft::pair<int, std::string> 	pr(42, "forty-two");
-	bool ret = m.insert(pr);
-	cr_expect(ret);
+	ret = m.insert(pr);
+	cr_expect(ret.second);
 
 	ret = m.insert(pr); // same key
-	cr_expect(ret == false);
+	cr_expect(ret.second == false);
 	cr_expect(m.size() == 1);
 
 	ret = m.insert(ft::pair<int, std::string>(19, "nineteen"));
-	cr_expect(ret);
+	cr_expect(ret.second);
 	cr_expect(m.size() == 2);
 
 	ret = m.insert(ft::pair<int, std::string>(21, "blackjack"));
-	cr_expect(ret);
+	cr_expect(ret.second);
 	cr_expect(m.size() == 3);
 
 	ret = m.insert(ft::map<int, std::string>::value_type(66, "the beast!"));
-	cr_expect(ret);
+	cr_expect(ret.second);
 	cr_expect(m.size() == 4);
+
+	// ft::map<int, std::string>::iterator it = ret.first;
+	// std::cout << it->first << std::endl;
+	// std::cout << it->second << std::endl;
 
 	m.clear();
 	cr_expect(m.size() == 0);
 
 
+}
+
+Test(operator_brackets, test)
+{
+	ft::map<std::string, int> m;
+
+	m["hello"] = 42;
+	cr_expect(m["hello"] == 42);
+	m["you"] = 19;
+	cr_expect(m["you"] == 19);
+	cr_expect(m["new"] == 0);
+	m["yey"] = m["hello"];
+	cr_expect(m["yey"] == m["hello"]);
+
+	// std::cout << m["hello"] << std::endl;
+	// std::cout << m["you"] << std::endl;
+	// std::cout << m["new"] << std::endl;
+	// std::cout << m["new_again"] << std::endl;
 }

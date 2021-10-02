@@ -7,13 +7,13 @@ namespace ft
 {
 	template <	typename Key,
 				typename T > class map;
-	
+
 	template < typename T1, typename T2 > struct pair
 	{
 		T1 first;
 		T2 second;
 
-		pair(): first(T1()), second(T2()) // is this value-initialization ?
+		pair():  first(T1()), second(T2()) // is this value-initialization ?
 		{
 			// std::cout << "pair default constructor\n";
 		}
@@ -23,17 +23,22 @@ namespace ft
 			// std::cout << "pair initialization constructor\n";
 		}
 
-		pair(pair const & src): first(src.first), second(src.second)
+		// pair(pair const & src): first(src.first), second(src.second)
+		// {
+		// 	// std::cout << "pair copy construtor\n";
+		// }
+
+		template<typename U, typename V> pair(pair<U,V> const & pr):
+		first(pr.first), second(pr.second)
 		{
-			// std::cout << "pair copy construtor\n";
 		}
 
-		pair & operator=(pair const & rhs)
-		{
-			first = rhs.first;
-			second = rhs.second;
-			return (*this);
-		}
+		// pair & operator=(pair const & rhs)
+		// {
+			// first = rhs.first;
+			// second = rhs.second;
+			// return (*this);
+		// }
 
 		// enable convertion from pair<T1, T2> to pair<const T1, T2>
 		operator pair<const T1, T2>() const
@@ -41,7 +46,43 @@ namespace ft
 			return (pair<const T1, T2>(first, second));
 		}
 	};
-	
+
+	template <typename T>
+	class map_iterator
+	{
+	public: // should I just inherit from a base class of iterator?
+
+		typedef std::ptrdiff_t					difference_type;
+		typedef T								value_type;
+		typedef T *								pointer;
+		typedef T &								reference;
+		typedef std::bidirectional_iterator_tag	iterator_category;
+
+	private:
+		value_type *ptr;
+
+	public:
+		map_iterator() {}
+		map_iterator(pointer p): ptr(p) {}
+		map_iterator(map_iterator const & src): ptr(src.ptr) {}
+		map_iterator & operator=(map_iterator const & src)
+		{
+			ptr = src.ptr;
+			return (*this);
+		}
+
+		reference operator*() const
+		{
+			return (*ptr);
+		}
+
+		pointer operator->() const
+		{
+			return (ptr);
+		}
+	};
+
+
 }
 
 template < typename Key, typename T >
@@ -52,6 +93,7 @@ public:
 	typedef	T								mapped_type;
 	typedef pair<const key_type, mapped_type> value_type;
 	typedef std::size_t						size_type;
+	typedef ft::map_iterator<value_type>	iterator;
 
 private:
 	struct Node
@@ -73,21 +115,26 @@ private:
 	size_type	_size;
 	Node *		_root;
 
-	bool insert (Node ** root, value_type const & val)
+	ft::pair<iterator, bool> insert (Node ** root, value_type const & val)
 	{
 		Node * current_node = *root;
+		ft::pair<iterator, bool> ret;
 
 		if (current_node == NULL)
 		{
 			*root = new Node(val); // use std::allocator instead
 			_size += 1;
-			return (true);
+			ret.first = &(*root)->kv_pair;
+			ret.second = true;
+			return (ret);
 		}
 		if (val.first < current_node->kv_pair.first) // change < for a comp function
 			return (insert(&current_node->left, val));
 		if (current_node->kv_pair.first < val.first)
 			return (insert(&current_node->right, val));
-		return (false);
+		ret.first = &current_node->kv_pair;
+		ret.second = false;
+		return (ret);
 	}
 
 	void clear(Node **root)
@@ -96,7 +143,7 @@ private:
 		{
 			clear(&(*root)->left);
 			clear(&(*root)->right);
-			std::cout << "deleting " << (*root)->kv_pair.first << std::endl;
+			// std::cout << "deleting " << (*root)->kv_pair.first << std::endl;
 			delete (*root);	// use std::allocator instead
 			*root = NULL;
 		}
@@ -123,8 +170,7 @@ public:
 		return (!_size);
 	}
 
-	// for now, return just a bool if value inserted
-	bool insert (value_type const & val)
+	ft::pair<iterator, bool> insert (value_type const & val)
 	{
 		return (insert(&_root, val));
 	}
@@ -135,20 +181,15 @@ public:
 		_size = 0;
 	}
 
+	mapped_type & operator[](key_type const & k)
+	{
+		value_type pr(k, mapped_type());
+		pair<iterator, bool> ret(insert(pr));
+		return ((ret.first)->second);
+	}
+	
+
 };
-
-// TODO
-/*
-write an iterator
-	iterator_category = bidirectional
-	for now, just a pointer to a value_type (pair<key_type, value_type>)
-	operator* returns a reference to the pair
-
-change return type of insert to pair<iterator,bool>
-
-write operator[] overload using the insert function
-
-*/
 
 
 #endif
