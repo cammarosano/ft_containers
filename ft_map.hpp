@@ -41,10 +41,10 @@ namespace ft
 		// }
 
 		// enable convertion from pair<T1, T2> to pair<const T1, T2>
-		operator pair<const T1, T2>() const
-		{
-			return (pair<const T1, T2>(first, second));
-		}
+		// operator pair<const T1, T2>() const
+		// {
+		// 	return (pair<const T1, T2>(first, second));
+		// }
 	};
 
 	template <typename T>
