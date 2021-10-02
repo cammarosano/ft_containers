@@ -15,18 +15,17 @@ namespace ft
 
 		pair(): first(T1()), second(T2()) // is this value-initialization ?
 		{
-			std::cout << "pair default constructor\n";
-
+			// std::cout << "pair default constructor\n";
 		}
 
 		pair(T1 const & a, T2 const & b): first(a), second(b)
 		{
-			std::cout << "pair initialization constructor\n";
+			// std::cout << "pair initialization constructor\n";
 		}
 
 		pair(pair const & src): first(src.first), second(src.second)
 		{
-			std::cout << "pair copy construtor\n";
+			// std::cout << "pair copy construtor\n";
 		}
 
 		pair & operator=(pair const & rhs)
@@ -34,6 +33,12 @@ namespace ft
 			first = rhs.first;
 			second = rhs.second;
 			return (*this);
+		}
+
+		// enable convertion from pair<T1, T2> to pair<const T1, T2>
+		operator pair<const T1, T2>() const
+		{
+			return (pair<const T1, T2>(first, second));
 		}
 	};
 	
@@ -49,59 +54,63 @@ public:
 	typedef std::size_t						size_type;
 
 private:
-	struct Btree
+	struct Node
 	{
-		Btree *		left;
-		Btree *		right;
-		value_type	data;
+		Node *		left;
+		Node *		right;
+		value_type	kv_pair;
 
-		Btree(value_type const & item): left(NULL), right(NULL), data(item)
+		Node(value_type const & item):
+		left(NULL), right(NULL), kv_pair(item)
 		{
 		}
-		~Btree()
+		~Node()
 		{
-			// delete child subtrees ?
 		}
 
 	};
 	
 	size_type	_size;
-	Btree	 *	_root;
+	Node *		_root;
 
-	bool insert_data (Btree ** root, value_type const & val)
+	bool insert (Node ** root, value_type const & val)
 	{
-		if (!*root)
+		Node * current_node = *root;
+
+		if (current_node == NULL)
 		{
-			*root = new Btree(val);
+			*root = new Node(val); // use std::allocator instead
 			_size += 1;
 			return (true);
 		}
-		if (val.first < (*root)->data.first) // change < for a comp function
-			return (insert_data(&(*root)->left, val));
-		if ((*root)->data.first < val.first)
-			return (insert_data(&(*root)->right, val));
+		if (val.first < current_node->kv_pair.first) // change < for a comp function
+			return (insert(&current_node->left, val));
+		if (current_node->kv_pair.first < val.first)
+			return (insert(&current_node->right, val));
 		return (false);
 	}
 
-	void clear_data(Btree **root)
+	void clear(Node **root)
 	{
 		if (*root)
 		{
-			clear_data(&(*root)->left);
-			clear_data(&(*root)->right);
-			std::cout << "deleting " << (*root)->data.first << std::endl;
-			delete (*root);
+			clear(&(*root)->left);
+			clear(&(*root)->right);
+			std::cout << "deleting " << (*root)->kv_pair.first << std::endl;
+			delete (*root);	// use std::allocator instead
 			*root = NULL;
 		}
 	}
 
 
 public:
+	// default constructor
 	map(): _size(0), _root(NULL)
 	{
 	}
 	~map()
 	{
+		clear();
 	}
 
 	size_type size() const
@@ -109,20 +118,37 @@ public:
 		return (_size);
 	}
 
+	bool empty() const
+	{
+		return (!_size);
+	}
+
 	// for now, return just a bool if value inserted
 	bool insert (value_type const & val)
 	{
-		return (insert_data(&_root, val));
+		return (insert(&_root, val));
 	}
 
 	void clear()
 	{
-		clear_data(&_root);
+		clear(&_root);
 		_size = 0;
 	}
 
 };
 
+// TODO
+/*
+write an iterator
+	iterator_category = bidirectional
+	for now, just a pointer to a value_type (pair<key_type, value_type>)
+	operator* returns a reference to the pair
+
+change return type of insert to pair<iterator,bool>
+
+write operator[] overload using the insert function
+
+*/
 
 
 #endif

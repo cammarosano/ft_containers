@@ -32,15 +32,25 @@ Test(insert, insert_pair)
 {
 	ft::map<int, std::string> m;
 
-	ft::pair<int const, std::string> 	pr(42, "forty-two");
+	ft::pair<int, std::string> 	pr(42, "forty-two");
 	bool ret = m.insert(pr);
 	cr_expect(ret);
+
 	ret = m.insert(pr); // same key
 	cr_expect(ret == false);
 	cr_expect(m.size() == 1);
-	ret = m.insert(ft::pair<int const, std::string>(19, "nineteen"));
+
+	ret = m.insert(ft::pair<int, std::string>(19, "nineteen"));
 	cr_expect(ret);
 	cr_expect(m.size() == 2);
+
+	ret = m.insert(ft::pair<int, std::string>(21, "blackjack"));
+	cr_expect(ret);
+	cr_expect(m.size() == 3);
+
+	ret = m.insert(ft::map<int, std::string>::value_type(66, "the beast!"));
+	cr_expect(ret);
+	cr_expect(m.size() == 4);
 
 	m.clear();
 	cr_expect(m.size() == 0);

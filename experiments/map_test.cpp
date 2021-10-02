@@ -33,4 +33,14 @@ int main()
 		++it;
 	}
 
+	std::map<std::string, int>::reverse_iterator rit = map.rend();
+	
+	it = map.end();
+
+	std::cout << &(*it) << std::endl;
+	std::cout << &(*rit) << std::endl;
+
+	std::cout << it->first << std::endl;
+	std::cout << it->second << std::endl;  // uninitialized memory
+
 }
