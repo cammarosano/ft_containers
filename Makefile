@@ -1,6 +1,6 @@
 SRC = main.cpp
 OBJ = $(SRC:.cpp=.o)
-HEADER = ft_vector.hpp iterator.hpp reverse_iterator.hpp
+HEADER = ft_vector.hpp iterator.hpp reverse_iterator.hpp ft_map.hpp
 CC = clang++
 CFLAGS = -Wall -Wextra -Werror -g  -fsanitize=address
 NAME = a.out
@@ -16,6 +16,9 @@ map_test:	ft_map.hpp
 			@ $(CC) $(CFLAGS) unit_test_map.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
 
+my_map_test:	my_map_test.o
+			$(CC) $(CFLAGS) $^ -o $@
+
 
 $(NAME):	$(OBJ)
 			$(CC) $(CFLAGS) $^ -o $@
@@ -24,10 +27,10 @@ $(NAME):	$(OBJ)
 			$(CC) $(CFLAGS) -std=c++98 -c $< -o $@
 
 clean:
-			rm -f $(OBJ)
+			rm -f $(OBJ) my_map_test.o
 
 fclean:		clean
-			rm -f $(NAME) unit_test map_test
+			rm -f $(NAME) unit_test map_test my_map_test
 
 re:			fclean all
 

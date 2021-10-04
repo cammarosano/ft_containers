@@ -33,11 +33,12 @@ namespace ft
 		{
 		}
 
+	// raises deprecated error. It compiles with std=c++98
 		// pair & operator=(pair const & rhs)
 		// {
-			// first = rhs.first;
-			// second = rhs.second;
-			// return (*this);
+		// 	first = rhs.first;
+		// 	second = rhs.second;
+		// 	return (*this);
 		// }
 
 		// enable convertion from pair<T1, T2> to pair<const T1, T2>
@@ -46,6 +47,25 @@ namespace ft
 		// 	return (pair<const T1, T2>(first, second));
 		// }
 	};
+
+	template <typename ValueType>
+	struct Node
+	{
+		Node *		left;
+		Node *		right;
+		Node *		parent;
+		ValueType	kv_pair;
+
+		Node(ValueType const & item):
+		left(NULL), right(NULL), parent(NULL), kv_pair(item)
+		{
+		}
+		~Node()
+		{
+		}
+
+	};
+	///// ITERATOR //////
 
 	template <typename T>
 	class map_iterator
@@ -59,31 +79,74 @@ namespace ft
 		typedef std::bidirectional_iterator_tag	iterator_category;
 
 	private:
-		value_type *ptr;
+		typedef Node<value_type> node;
+
+		node *_ptr;
+
+		// root must not be NULL
+		// returns the mininum node of a subtree
+		node * min(node * root) const
+		{
+			while (root->left)
+				root = root->left;
+			return (root);
+		}
+
+		// returns pointer to next node of sorted sequence
+		node * next(node *ptr) const
+		{
+			if (ptr->right)
+				return (min(ptr->right));
+			while (ptr->parent)
+			{
+				if (ptr->parent->left == ptr) // _ptr is a left child
+					return (ptr->parent);
+				ptr = ptr->parent;
+			}
+			return (NULL);	// end
+		}
 
 	public:
 		map_iterator() {}
-		map_iterator(pointer p): ptr(p) {}
-		map_iterator(map_iterator const & src): ptr(src.ptr) {}
+		map_iterator(node * address): _ptr(address) {}
+		map_iterator(map_iterator const & src): _ptr(src._ptr) {}
 		map_iterator & operator=(map_iterator const & src)
 		{
-			ptr = src.ptr;
+			_ptr = src._ptr;
 			return (*this);
 		}
 
 		reference operator*() const
 		{
-			return (*ptr);
+			return (_ptr->kv_pair);
 		}
 
 		pointer operator->() const
 		{
-			return (ptr);
+			return (&_ptr->kv_pair);
+		}
+
+		map_iterator & operator++()
+		{
+			_ptr = next(_ptr);
+			return (*this);
+		}
+
+		bool operator==(map_iterator const & rhs)
+		{
+			return (_ptr == rhs._ptr);
+		}
+
+		bool operator!=(map_iterator const & rhs)
+		{
+			return (_ptr != rhs._ptr);
 		}
 	};
 
 
 }
+
+///// ft::map //////
 
 template < typename Key, typename T >
 class ft::map
@@ -96,48 +159,36 @@ public:
 	typedef ft::map_iterator<value_type>	iterator;
 
 private:
-	struct Node
-	{
-		Node *		left;
-		Node *		right;
-		value_type	kv_pair;
 
-		Node(value_type const & item):
-		left(NULL), right(NULL), kv_pair(item)
-		{
-		}
-		~Node()
-		{
-		}
-
-	};
+	typedef Node<value_type>	node;
 	
 	size_type	_size;
-	Node *		_root;
+	node *		_root;
 
-	ft::pair<iterator, bool> insert (Node ** root, value_type const & val)
+	ft::pair<iterator, bool> insert (node ** root, node *parent, value_type const & val)
 	{
-		Node * current_node = *root;
+		node * current_node = *root;
 		ft::pair<iterator, bool> ret;
 
 		if (current_node == NULL)
 		{
-			*root = new Node(val); // use std::allocator instead
+			*root = new node(val); // use std::allocator instead
+			(*root)->parent = parent;
 			_size += 1;
-			ret.first = &(*root)->kv_pair;
+			ret.first = iterator(*root);
 			ret.second = true;
 			return (ret);
 		}
 		if (val.first < current_node->kv_pair.first) // change < for a comp function
-			return (insert(&current_node->left, val));
+			return (insert(&current_node->left, current_node, val));
 		if (current_node->kv_pair.first < val.first)
-			return (insert(&current_node->right, val));
-		ret.first = &current_node->kv_pair;
+			return (insert(&current_node->right, current_node, val));
+		ret.first = iterator(current_node);
 		ret.second = false;
 		return (ret);
 	}
 
-	void clear(Node **root)
+	void clear(node **root)
 	{
 		if (*root)
 		{
@@ -172,7 +223,7 @@ public:
 
 	ft::pair<iterator, bool> insert (value_type const & val)
 	{
-		return (insert(&_root, val));
+		return (insert(&_root, NULL, val));
 	}
 
 	void clear()
@@ -186,6 +237,21 @@ public:
 		value_type pr(k, mapped_type());
 		pair<iterator, bool> ret(insert(pr));
 		return ((ret.first)->second);
+	}
+
+	iterator begin()
+	{
+		node *ptr = _root;
+		if (!ptr)
+			return (iterator(NULL));
+		while (ptr->left)
+			ptr = ptr->left;
+		return (iterator(ptr));
+	}
+
+	iterator end()
+	{
+		return (iterator(NULL));
 	}
 	
 

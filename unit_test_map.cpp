@@ -3,6 +3,17 @@
 #include "ft_map.hpp"
 #include <string>
 
+
+ft::map<int, std::string> m;
+
+void setup(void)
+{
+	m[1] = "one";
+	m[0] = "zero";
+	m[2] = "two";
+	m[3] = "three";
+}
+
 Test(constructor, default_construct)
 {
 	ft::map<int, std::string> m;
@@ -60,7 +71,6 @@ Test(insert, insert_pair)
 	m.clear();
 	cr_expect(m.size() == 0);
 
-
 }
 
 Test(operator_brackets, test)
@@ -79,4 +89,38 @@ Test(operator_brackets, test)
 	// std::cout << m["you"] << std::endl;
 	// std::cout << m["new"] << std::endl;
 	// std::cout << m["new_again"] << std::endl;
+}
+
+Test(iterator, pre_increment, .init=setup)
+{
+	ft::map<int, std::string>::iterator it;
+
+	it = m.begin();
+	cr_expect(it->first == 0);
+	cr_expect(it->second == "zero");
+
+	++it;
+	cr_expect(it->first == 1);
+	cr_expect(it->second == "one");
+
+	++it;
+	cr_expect(it->first == 2);
+	cr_expect(it->second == "two");
+	cr_expect(it->second == m[2]);
+
+	++it;
+	cr_expect(it->first == 3);
+	cr_expect(it->second == "three");
+}
+
+Test(iterator, equalitiy, .init=setup)
+{
+	ft::map<int, std::string>::iterator it;
+	it = m.begin();
+	while (it != m.end())
+	{
+		std::cout << it->first << ": " << it->second << std::endl;
+		++it;
+	}
+	
 }
