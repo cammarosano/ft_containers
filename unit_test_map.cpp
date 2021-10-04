@@ -119,8 +119,41 @@ Test(iterator, equalitiy, .init=setup)
 	it = m.begin();
 	while (it != m.end())
 	{
-		std::cout << it->first << ": " << it->second << std::endl;
+		// std::cout << it->first << ": " << it->second << std::endl;
 		++it;
 	}
-	
+	// dereferencing iterator to end
+	// std::cout << it->first << ": " << it->second << std::endl;
+	// std::cout << &(*it) << std::endl;
+	cr_expect(it == m.end());
+}
+
+Test(iterator, end, .init=setup)
+{
+	ft::map<int, std::string>::iterator it;
+	it = m.begin();
+	size_t n = 0;
+	while (it++ != m.end())
+		++n;
+	cr_expect(m.size() == n);
+}
+
+Test(iterador, bidirectional_it, .init=setup)
+{
+	ft::map<int, std::string>::iterator it1 = m.begin();
+	ft::map<int, std::string>::iterator it2(it1);
+
+	while (it1 != m.end())
+	{
+		cr_expect(it1++ == it2);
+		++it2;
+	}
+	--it1;
+	it2--;
+	cr_expect(it1 == it2);
+	cr_expect(it1->first == 3);
+
+	it2->second = "THREE";
+	cr_expect(it1->second == "THREE");
+	cr_expect(m[3] == "THREE");
 }

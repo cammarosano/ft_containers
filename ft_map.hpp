@@ -60,6 +60,11 @@ namespace ft
 		left(NULL), right(NULL), parent(NULL), kv_pair(item)
 		{
 		}
+		// default contructor
+		Node():
+		left(NULL), right(NULL), parent(NULL)
+		{
+		}
 		~Node()
 		{
 		}
@@ -92,6 +97,13 @@ namespace ft
 			return (root);
 		}
 
+		node * max(node * root) const
+		{
+			while (root->right)
+				root = root->right;
+			return (root);
+		}
+
 		// returns pointer to next node of sorted sequence
 		node * next(node *ptr) const
 		{
@@ -99,11 +111,25 @@ namespace ft
 				return (min(ptr->right));
 			while (ptr->parent)
 			{
-				if (ptr->parent->left == ptr) // _ptr is a left child
+				if (ptr->parent->left == ptr) // ptr is a left child
 					return (ptr->parent);
 				ptr = ptr->parent;
 			}
-			return (NULL);	// end
+			return (ptr); // this line should not be reached
+		}
+
+		// returns pointer to previous node of sorted sequence
+		node * previous(node *ptr) const
+		{
+			if (ptr->left)
+				return (max(ptr->left));
+			while (ptr->parent)
+			{
+				if (ptr->parent->right == ptr) // ptr is a right child
+					return (ptr->parent);
+				ptr = ptr->parent;
+			}
+			return (ptr);
 		}
 
 	public:
@@ -130,6 +156,28 @@ namespace ft
 		{
 			_ptr = next(_ptr);
 			return (*this);
+		}
+
+		map_iterator operator++(int)
+		{
+			map_iterator temp(*this);
+
+			_ptr = next(_ptr);
+			return (temp);
+		}
+
+		map_iterator & operator--()
+		{
+			_ptr = previous(_ptr);
+			return (*this);
+		}
+
+		map_iterator operator--(int)
+		{
+			map_iterator temp(*this);
+
+			_ptr = previous(_ptr);
+			return (temp);
 		}
 
 		bool operator==(map_iterator const & rhs)
@@ -164,6 +212,7 @@ private:
 	
 	size_type	_size;
 	node *		_root;
+	node *		_end;
 
 	ft::pair<iterator, bool> insert (node ** root, node *parent, value_type const & val)
 	{
@@ -205,10 +254,12 @@ public:
 	// default constructor
 	map(): _size(0), _root(NULL)
 	{
+		_end = new node();
 	}
 	~map()
 	{
 		clear();
+		delete _end;
 	}
 
 	size_type size() const
@@ -223,7 +274,12 @@ public:
 
 	ft::pair<iterator, bool> insert (value_type const & val)
 	{
-		return (insert(&_root, NULL, val));
+		ft::pair<iterator, bool> ret = insert(&_root, NULL, val);
+		// update _end
+		_end->left = _root;
+		_end->right = _root;
+		_root->parent = _end;
+		return (ret);
 	}
 
 	void clear()
@@ -241,9 +297,7 @@ public:
 
 	iterator begin()
 	{
-		node *ptr = _root;
-		if (!ptr)
-			return (iterator(NULL));
+		node *ptr = _end;
 		while (ptr->left)
 			ptr = ptr->left;
 		return (iterator(ptr));
@@ -251,7 +305,7 @@ public:
 
 	iterator end()
 	{
-		return (iterator(NULL));
+		return (iterator(_end));
 	}
 	
 

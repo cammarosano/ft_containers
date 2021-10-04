@@ -43,4 +43,8 @@ int main()
 	std::cout << it->first << std::endl;
 	std::cout << it->second << std::endl;  // uninitialized memory
 
+	--it;
+	std::cout << it->first << std::endl;
+	std::cout << it->second << std::endl;  // uninitialized memory
+
 }
