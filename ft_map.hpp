@@ -308,6 +308,23 @@ public:
 		return (iterator(_end));
 	}
 	
+	size_type erase(key_type const & k)
+	{
+		// TODO
+		/*
+		write: node * find_ptr(key_type const & key)
+
+		find node
+		1. if node has no child, delete node, update parent's pointer
+		2. if node has one child, child replaces it (rearrange pointers)
+		3. if node has two children,
+			find the predecessor (max in left sub-tree)
+			replace node by predecessor (lots of pointer rearranging... maybe make some copy node?)
+		*/
+
+
+		return (0):
+	}
 
 };
 
