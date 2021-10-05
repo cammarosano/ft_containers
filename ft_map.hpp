@@ -111,6 +111,7 @@ namespace ft
 				return (min(ptr->right));
 			while (ptr->parent)
 			{
+				std::cout << "ptr points to " << ptr->kv_pair.first << std::endl;
 				if (ptr->parent->left == ptr) // ptr is a left child
 					return (ptr->parent);
 				ptr = ptr->parent;
@@ -422,6 +423,13 @@ public:
 		{
 			_root = predecessor;
 			update_end();
+			std::cout << _end->parent << std::endl;
+			std::cout << _end->left << std::endl;
+			std::cout << _end->right << std::endl;
+			std::cout << _root << std::endl;
+			std::cout << _root->parent << std::endl;
+			std::cout << _end << std::endl;
+
 		}
 		delete target;
 		_size -= 1;

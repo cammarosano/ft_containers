@@ -201,9 +201,14 @@ Test(erase, no_children, .init=setup)
 
 Test(erase, one_child, .init=setup)
 {
+	ft::map<int, std::string>::iterator it = m.begin();
+
 	cr_expect(m.count(2) == 1);
 	cr_expect(m.erase(2) == 1);
 	cr_expect(m.count(2) == 0);
+
+	while (it != m.end())
+		++it; // no crash
 
 	m.erase(3);
 
@@ -213,4 +218,26 @@ Test(erase, one_child, .init=setup)
 	cr_expect(m.count(0) == 1);
 }
 
-// TODO: rest erase two children
+// TODO: test erase two children
+Test(erase, two_children, .init=setup)
+{
+	ft::map<int, std::string>::iterator it = m.begin();
+	cr_expect(m.erase(1) == 1);
+	cr_expect(m.count(1) == 0);
+	cr_expect(m.count(0) == 1);
+	cr_expect(m.count(2) == 1);
+	cr_expect(m.count(3) == 1);
+	cr_expect(m.size() == 3);
+	
+	cr_expect(it->first == 0);
+	++it;
+	cr_expect(it->first == 2);
+	++it;
+	cr_expect(it->first == 3);
+	// ++it;
+	// cr_expect(it == m.end());
+
+	// cr_expect((it++)->first == 2);
+	// cr_expect((it)++->first == 3);
+	// cr_expect(it == m.end());
+}
