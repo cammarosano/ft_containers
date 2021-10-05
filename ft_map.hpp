@@ -249,6 +249,47 @@ private:
 		}
 	}
 
+	// returns pointer to node matching key k or _end if no match
+	node * find(key_type const & k, node * root) const
+	{
+		if (!root)
+			return (_end);
+		if (k < root->kv_pair.first) // change for comp object
+			return (find(k, root->left));
+		if (k > root->kv_pair.first) // idem
+			return (find(k, root->right));
+		return (root);
+	}
+
+	void update_end()
+	{
+		_end->left = _root;
+		_end->right = _root;
+		if (_root)
+			_root->parent = _end;
+	}
+
+	// returns address of parent's left or right 
+	node **parent_ptr_to_child(node *child) const
+	{
+		if (child->parent->left == child)
+			return (&child->parent->left);
+		return (&child->parent->right);
+	}
+
+	node *max(node *root) const
+	{
+		while (root->right)
+			root = root->right;
+		return (root);
+	}
+
+	// root->left must NOT be NULL
+	node *find_predecessor(node *root) const
+	{
+		return (max(root->left));
+	}
+
 
 public:
 	// default constructor
@@ -262,38 +303,7 @@ public:
 		delete _end;
 	}
 
-	size_type size() const
-	{
-		return (_size);
-	}
-
-	bool empty() const
-	{
-		return (!_size);
-	}
-
-	ft::pair<iterator, bool> insert (value_type const & val)
-	{
-		ft::pair<iterator, bool> ret = insert(&_root, NULL, val);
-		// update _end
-		_end->left = _root;
-		_end->right = _root;
-		_root->parent = _end;
-		return (ret);
-	}
-
-	void clear()
-	{
-		clear(&_root);
-		_size = 0;
-	}
-
-	mapped_type & operator[](key_type const & k)
-	{
-		value_type pr(k, mapped_type());
-		pair<iterator, bool> ret(insert(pr));
-		return ((ret.first)->second);
-	}
+	/* Iterators */
 
 	iterator begin()
 	{
@@ -308,23 +318,131 @@ public:
 		return (iterator(_end));
 	}
 	
+	/* Capacity */
+
+	bool empty() const
+	{
+		return (!_size);
+	}
+
+	size_type size() const
+	{
+		return (_size);
+	}
+
+	/* Element access */
+
+	mapped_type & operator[](key_type const & k)
+	{
+		value_type pr(k, mapped_type());
+		pair<iterator, bool> ret(insert(pr));
+		return ((ret.first)->second);
+	}
+
+	/* Modifiers */
+
+	ft::pair<iterator, bool> insert (value_type const & val)
+	{
+		ft::pair<iterator, bool> ret = insert(&_root, NULL, val);
+		update_end();
+		return (ret);
+	}
+
+	void clear()
+	{
+		clear(&_root);
+		_size = 0;
+	}
+
 	size_type erase(key_type const & k)
 	{
-		// TODO
-		/*
-		write: node * find_ptr(key_type const & key)
+		// find node
+		node * target = find(k, _root);
+		if (target == _end) // key not found
+			return (0);
 
-		find node
-		1. if node has no child, delete node, update parent's pointer
-		2. if node has one child, child replaces it (rearrange pointers)
-		3. if node has two children,
-			find the predecessor (max in left sub-tree)
-			replace node by predecessor (lots of pointer rearranging... maybe make some copy node?)
-		*/
+		// 1. if node has no child, delete node, update parent's pointer
+		if (!target->left && !target->right)
+		{
+			*(parent_ptr_to_child(target)) = NULL;
+			delete target;
+			_size -= 1;
+			if (target == _root)
+			{
+				_root = NULL;
+				update_end();
+			}
+			return (1);
+		}
 
+		// 2. if node has one child, child replaces it (rearrange pointers)
+		// left case
+		if (target->left && !target->right)
+		{
+			*(parent_ptr_to_child(target)) = target->left;
+			target->left->parent = target->parent;
+			if (target == _root)
+			{
+				_root = target->left;
+				update_end();
+			}
+			delete target;
+			_size -= 1;
+			return (1);
+		}
+		// right case
+		if (target->right && !target->left)
+		{
+			*(parent_ptr_to_child(target)) = target->right;
+			target->right->parent = target->parent;
+			if (target == _root)
+			{
+				_root = target->right;
+				update_end();
+			}
+			delete target;
+			_size -= 1;
+			return (1);
+		}
 
-		return (0):
+		// 3. if node has two children,
+		
+		// 	find the predecessor (max in left sub-tree)
+		node *predecessor = find_predecessor(target); // predecessor->right is NULL.
+		// connect predecessor's parent with its left child
+		if (predecessor->left)
+			predecessor->left->parent = predecessor->parent;
+		*(parent_ptr_to_child(predecessor)) = predecessor->left;
+		// substitute target by predecessor
+		predecessor->left = target->left;
+		predecessor->right = target->right;
+		predecessor->parent = target->parent;
+		*(parent_ptr_to_child(target)) = predecessor;
+		if (target == _root)
+		{
+			_root = predecessor;
+			update_end();
+		}
+		delete target;
+		_size -= 1;
+		return (1);
 	}
+
+	/* Operations */ 
+
+	iterator find(key_type const & k)
+	{
+		return (iterator(find(k, _root)));
+	}
+
+	size_type count(key_type const & k) const
+	{
+		if (find(k, _root) == _end)
+			return (0);
+		return (1);
+	}
+
+
 
 };
 

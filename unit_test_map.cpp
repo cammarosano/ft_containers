@@ -157,3 +157,60 @@ Test(iterador, bidirectional_it, .init=setup)
 	cr_expect(it1->second == "THREE");
 	cr_expect(m[3] == "THREE");
 }
+
+Test(find, key, .init=setup)
+{
+	ft::map<int, std::string>::iterator it;
+
+	for (int i = 0; i < static_cast<int>(m.size()); i++)
+	{
+		it = m.find(i);
+		// std::cout << it->second << std::endl;
+		cr_expect(it->first == i);
+	}
+	it = m.find(5);
+	cr_expect(it == m.end());
+	
+}
+
+Test(count, key, .init=setup)
+{
+	cr_expect(m.count(0) == 1);
+	cr_expect(m.count(1) == 1);
+	cr_expect(m.count(2) == 1);
+	cr_expect(m.count(3) == 1);
+	cr_expect(m.count(4) == 0);
+}
+
+Test(erase, no_children, .init=setup)
+{
+	cr_expect(m.erase(4) == 0);
+	cr_expect(m.erase(0) == 1);
+	cr_expect(m.size() == 3);
+	cr_expect(m.count(0) == 0);
+	cr_expect(m.count(3) == 1);
+	cr_expect(m.erase(3) == 1);
+	cr_expect(m.size() == 2);
+	cr_expect(m.count(3) == 0);
+	cr_expect(m.erase(2) == 1);
+	cr_expect(m.count(2) == 0);
+	cr_expect(m.erase(1) == 1); // root
+	cr_expect(m.count(1) == 0);
+	cr_expect(m.size() == 0);
+}
+
+Test(erase, one_child, .init=setup)
+{
+	cr_expect(m.count(2) == 1);
+	cr_expect(m.erase(2) == 1);
+	cr_expect(m.count(2) == 0);
+
+	m.erase(3);
+
+	cr_expect(m.count(1) == 1);
+	cr_expect(m.erase(1) == 1);
+	cr_expect(m.count(1) == 0);
+	cr_expect(m.count(0) == 1);
+}
+
+// TODO: rest erase two children
