@@ -26,10 +26,16 @@ public:
 private:
 
 	typedef Node<value_type>	node;
-	
+
 	size_type	_size;
 	node *		_root;
 	node *		_end;
+
+	node * get_node_address(iterator const & it)
+	{
+		// nasty stuff!!!
+		return (*reinterpret_cast<node * const *>(&it));
+	}
 
 	ft::pair<iterator, bool> insert (node ** root, node *parent, value_type const & val)
 	{
@@ -78,14 +84,6 @@ private:
 		return (root);
 	}
 
-	void update_end()
-	{
-		_end->left = _root;
-		_end->right = _root;
-		if (_root)
-			_root->parent = _end;
-	}
-
 	// returns address of parent's left or right accordingly
 	// returns left pointer in case _end is the parent
 	node **parent_ptr_to_child(node *child) const
@@ -108,74 +106,71 @@ private:
 			parent->right = new_child;
 	}
 
-	node *max(node *root) const
+	// find predecessor in subtree
+	// root->left must NOT be NULL
+	node *find_predecessor(node *root) const
 	{
+		root = root->left;
 		while (root->right)
 			root = root->right;
 		return (root);
 	}
 
-	// root->left must NOT be NULL
-	node *find_predecessor(node *root) const
-	{
-		return (max(root->left));
-	}
-
-	// copies left, right and parent pointers. updates neighboring nodes.
-	// updates _root if necessary
-	void replace_node(node * old, node * new_node)
-	{
-		new_node->left = old->left;
-		if (new_node->left)
-			new_node->left->parent = new_node;
-
-		new_node->right = old->right;
-		if (new_node->right)
-			new_node->right->parent = new_node;
-
-		new_node->parent = old->parent;
-		update_parent_ptr2child(old, new_node);
-
-		if (old == _root)
-			_root = new_node;
-	}
-
-	// no memory freeing, just pointer rearranging!
-	void detach_node(node * target)
+	// no memory freeing
+	void remove_node(node * target)
 	{
 		// 1. if node has no child, update parent's pointer
 		if (!target->left && !target->right)
-		{
 			update_parent_ptr2child(target, NULL);
-			if (target == _root)
-				_root = NULL;
-			return ;
-		}
 
 		// 2. if node has one child, child replaces it
 		// left case
-		if (target->left && !target->right)
+		else if (target->left && !target->right)
 		{
-			node * temp = target->left;
-			target->left = NULL; // detach node from tree
-			replace_node(target, temp);
-			return ;
+			update_parent_ptr2child(target, target->left);
+			target->left->parent = target->parent;
 		}
 		// right case
-		if (target->right && !target->left)
+		else if (target->right && !target->left)
 		{
-			node * temp = target->right;
-			target->right = NULL;
-			replace_node(target, temp);
-			return ;
+			update_parent_ptr2child(target, target->right);
+			target->right->parent = target->parent;
 		}
-
-		// 3. if node has two children
-		node *predecessor = find_predecessor(target);
-		detach_node(predecessor);
-		replace_node(target, predecessor);
+		else // 3. node has two children
+		{
+			node *predecessor = find_predecessor(target);
+			remove_node(predecessor); 	// predec->right is NULL
+			// replace target
+			predecessor->left = target->left;
+			if (target->left) // it could have been changed when predecessor was removed
+				target->left->parent = predecessor;
+			predecessor->right = target->right;
+			target->right->parent = predecessor;
+			predecessor->parent = target->parent;
+			update_parent_ptr2child(target, predecessor);
+		}
 	}
 
+	void erase_node(node *target)
+	{
+		remove_node(target);
+		delete target;
+		_size -= 1;
+		if (target == _root)
+			_root = _end->left;
+	}
+
+	bool check_hint(iterator position, key_type const & key)
+	{
+		if (position == end())
+			return false;
+		if (!(position->first < key))
+			return false;
+		++position;
+		if (position != end() && !(key < (position->first)))
+			return false;
+		return true;
+	}
 
 public:
 	// default constructor
@@ -229,9 +224,33 @@ public:
 
 	ft::pair<iterator, bool> insert (value_type const & val)
 	{
-		ft::pair<iterator, bool> ret = insert(&_root, NULL, val);
-		update_end();
+		bool	root_change;
+		ft::pair<iterator, bool> ret;
+	
+		root_change = !(_root);
+		ret = insert(&_root, _end, val);
+		if (root_change)
+		{
+			_end->left = _root;
+			_end->right = _root;
+		}
 		return (ret);
+	}
+
+	iterator insert (iterator position, value_type const & val)
+	{
+		node *predecessor;
+		ft::pair<iterator, bool> ret;
+
+		if (check_hint(position, val.first))
+		{
+			// std::cout << "good hint for inserting " << val.first << std::endl;
+			predecessor = get_node_address(position);
+			ret = insert(&predecessor->right, predecessor, val);
+		}
+		else
+			ret = insert(val);
+		return (ret.first);
 	}
 
 	void clear()
@@ -240,16 +259,36 @@ public:
 		_size = 0;
 	}
 
-
 	size_type erase(key_type const & k)
 	{
-		node * target = find(k, _root);
-		if (target == _end) // key not found
+		node * target;
+		
+		target = find(k, _root);
+		if (target == _end)
 			return (0);
-		detach_node(target);
-		delete target;
-		_size -= 1;
+		erase_node(target);
 		return (1);
+	}
+
+	void erase(iterator position)
+	{
+		node *target;
+		
+		target = get_node_address(position);
+		if (target != _end) // must be a valid iterator though
+			erase_node(target);
+	}
+	
+	void erase(iterator first, iterator last)
+	{
+		node *target;
+
+		while (first != last)
+		{
+			target = get_node_address(first);
+			++first;
+			erase_node(target);
+		}
 	}
 
 	/* Operations */ 

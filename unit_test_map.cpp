@@ -238,3 +238,74 @@ Test(erase, two_children, .init=setup)
 	cr_expect(it == m.end());
 
 }
+
+Test(erase, iterator, .init=setup)
+{
+	ft::map<int, std::string>::iterator it = m.begin();
+	m.erase(it);
+	cr_expect(m.count(0) == 0);
+
+}
+
+Test(erase, range, .init=setup)
+{
+	ft::map<int, std::string>::iterator it, ite;
+	
+	it = m.begin();
+	ite = m.end();
+	
+	m.erase(it, --ite);
+	cr_expect(m.size() == 1);
+	cr_expect(m.count(3) == 1);
+}
+
+Test(erase, range_total, .init=setup)
+{
+	ft::map<int, std::string>::iterator it, ite;
+	
+	it = m.begin();
+	ite = m.end();
+	
+	m.erase(it, ite);
+	cr_expect(m.size() == 0);
+}
+
+Test(make_pair, test)
+{
+	ft::map<std::string, double> m;
+	m.insert(ft::make_pair("hello", 0.5));
+	m.insert(ft::make_pair("bye", 666));
+	ft::map<std::string, double>::iterator it = m.begin();
+	cr_expect(it->first == "bye");
+	++it;
+	cr_expect(it->second == 0.5f);
+}
+
+Test(insert, hint, .init=setup)
+{
+	ft::map<int, std::string> m;
+	ft::map<int, std::string>::iterator it, ite, ret;
+	
+	m.insert(ft::make_pair(10, ""));
+	m.insert(ft::make_pair(5, ""));
+	m.insert(ft::make_pair(15, ""));
+	m.insert(ft::make_pair(8, ""));
+	m.insert(ft::make_pair(0, ""));
+
+	it = m.begin(); // 0
+
+	ret = m.insert(it, ft::make_pair(2, "")); // good hint
+	m.insert(ret, ft::make_pair(3, "")); // good hint
+	m.insert(it, ft::make_pair(4, "")); // bad hint
+
+	cr_expect(m.size() == 8);
+	it = m.begin();
+	ite = m.end();
+	ite--;
+	while (it != ite)
+	{
+		cr_expect(it->first < (++it)->first);
+	}
+}
+
+

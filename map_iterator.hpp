@@ -44,7 +44,6 @@ namespace ft
 				return (min(ptr->right));
 			while (ptr->parent)
 			{
-				// std::cout << "ptr points to " << ptr->kv_pair.first << std::endl;
 				if (ptr->parent->left == ptr) // ptr is a left child
 					return (ptr->parent);
 				ptr = ptr->parent;
