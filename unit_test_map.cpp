@@ -234,10 +234,7 @@ Test(erase, two_children, .init=setup)
 	cr_expect(it->first == 2);
 	++it;
 	cr_expect(it->first == 3);
-	// ++it;
-	// cr_expect(it == m.end());
+	++it;
+	cr_expect(it == m.end());
 
-	// cr_expect((it++)->first == 2);
-	// cr_expect((it)++->first == 3);
-	// cr_expect(it == m.end());
 }

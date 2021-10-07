@@ -53,6 +53,8 @@ namespace ft
 	// TODO: predicate version
 
 
+	/* lexigographical_compare */
+
 	//return true if first range is lexicogr smaller than second range
 	template < typename It_1, typename It_2 >
 	bool lexicographical_compare(It_1 first1, It_1 last1,
@@ -73,8 +75,68 @@ namespace ft
 	}
 
 
+	/* class pair */
+	template < typename T1, typename T2 >
+	struct pair
+	{
+		T1 first;
+		T2 second;
+
+		pair():  first(T1()), second(T2()) // is this value-initialization ?
+		{
+			// std::cout << "pair default constructor\n";
+		}
+
+		pair(T1 const & a, T2 const & b): first(a), second(b)
+		{
+			// std::cout << "pair initialization constructor\n";
+		}
+
+		template<typename U, typename V> pair(pair<U,V> const & pr):
+		first(pr.first), second(pr.second)
+		{
+		}
+
+	// raises deprecated error. It compiles with std=c++98 (reference says this is implicit declared)
+		// pair & operator=(pair const & rhs)
+		// {
+		// 	first = rhs.first;
+		// 	second = rhs.second;
+		// 	return (*this);
+		// }
+
+		// enable convertion from pair<T1, T2> to pair<const T1, T2>
+		// operator pair<const T1, T2>() const
+		// {
+		// 	return (pair<const T1, T2>(first, second));
+		// }
+	};
 
 
+	/* Node */
+
+	template <typename ValueType>
+	struct Node
+	{
+		Node *		left;
+		Node *		right;
+		Node *		parent;
+		ValueType	kv_pair;
+
+		Node(ValueType const & item):
+		left(NULL), right(NULL), parent(NULL), kv_pair(item)
+		{
+		}
+		// default contructor
+		Node():
+		left(NULL), right(NULL), parent(NULL)
+		{
+		}
+		~Node()
+		{
+		}
+
+	};
 
 }
 

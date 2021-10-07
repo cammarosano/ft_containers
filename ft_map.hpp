@@ -3,204 +3,20 @@
 
 #include <iostream> // for debug messages
 
+#include "utils.hpp"
+#include "map_iterator.hpp"
+
 namespace ft
 {
 	template <	typename Key,
 				typename T > class map;
-
-	template < typename T1, typename T2 > struct pair
-	{
-		T1 first;
-		T2 second;
-
-		pair():  first(T1()), second(T2()) // is this value-initialization ?
-		{
-			// std::cout << "pair default constructor\n";
-		}
-
-		pair(T1 const & a, T2 const & b): first(a), second(b)
-		{
-			// std::cout << "pair initialization constructor\n";
-		}
-
-		// pair(pair const & src): first(src.first), second(src.second)
-		// {
-		// 	// std::cout << "pair copy construtor\n";
-		// }
-
-		template<typename U, typename V> pair(pair<U,V> const & pr):
-		first(pr.first), second(pr.second)
-		{
-		}
-
-	// raises deprecated error. It compiles with std=c++98
-		// pair & operator=(pair const & rhs)
-		// {
-		// 	first = rhs.first;
-		// 	second = rhs.second;
-		// 	return (*this);
-		// }
-
-		// enable convertion from pair<T1, T2> to pair<const T1, T2>
-		// operator pair<const T1, T2>() const
-		// {
-		// 	return (pair<const T1, T2>(first, second));
-		// }
-	};
-
-	template <typename ValueType>
-	struct Node
-	{
-		Node *		left;
-		Node *		right;
-		Node *		parent;
-		ValueType	kv_pair;
-
-		Node(ValueType const & item):
-		left(NULL), right(NULL), parent(NULL), kv_pair(item)
-		{
-		}
-		// default contructor
-		Node():
-		left(NULL), right(NULL), parent(NULL)
-		{
-		}
-		~Node()
-		{
-		}
-
-	};
-	///// ITERATOR //////
-
-	template <typename T>
-	class map_iterator
-	{
-	public: // should I just inherit from a base class of iterator?
-
-		typedef std::ptrdiff_t					difference_type;
-		typedef T								value_type;
-		typedef T *								pointer;
-		typedef T &								reference;
-		typedef std::bidirectional_iterator_tag	iterator_category;
-
-	private:
-		typedef Node<value_type> node;
-
-		node *_ptr;
-
-		// root must not be NULL
-		// returns the mininum node of a subtree
-		node * min(node * root) const
-		{
-			while (root->left)
-				root = root->left;
-			return (root);
-		}
-
-		node * max(node * root) const
-		{
-			while (root->right)
-				root = root->right;
-			return (root);
-		}
-
-		// returns pointer to next node of sorted sequence
-		node * next(node *ptr) const
-		{
-			if (ptr->right)
-				return (min(ptr->right));
-			while (ptr->parent)
-			{
-				std::cout << "ptr points to " << ptr->kv_pair.first << std::endl;
-				if (ptr->parent->left == ptr) // ptr is a left child
-					return (ptr->parent);
-				ptr = ptr->parent;
-			}
-			return (ptr); // this line should not be reached
-		}
-
-		// returns pointer to previous node of sorted sequence
-		node * previous(node *ptr) const
-		{
-			if (ptr->left)
-				return (max(ptr->left));
-			while (ptr->parent)
-			{
-				if (ptr->parent->right == ptr) // ptr is a right child
-					return (ptr->parent);
-				ptr = ptr->parent;
-			}
-			return (ptr);
-		}
-
-	public:
-		map_iterator() {}
-		map_iterator(node * address): _ptr(address) {}
-		map_iterator(map_iterator const & src): _ptr(src._ptr) {}
-		map_iterator & operator=(map_iterator const & src)
-		{
-			_ptr = src._ptr;
-			return (*this);
-		}
-
-		reference operator*() const
-		{
-			return (_ptr->kv_pair);
-		}
-
-		pointer operator->() const
-		{
-			return (&_ptr->kv_pair);
-		}
-
-		map_iterator & operator++()
-		{
-			_ptr = next(_ptr);
-			return (*this);
-		}
-
-		map_iterator operator++(int)
-		{
-			map_iterator temp(*this);
-
-			_ptr = next(_ptr);
-			return (temp);
-		}
-
-		map_iterator & operator--()
-		{
-			_ptr = previous(_ptr);
-			return (*this);
-		}
-
-		map_iterator operator--(int)
-		{
-			map_iterator temp(*this);
-
-			_ptr = previous(_ptr);
-			return (temp);
-		}
-
-		bool operator==(map_iterator const & rhs)
-		{
-			return (_ptr == rhs._ptr);
-		}
-
-		bool operator!=(map_iterator const & rhs)
-		{
-			return (_ptr != rhs._ptr);
-		}
-	};
-
-
 }
-
-///// ft::map //////
 
 template < typename Key, typename T >
 class ft::map
 {
 public:
+
 	typedef	Key								key_type;
 	typedef	T								mapped_type;
 	typedef pair<const key_type, mapped_type> value_type;
@@ -270,12 +86,26 @@ private:
 			_root->parent = _end;
 	}
 
-	// returns address of parent's left or right 
+	// returns address of parent's left or right accordingly
+	// returns left pointer in case _end is the parent
 	node **parent_ptr_to_child(node *child) const
 	{
 		if (child->parent->left == child)
 			return (&child->parent->left);
 		return (&child->parent->right);
+	}
+
+	// new_child could be NULL
+	void update_parent_ptr2child(node *old_child, node *new_child)
+	{
+		node *parent = old_child->parent;
+		if (!parent)
+			return ;
+		if (parent->left == old_child)
+			parent->left = new_child;
+		// these conditions are not mutually exclusive in case _end is the parent
+		if (parent->right == old_child) 
+			parent->right = new_child;
 	}
 
 	node *max(node *root) const
@@ -289,6 +119,61 @@ private:
 	node *find_predecessor(node *root) const
 	{
 		return (max(root->left));
+	}
+
+	// copies left, right and parent pointers. updates neighboring nodes.
+	// updates _root if necessary
+	void replace_node(node * old, node * new_node)
+	{
+		new_node->left = old->left;
+		if (new_node->left)
+			new_node->left->parent = new_node;
+
+		new_node->right = old->right;
+		if (new_node->right)
+			new_node->right->parent = new_node;
+
+		new_node->parent = old->parent;
+		update_parent_ptr2child(old, new_node);
+
+		if (old == _root)
+			_root = new_node;
+	}
+
+	// no memory freeing, just pointer rearranging!
+	void detach_node(node * target)
+	{
+		// 1. if node has no child, update parent's pointer
+		if (!target->left && !target->right)
+		{
+			update_parent_ptr2child(target, NULL);
+			if (target == _root)
+				_root = NULL;
+			return ;
+		}
+
+		// 2. if node has one child, child replaces it
+		// left case
+		if (target->left && !target->right)
+		{
+			node * temp = target->left;
+			target->left = NULL; // detach node from tree
+			replace_node(target, temp);
+			return ;
+		}
+		// right case
+		if (target->right && !target->left)
+		{
+			node * temp = target->right;
+			target->right = NULL;
+			replace_node(target, temp);
+			return ;
+		}
+
+		// 3. if node has two children
+		node *predecessor = find_predecessor(target);
+		detach_node(predecessor);
+		replace_node(target, predecessor);
 	}
 
 
@@ -355,82 +240,13 @@ public:
 		_size = 0;
 	}
 
+
 	size_type erase(key_type const & k)
 	{
-		// find node
 		node * target = find(k, _root);
 		if (target == _end) // key not found
 			return (0);
-
-		// 1. if node has no child, delete node, update parent's pointer
-		if (!target->left && !target->right)
-		{
-			*(parent_ptr_to_child(target)) = NULL;
-			delete target;
-			_size -= 1;
-			if (target == _root)
-			{
-				_root = NULL;
-				update_end();
-			}
-			return (1);
-		}
-
-		// 2. if node has one child, child replaces it (rearrange pointers)
-		// left case
-		if (target->left && !target->right)
-		{
-			*(parent_ptr_to_child(target)) = target->left;
-			target->left->parent = target->parent;
-			if (target == _root)
-			{
-				_root = target->left;
-				update_end();
-			}
-			delete target;
-			_size -= 1;
-			return (1);
-		}
-		// right case
-		if (target->right && !target->left)
-		{
-			*(parent_ptr_to_child(target)) = target->right;
-			target->right->parent = target->parent;
-			if (target == _root)
-			{
-				_root = target->right;
-				update_end();
-			}
-			delete target;
-			_size -= 1;
-			return (1);
-		}
-
-		// 3. if node has two children,
-		
-		// 	find the predecessor (max in left sub-tree)
-		node *predecessor = find_predecessor(target); // predecessor->right is NULL.
-		// connect predecessor's parent with its left child
-		if (predecessor->left)
-			predecessor->left->parent = predecessor->parent;
-		*(parent_ptr_to_child(predecessor)) = predecessor->left;
-		// substitute target by predecessor
-		predecessor->left = target->left;
-		predecessor->right = target->right;
-		predecessor->parent = target->parent;
-		*(parent_ptr_to_child(target)) = predecessor;
-		if (target == _root)
-		{
-			_root = predecessor;
-			update_end();
-			std::cout << _end->parent << std::endl;
-			std::cout << _end->left << std::endl;
-			std::cout << _end->right << std::endl;
-			std::cout << _root << std::endl;
-			std::cout << _root->parent << std::endl;
-			std::cout << _end << std::endl;
-
-		}
+		detach_node(target);
 		delete target;
 		_size -= 1;
 		return (1);

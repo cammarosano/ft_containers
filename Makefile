@@ -12,7 +12,7 @@ unit_test:	$(HEADER)
 			@ $(CC) $(CFLAGS) unit_test.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
 
-map_test:	ft_map.hpp
+map_test:	ft_map.hpp map_iterator.hpp utils.hpp
 			@ $(CC) $(CFLAGS) unit_test_map.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
 
