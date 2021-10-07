@@ -84,15 +84,6 @@ private:
 		return (root);
 	}
 
-	// returns address of parent's left or right accordingly
-	// returns left pointer in case _end is the parent
-	node **parent_ptr_to_child(node *child) const
-	{
-		if (child->parent->left == child)
-			return (&child->parent->left);
-		return (&child->parent->right);
-	}
-
 	// new_child could be NULL
 	void update_parent_ptr2child(node *old_child, node *new_child)
 	{
@@ -237,7 +228,7 @@ public:
 		return (ret);
 	}
 
-	iterator insert (iterator position, value_type const & val)
+	iterator insert(iterator position, value_type const & val)
 	{
 		node *predecessor;
 		ft::pair<iterator, bool> ret;
@@ -253,12 +244,17 @@ public:
 		return (ret.first);
 	}
 
-	void clear()
+	template <typename I>
+	void insert(I first, I last)
 	{
-		clear(&_root);
-		_size = 0;
+		iterator hint = end();
+		while (first != last)
+		{
+			hint = insert(hint, *first);
+			++first;
+		}
 	}
-
+	
 	size_type erase(key_type const & k)
 	{
 		node * target;
@@ -291,6 +287,32 @@ public:
 		}
 	}
 
+	void swap(map& x)
+	{
+		node *temp_ptr;
+		size_type temp_size;
+
+		// swap _end
+		temp_ptr = _end;
+		_end = x._end;
+		x._end = temp_ptr;
+
+		// update _root
+		_root = _end->left;
+		x._root = x._end->left;
+
+		// swap _size
+		temp_size = _size;
+		_size = x._size;
+		x._size = temp_size;
+	}
+
+	void clear()
+	{
+		clear(&_root);
+		_size = 0;
+	}
+
 	/* Operations */ 
 
 	iterator find(key_type const & k)
@@ -304,6 +326,39 @@ public:
 			return (0);
 		return (1);
 	}
+	
+	// IN CONSRTUCTION!!!
+	node * lower_bound(node *root, key_type const & k)
+	{
+		node * candidate = _end;
+		while (root)
+		{
+			if (root->kv_pair.first < k)
+				root = root->right;
+			else if (!(root->kv_pair.first < k))
+			{
+				candidate = root;
+				root = root->left;
+			}
+			else // equal
+			{
+				return (root);
+			}
+		}
+		return (candidate);
+
+	}
+
+	iterator lower_bound(key_type const & k)
+	{
+		node *ptr = _root;
+		while (ptr)
+		{
+			if (ptr->kv_pair.first < k)
+
+		}
+	}
+
 
 
 

@@ -2,6 +2,7 @@
 #include <iostream>
 #include "ft_map.hpp"
 #include <string>
+#include <vector>
 
 
 ft::map<int, std::string> m;
@@ -308,4 +309,22 @@ Test(insert, hint, .init=setup)
 	}
 }
 
+Test(insert, range, .init=setup)
+{
+	std::vector<ft::pair<int, std::string>> v;
+
+	v.push_back(ft::make_pair(0, ""));
+	v.push_back(ft::make_pair(2, ""));
+	v.push_back(ft::make_pair(4, ""));
+	v.push_back(ft::make_pair(6, ""));
+	v.push_back(ft::make_pair(8, ""));
+
+	m.insert(v.begin(), v.end());
+	cr_expect(m.size() == 7);
+
+}
+
+// TODO: test swap
+// consider making _end const (and not swaping it)
+// consider not having a _root
 
