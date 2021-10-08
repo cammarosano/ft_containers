@@ -122,34 +122,35 @@ namespace ft
 
 	/* Node */
 
-	template < typename Key, typename T >
+	template < typename ValueType >
 	struct Node
 	{
-		typedef ft::pair<const Key, T> ValueType;
-
 		Node *		left;
 		Node *		right;
 		Node *		parent;
-		ValueType *	kv_pair;
+		ValueType *	content;
 
-		Node(ValueType *item):
-		left(NULL), right(NULL), parent(NULL), kv_pair(item)
+		Node(ValueType *content):
+		left(NULL), right(NULL), parent(NULL), content(content)
 		{
 		}
 		// default contructor - should not be used
 		Node():
-		left(NULL), right(NULL), parent(NULL), kv_pair(NULL)
+		left(NULL), right(NULL), parent(NULL), content(NULL)
 		{
 		}
 		~Node()
 		{
 		}
+	};
 
-		Key const & key() const
+	template <typename T>
+	struct less
+	{
+		bool operator()(T const & x, T const & y) const
 		{
-			return (kv_pair->first);
+			return (x < y);
 		}
-
 	};
 
 }

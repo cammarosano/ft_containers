@@ -3,6 +3,7 @@
 #include "ft_map.hpp"
 #include <string>
 #include <vector>
+#include <map>
 
 
 ft::map<int, std::string> m;
@@ -405,9 +406,40 @@ Test(swap, test, .init = setup)
 
 }
 
+Test(reverse_iterator, test, .init=setup)
+{
+	ft::map<int, std::string>::reverse_iterator rit = m.rbegin();
+
+	// while (rit != m.rend())
+	// {
+	// 	std::cout << rit->first << ": " << rit->second << std::endl;
+	// 	++rit;
+	// }
+	int i = 3;
+	while (rit != m.rend())
+	{
+		cr_expect(rit->first == i);
+		++rit;
+		--i;
+	}
+}
+
 // TODO
 // test get_allocator
-
 // change < by _compare
-// create a node_allocator object that uses std::allocator and has methods
-// 	new_node and delete_node. Node kv_pair would become a pointer in this case
+
+Test(max_size, test, .init=setup)
+{
+	std::map<int, double> std_map;
+	// std::cout << "STL MAP\n";
+	// std::cout << "max_size(): " << std_map.max_size() << std::endl;
+	// std::cout << "get_allocator().max_size(): " << std_map.get_allocator().max_size() << std::endl;
+
+	std::map<int, double> m;
+	// std::cout << "ft::map\n";
+	// std::cout << "max_size(): " << m.max_size() << std::endl;
+	// std::cout << "get_allocator().max_size(): " << m.get_allocator().max_size() << std::endl;
+
+	cr_expect(std_map.max_size() == m.max_size());
+
+}

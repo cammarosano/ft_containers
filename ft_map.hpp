@@ -5,18 +5,10 @@
 
 #include "utils.hpp"
 #include "map_iterator.hpp"
+#include "reverse_iterator.hpp"
 
 namespace ft
 {
-	template <typename T>
-	struct less
-	{
-		bool operator()(T const & x, T const & y) const
-		{
-			return (x < y);
-		}
-	};
-
 	template <typename Key, typename T, typename Compare>
 	class map;
 }
@@ -30,14 +22,14 @@ public:
 	typedef	T									mapped_type;
 	typedef pair<const key_type, mapped_type>	value_type;
 	typedef std::size_t							size_type;
-	// typedef ft::map_iterator<value_type>		iterator; // I shall revert back to this
-	typedef ft::map_iterator<Key, T>			iterator;
+	typedef ft::map_iterator<value_type>		iterator;
+	typedef ft::reverse_iterator<iterator>		reverse_iterator;
 	typedef Compare								key_compare;
 	typedef std::allocator<value_type>			allocator_type;
 
 private:
 
-	typedef Node<Key, T>	node;
+	typedef Node<value_type>	node;
 
 	size_type		_size;
 	node *			_root;
@@ -50,6 +42,11 @@ private:
 	{
 		// nasty stuff!!!
 		return (*reinterpret_cast<node * const *>(&it));
+	}
+
+	key_type const & key(node *n) const
+	{
+		return (n->content->first);
 	}
 
 	node *new_node(value_type const & val)
@@ -66,8 +63,8 @@ private:
 
 	void delete_node(node * &ptr)
 	{
-		_allocator.destroy(ptr->kv_pair);
-		_allocator.deallocate(ptr->kv_pair, 1);
+		_allocator.destroy(ptr->content);
+		_allocator.deallocate(ptr->content, 1);
 		_node_allocator.destroy(ptr);
 		_node_allocator.deallocate(ptr, 1);
 		ptr = NULL;
@@ -83,9 +80,9 @@ private:
 			_size += 1;
 			return (ft::make_pair(iterator(*root), true));
 		}
-		if (_compare(val.first, (*root)->key()))
+		if (_compare(val.first, key(*root)))
 			return (insert(&(*root)->left, *root, val));
-		if (_compare((*root)->key(), val.first))
+		if (_compare(key(*root), val.first))
 			return (insert(&(*root)->right, *root, val));
 		return (ft::make_pair(iterator(*root), false));
 	}
@@ -109,9 +106,9 @@ private:
 	{
 		if (!root)
 			return (_end);
-		if (_compare(k, root->key()))
+		if (_compare(k, key(root)))
 			return (find(k, root->left));
-		if (_compare(root->key(), k))
+		if (_compare(key(root), k))
 			return (find(k, root->right));
 		return (root);
 	}
@@ -200,9 +197,9 @@ private:
 	{
 		if (!root)
 			return (NULL);
-		if (root->key() < k)
+		if (key(root) < k)
 			return (lower_bound(root->right, k));
-		if (k < root->key())
+		if (k < key(root))
 		{
 			node * better_candidate = lower_bound(root->left, k);
 			if (better_candidate)
@@ -215,7 +212,7 @@ private:
 	{
 		if (!root)
 			return (NULL);
-		if (!(k < root->key()))
+		if (!(k < key(root)))
 			return (upper_bound(root->right, k));
 		node * better_candidate = upper_bound(root->left, k);
 		if (better_candidate)
@@ -235,7 +232,7 @@ public:
 	{
 		clear();
 		// delete _end;
-		_allocator.deallocate(_end->kv_pair, 1);
+		_allocator.deallocate(_end->content, 1);
 		_node_allocator.destroy(_end);
 		_node_allocator.deallocate(_end, 1);
 	}
@@ -250,9 +247,19 @@ public:
 		return (iterator(ptr));
 	}
 
+	reverse_iterator rbegin()
+	{
+		return (reverse_iterator(end()));
+	}
+
 	iterator end()
 	{
 		return (iterator(_end));
+	}
+
+	reverse_iterator rend()
+	{
+		return (reverse_iterator(begin()));
 	}
 	
 	/* Capacity */
@@ -265,6 +272,13 @@ public:
 	size_type size() const
 	{
 		return (_size);
+	}
+
+	size_type max_size() const
+	{
+		// double factor = 1 / (1 + static_cast<double>(sizeof(node)) / sizeof(value_type));
+		return (_allocator.max_size() * sizeof(value_type) /
+						(sizeof(value_type) + sizeof(node)));
 	}
 
 	/* Element access */
