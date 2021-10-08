@@ -5,19 +5,19 @@
 
 namespace ft
 {
-	template <typename T>
+	template <typename Key, typename T>
 	class map_iterator
 	{
 	public: // should I just inherit from a base class of iterator?
 
 		typedef std::ptrdiff_t					difference_type;
-		typedef T								value_type;
-		typedef T *								pointer;
-		typedef T &								reference;
+		typedef ft::pair<const Key, T>			value_type;
+		typedef value_type *					pointer;
+		typedef value_type &					reference;
 		typedef std::bidirectional_iterator_tag	iterator_category;
 
 	private:
-		typedef ft::Node<value_type> node;
+		typedef ft::Node<Key, T> node;
 
 		node *_ptr;
 
@@ -77,12 +77,12 @@ namespace ft
 
 		reference operator*() const
 		{
-			return (_ptr->kv_pair);
+			return (*_ptr->kv_pair);
 		}
 
 		pointer operator->() const
 		{
-			return (&_ptr->kv_pair);
+			return (_ptr->kv_pair);
 		}
 
 		map_iterator & operator++()

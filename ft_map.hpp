@@ -30,21 +30,21 @@ public:
 	typedef	T									mapped_type;
 	typedef pair<const key_type, mapped_type>	value_type;
 	typedef std::size_t							size_type;
-	typedef ft::map_iterator<value_type>		iterator;
+	// typedef ft::map_iterator<value_type>		iterator; // I shall revert back to this
+	typedef ft::map_iterator<Key, T>			iterator;
 	typedef Compare								key_compare;
 	typedef std::allocator<value_type>			allocator_type;
 
 private:
 
-	typedef Node<value_type>	node;
-	typedef std::allocator<node>	node_allocator_type;
+	typedef Node<Key, T>	node;
 
 	size_type		_size;
 	node *			_root;
 	node *			_end;
 	key_compare		_compare;
-	node_allocator_type	_node_allocator;
-	allocator_type	_allocator;	// the one I don't actually use
+	allocator_type	_allocator;
+	std::allocator<node> _node_allocator;
 
 	node * get_node_address(iterator const & it)
 	{
@@ -52,8 +52,22 @@ private:
 		return (*reinterpret_cast<node * const *>(&it));
 	}
 
+	node *new_node(value_type const & val)
+	{
+		value_type	*pair;
+		node		*n;
+
+		pair = _allocator.allocate(1);
+		_allocator.construct(pair, val);
+		n = _node_allocator.allocate(1);
+		_node_allocator.construct(n, node(pair));
+		return (n);
+	}
+
 	void delete_node(node * &ptr)
 	{
+		_allocator.destroy(ptr->kv_pair);
+		_allocator.deallocate(ptr->kv_pair, 1);
 		_node_allocator.destroy(ptr);
 		_node_allocator.deallocate(ptr, 1);
 		ptr = NULL;
@@ -62,18 +76,16 @@ private:
 	ft::pair<iterator, bool>
 	insert (node ** root, node *parent, value_type const & val)
 	{
-		if ((*root) == NULL)
+		if (*root == NULL)
 		{
-			// *root = new node(val); // use std::allocator instead
-			*root = _node_allocator.allocate(1);
-			_node_allocator.construct(*root, node(val));
+			*root = new_node(val);
 			(*root)->parent = parent;
 			_size += 1;
 			return (ft::make_pair(iterator(*root), true));
 		}
-		if (_compare(val.first, (*root)->kv_pair.first))
+		if (_compare(val.first, (*root)->key()))
 			return (insert(&(*root)->left, *root, val));
-		if (_compare((*root)->kv_pair.first, val.first))
+		if (_compare((*root)->key(), val.first))
 			return (insert(&(*root)->right, *root, val));
 		return (ft::make_pair(iterator(*root), false));
 	}
@@ -97,9 +109,9 @@ private:
 	{
 		if (!root)
 			return (_end);
-		if (_compare(k, root->kv_pair.first))
+		if (_compare(k, root->key()))
 			return (find(k, root->left));
-		if (_compare(root->kv_pair.first, k))
+		if (_compare(root->key(), k))
 			return (find(k, root->right));
 		return (root);
 	}
@@ -188,9 +200,9 @@ private:
 	{
 		if (!root)
 			return (NULL);
-		if (root->kv_pair.first < k)
+		if (root->key() < k)
 			return (lower_bound(root->right, k));
-		if (k < root->kv_pair.first)
+		if (k < root->key())
 		{
 			node * better_candidate = lower_bound(root->left, k);
 			if (better_candidate)
@@ -203,7 +215,7 @@ private:
 	{
 		if (!root)
 			return (NULL);
-		if (!(k < root->kv_pair.first))
+		if (!(k < root->key()))
 			return (upper_bound(root->right, k));
 		node * better_candidate = upper_bound(root->left, k);
 		if (better_candidate)
@@ -217,13 +229,15 @@ public:
 	{
 		// _end = new node();
 		_end = _node_allocator.allocate(1);
-		_node_allocator.construct(_end, node());
+		_node_allocator.construct(_end, node(_allocator.allocate(1))); // pair is allocated but not constructed
 	}
 	~map()
 	{
 		clear();
 		// delete _end;
-		delete_node(_end);
+		_allocator.deallocate(_end->kv_pair, 1);
+		_node_allocator.destroy(_end);
+		_node_allocator.deallocate(_end, 1);
 	}
 
 	/* Iterators */
@@ -286,7 +300,6 @@ public:
 
 		if (check_hint(position, val.first))
 		{
-			// std::cout << "good hint for inserting " << val.first << std::endl;
 			predecessor = get_node_address(position);
 			ret = insert(&predecessor->right, predecessor, val);
 		}
