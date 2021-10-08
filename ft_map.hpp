@@ -330,33 +330,27 @@ public:
 	// IN CONSRTUCTION!!!
 	node * lower_bound(node *root, key_type const & k)
 	{
-		node * candidate = _end;
-		while (root)
+		if (!root)
+			return (NULL);
+		if (root->kv_pair.first < k)
+			return (lower_bound(root->right, k));
+		if (k < root->kv_pair.first)
 		{
-			if (root->kv_pair.first < k)
-				root = root->right;
-			else if (!(root->kv_pair.first < k))
-			{
-				candidate = root;
-				root = root->left;
-			}
-			else // equal
-			{
-				return (root);
-			}
+			node * better_candidate = lower_bound(root->left, k);
+			if (better_candidate)
+				return (better_candidate);
 		}
-		return (candidate);
-
+		return (root);
 	}
 
 	iterator lower_bound(key_type const & k)
 	{
-		node *ptr = _root;
-		while (ptr)
-		{
-			if (ptr->kv_pair.first < k)
+		node *ptr;
 
-		}
+		ptr = lower_bound(_root, k);
+		if (!ptr)
+			return (end());
+		return (iterator(ptr));
 	}
 
 

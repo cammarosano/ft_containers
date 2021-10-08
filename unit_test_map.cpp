@@ -324,7 +324,7 @@ Test(insert, range, .init=setup)
 
 }
 
-// TODO: test swap
+// TODO: test swap, lower_bound
 // consider making _end const (and not swaping it)
 // consider not having a _root
 
