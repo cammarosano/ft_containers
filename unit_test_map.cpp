@@ -328,3 +328,86 @@ Test(insert, range, .init=setup)
 // consider making _end const (and not swaping it)
 // consider not having a _root
 
+Test(lower_and_upper_bound, test, .init=setup)
+{
+	ft::map<int, std::string>::iterator it;
+
+	int key;
+
+	key = 0;
+	it = m.lower_bound(key);
+	cr_expect(it->first == 0);
+	it = m.upper_bound(key);
+	cr_expect(it->first == 1);
+
+	key = 1;
+	it = m.lower_bound(key);
+	cr_expect(it->first == 1);
+	it = m.upper_bound(key);
+	cr_expect(it->first == 2);
+
+	key = 2;
+	it = m.lower_bound(key);
+	cr_expect(it->first == 2);
+	it = m.upper_bound(key);
+	cr_expect(it->first == 3);
+
+	key = 3;
+	it = m.lower_bound(key);
+	cr_expect(it->first == 3);
+	it = m.upper_bound(key);
+	cr_expect(it == m.end());
+
+	key = 4;
+	it = m.lower_bound(key);
+	cr_expect(it == m.end());
+	it = m.upper_bound(key);
+	cr_expect(it == m.end());
+
+	key = -1;
+	it = m.lower_bound(key);
+	cr_expect(it->first == 0);
+	it = m.upper_bound(key);
+	cr_expect(it->first == 0);
+
+}
+
+Test(equal_range, test, .init = setup)
+{
+	cr_expect(((m.equal_range(0)).first)->first == 0);
+	cr_expect(((m.equal_range(0)).second)->first == 1);
+
+	cr_expect(((m.equal_range(-1)).first)->first == 0);
+	cr_expect(((m.equal_range(-1)).second)->first == 0);
+
+	cr_expect(((m.equal_range(4)).first) == m.end());
+	cr_expect(((m.equal_range(4)).second) == m.end());
+}
+
+Test(swap, test, .init = setup)
+{
+	ft::map<int, std::string> m2;
+	m2.insert(ft::make_pair(10, "ten"));
+	m2.insert(ft::make_pair(15, "vijftien"));
+	m2.insert(ft::make_pair(20, "twintig"));
+	m2.insert(ft::make_pair(25, "vijfentwintig"));
+	m2.insert(ft::make_pair(30, "dertig"));
+
+	ft::map<int, std::string>::iterator it, it2;
+	it = m.begin();
+	it2 = m2.begin();
+
+	m.swap(m2);
+
+	cr_expect(it->first == 0 && it2->first == 10);
+	cr_expect(m.size() == 5 && m2.size() == 4);
+	cr_expect(m2[0] == "zero" && m[10] == "ten");
+
+}
+
+// TODO
+// test get_allocator
+
+// change < by _compare
+// create a node_allocator object that uses std::allocator and has methods
+// 	new_node and delete_node. Node kv_pair would become a pointer in this case

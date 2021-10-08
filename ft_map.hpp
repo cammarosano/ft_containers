@@ -8,28 +8,43 @@
 
 namespace ft
 {
-	template <	typename Key,
-				typename T > class map;
+	template <typename T>
+	struct less
+	{
+		bool operator()(T const & x, T const & y) const
+		{
+			return (x < y);
+		}
+	};
+
+	template <typename Key, typename T, typename Compare>
+	class map;
 }
 
-template < typename Key, typename T >
+template < typename Key, typename T, typename Compare = ft::less<Key> >
 class ft::map
 {
 public:
 
-	typedef	Key								key_type;
-	typedef	T								mapped_type;
-	typedef pair<const key_type, mapped_type> value_type;
-	typedef std::size_t						size_type;
-	typedef ft::map_iterator<value_type>	iterator;
+	typedef	Key									key_type;
+	typedef	T									mapped_type;
+	typedef pair<const key_type, mapped_type>	value_type;
+	typedef std::size_t							size_type;
+	typedef ft::map_iterator<value_type>		iterator;
+	typedef Compare								key_compare;
+	typedef std::allocator<value_type>			allocator_type;
 
 private:
 
 	typedef Node<value_type>	node;
+	typedef std::allocator<node>	node_allocator_type;
 
-	size_type	_size;
-	node *		_root;
-	node *		_end;
+	size_type		_size;
+	node *			_root;
+	node *			_end;
+	key_compare		_compare;
+	node_allocator_type	_node_allocator;
+	allocator_type	_allocator;	// the one I don't actually use
 
 	node * get_node_address(iterator const & it)
 	{
@@ -37,27 +52,30 @@ private:
 		return (*reinterpret_cast<node * const *>(&it));
 	}
 
-	ft::pair<iterator, bool> insert (node ** root, node *parent, value_type const & val)
+	void delete_node(node * &ptr)
 	{
-		node * current_node = *root;
-		ft::pair<iterator, bool> ret;
+		_node_allocator.destroy(ptr);
+		_node_allocator.deallocate(ptr, 1);
+		ptr = NULL;
+	}
 
-		if (current_node == NULL)
+	ft::pair<iterator, bool>
+	insert (node ** root, node *parent, value_type const & val)
+	{
+		if ((*root) == NULL)
 		{
-			*root = new node(val); // use std::allocator instead
+			// *root = new node(val); // use std::allocator instead
+			*root = _node_allocator.allocate(1);
+			_node_allocator.construct(*root, node(val));
 			(*root)->parent = parent;
 			_size += 1;
-			ret.first = iterator(*root);
-			ret.second = true;
-			return (ret);
+			return (ft::make_pair(iterator(*root), true));
 		}
-		if (val.first < current_node->kv_pair.first) // change < for a comp function
-			return (insert(&current_node->left, current_node, val));
-		if (current_node->kv_pair.first < val.first)
-			return (insert(&current_node->right, current_node, val));
-		ret.first = iterator(current_node);
-		ret.second = false;
-		return (ret);
+		if (_compare(val.first, (*root)->kv_pair.first))
+			return (insert(&(*root)->left, *root, val));
+		if (_compare((*root)->kv_pair.first, val.first))
+			return (insert(&(*root)->right, *root, val));
+		return (ft::make_pair(iterator(*root), false));
 	}
 
 	void clear(node **root)
@@ -66,9 +84,11 @@ private:
 		{
 			clear(&(*root)->left);
 			clear(&(*root)->right);
-			// std::cout << "deleting " << (*root)->kv_pair.first << std::endl;
-			delete (*root);	// use std::allocator instead
-			*root = NULL;
+			// delete (*root);	// use std::allocator instead
+			delete_node(*root);
+			// _allocator.destroy(*root);
+			// _allocator.deallocate(*root, 1);
+			// *root = NULL;
 		}
 	}
 
@@ -77,9 +97,9 @@ private:
 	{
 		if (!root)
 			return (_end);
-		if (k < root->kv_pair.first) // change for comp object
+		if (_compare(k, root->kv_pair.first))
 			return (find(k, root->left));
-		if (k > root->kv_pair.first) // idem
+		if (_compare(root->kv_pair.first, k))
 			return (find(k, root->right));
 		return (root);
 	}
@@ -145,10 +165,11 @@ private:
 	void erase_node(node *target)
 	{
 		remove_node(target);
-		delete target;
-		_size -= 1;
 		if (target == _root)
 			_root = _end->left;
+		// delete target;
+		delete_node(target);
+		_size -= 1;
 	}
 
 	bool check_hint(iterator position, key_type const & key)
@@ -163,16 +184,46 @@ private:
 		return true;
 	}
 
+	node * lower_bound(node *root, key_type const & k)
+	{
+		if (!root)
+			return (NULL);
+		if (root->kv_pair.first < k)
+			return (lower_bound(root->right, k));
+		if (k < root->kv_pair.first)
+		{
+			node * better_candidate = lower_bound(root->left, k);
+			if (better_candidate)
+				return (better_candidate);
+		}
+		return (root);
+	}
+
+	node * upper_bound(node *root, key_type const & k)
+	{
+		if (!root)
+			return (NULL);
+		if (!(k < root->kv_pair.first))
+			return (upper_bound(root->right, k));
+		node * better_candidate = upper_bound(root->left, k);
+		if (better_candidate)
+			return (better_candidate);
+		return (root);
+	}
+
 public:
 	// default constructor
 	map(): _size(0), _root(NULL)
 	{
-		_end = new node();
+		// _end = new node();
+		_end = _node_allocator.allocate(1);
+		_node_allocator.construct(_end, node());
 	}
 	~map()
 	{
 		clear();
-		delete _end;
+		// delete _end;
+		delete_node(_end);
 	}
 
 	/* Iterators */
@@ -326,22 +377,6 @@ public:
 			return (0);
 		return (1);
 	}
-	
-	// IN CONSRTUCTION!!!
-	node * lower_bound(node *root, key_type const & k)
-	{
-		if (!root)
-			return (NULL);
-		if (root->kv_pair.first < k)
-			return (lower_bound(root->right, k));
-		if (k < root->kv_pair.first)
-		{
-			node * better_candidate = lower_bound(root->left, k);
-			if (better_candidate)
-				return (better_candidate);
-		}
-		return (root);
-	}
 
 	iterator lower_bound(key_type const & k)
 	{
@@ -352,10 +387,27 @@ public:
 			return (end());
 		return (iterator(ptr));
 	}
+	
+	iterator upper_bound(key_type const & k)
+	{
+		node *ptr;
 
+		ptr = upper_bound(_root, k);
+		if (!ptr)
+			return (end());
+		return (iterator(ptr));
+	}
 
+	ft::pair<iterator, iterator> equal_range (key_type const & k)
+	{
+		return (ft::pair<iterator, iterator>(lower_bound(k), upper_bound(k)));
+	}
 
-
+	/* Allocator */
+	allocator_type get_allocator() const
+	{
+		return (_allocator);
+	}
 };
 
 
