@@ -27,6 +27,23 @@ public:
 	typedef Compare								key_compare;
 	typedef std::allocator<value_type>			allocator_type;
 
+	class value_compare
+	{
+	private:
+		key_compare _compare;
+	
+	public:
+		value_compare(key_compare c): _compare(c) {} // made it public to avoid the use of friend
+
+		bool operator() (value_type const & x, value_type const & y)
+		{
+			return (_compare(x.first, y.first));
+		}
+
+		// some typedefs here (see reference)
+
+	};
+
 private:
 
 	typedef Node<value_type>	node;
@@ -37,6 +54,7 @@ private:
 	key_compare		_compare;
 	allocator_type	_allocator;
 	std::allocator<node> _node_allocator;
+
 
 	node * get_node_address(iterator const & it)
 	{
@@ -390,6 +408,20 @@ public:
 		clear(&_root);
 		_size = 0;
 	}
+
+	/* Observers */ 
+
+	key_compare key_comp(void) const
+	{
+		return (_compare);
+	}
+
+	value_compare value_comp(void) const
+	{
+		return (value_compare(_compare));
+	}
+
+
 
 	/* Operations */ 
 

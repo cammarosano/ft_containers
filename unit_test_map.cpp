@@ -424,9 +424,18 @@ Test(reverse_iterator, test, .init=setup)
 	}
 }
 
-// TODO
-// test get_allocator
-// change < by _compare
+Test(get_allocator, test, .init=setup)
+{
+	ft::map<int, std::string>::allocator_type my_allocator = m.get_allocator();
+	ft::map<int, std::string>::value_type * pair = my_allocator.allocate(2);
+	my_allocator.construct(pair, ft::make_pair(42, "forty-two"));
+	my_allocator.construct(pair + 1, ft::make_pair(19, "nineteen"));
+	cr_expect(pair->first == 42);
+	cr_expect((pair + 1)->second == "nineteen");
+	my_allocator.destroy(pair);
+	my_allocator.destroy(pair + 1);
+	my_allocator.deallocate(pair, 2);
+}
 
 Test(max_size, test, .init=setup)
 {
@@ -435,11 +444,26 @@ Test(max_size, test, .init=setup)
 	// std::cout << "max_size(): " << std_map.max_size() << std::endl;
 	// std::cout << "get_allocator().max_size(): " << std_map.get_allocator().max_size() << std::endl;
 
-	std::map<int, double> m;
+	ft::map<int, double> m;
 	// std::cout << "ft::map\n";
 	// std::cout << "max_size(): " << m.max_size() << std::endl;
 	// std::cout << "get_allocator().max_size(): " << m.get_allocator().max_size() << std::endl;
 
 	cr_expect(std_map.max_size() == m.max_size());
+}
 
+Test(key_comp, test, .init=setup)
+{
+	ft::map<int, std::string>::key_compare my_comp = m.key_comp();
+
+	cr_expect(my_comp(1, 2));
+	cr_expect(!my_comp(2, 2));
+	cr_expect(!my_comp(3, 2));
+
+}
+
+Test(value_comp, test, .init=setup)
+{
+	ft::map<int, std::string>::iterator it = m.begin();
+	cr_expect(m.value_comp()(*it, *(++it)));
 }
