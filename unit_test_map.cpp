@@ -404,6 +404,8 @@ Test(swap, test, .init = setup)
 	cr_expect(m.size() == 5 && m2.size() == 4);
 	cr_expect(m2[0] == "zero" && m[10] == "ten");
 
+	swap(m, m2);
+	cr_expect(m.size() == 4 && m2.size() == 5);
 }
 
 Test(reverse_iterator, test, .init=setup)
@@ -466,4 +468,72 @@ Test(value_comp, test, .init=setup)
 {
 	ft::map<int, std::string>::iterator it = m.begin();
 	cr_expect(m.value_comp()(*it, *(++it)));
+}
+
+Test(pair, relational_operators)
+{
+	cr_expect(ft::make_pair(0, 0.0) == ft::make_pair(0, 0.0));
+
+	cr_expect(ft::make_pair(0, 0.0) != ft::make_pair(0, 0.1));
+	cr_expect(ft::make_pair(0, 0.0) != ft::make_pair(1, 0.0));
+
+	cr_expect(ft::make_pair(0, 0.0) < ft::make_pair(1, 0.0));
+	cr_expect(ft::make_pair(0, 0.0) < ft::make_pair(0, 0.1));
+	cr_expect(!(ft::make_pair(0, 0.0) < ft::make_pair(0, 0.0)));
+
+	cr_expect(ft::make_pair(0, 0.0) <= ft::make_pair(0, 0.1));
+	cr_expect(ft::make_pair(0, 0.0) <= ft::make_pair(0, 0.0));
+
+	cr_expect(ft::make_pair(1, 0.0) > ft::make_pair(0, 0.0));
+	cr_expect(ft::make_pair(0, 0.1) > ft::make_pair(0, 0.0));
+	cr_expect(!(ft::make_pair(0, 0.0) > ft::make_pair(0, 0.0)));
+
+	cr_expect(ft::make_pair(1, 0.0) >= ft::make_pair(0, 0.0));
+	cr_expect(ft::make_pair(0, 0.1) >= ft::make_pair(0, 0.0));
+	cr_expect(ft::make_pair(0, 0.0) >= ft::make_pair(0, 0.0));
+}
+
+Test(const_iterator, begin, .init=setup)
+{
+	ft::map<int, std::string> const m2;
+
+
+
+	ft::map<int, std::string>::const_iterator cit = m2.begin();
+	(void)cit;
+
+	// cr_expect(cit->first == 0); // read
+	// cit->second = "hello"; // should not compile
+}
+
+Test(relational_operators, equal, .init=setup)
+{
+	ft::map<int, std::string> m2;
+	m2[1] = "one";
+	m2[0] = "zero";
+	m2[2] = "two";
+	cr_expect(!(m == m2));
+
+	m2[3] = "three";
+	cr_expect(m == m2);
+
+	cr_expect(!(m != m2));
+	m2[4] = "four";
+	cr_expect(m != m2);
+}
+
+Test(relational_operator, others, .init=setup)
+{
+	ft::map<int, std::string> m2;
+	m2[1] = "one";
+	cr_expect(m < m2);
+
+	m2[0] = "zero";
+	cr_expect(!(m < m2));
+	cr_expect(m > m2);
+	cr_expect(m >= m2);
+
+	m2[2] = "z";
+	cr_expect(m < m2);
+	cr_expect(m <= m2);
 }

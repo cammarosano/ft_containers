@@ -75,6 +75,13 @@ namespace ft
 			return (*this);
 		}
 
+		// iterator must be convertible to const_iterator
+		operator map_iterator<const T>() const
+		{
+			std::cout << "conversion from interator to const_iterator" << std::endl; // debug message
+			return (map_iterator<const T>(reinterpret_cast<Node<const T>*>(_ptr)));
+		}
+
 		reference operator*() const
 		{
 			return (*_ptr->content);
