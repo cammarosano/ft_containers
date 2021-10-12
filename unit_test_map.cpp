@@ -538,4 +538,101 @@ Test(relational_operator, others, .init=setup)
 	cr_expect(m <= m2);
 }
 
-// TODO: constructors, reverse_const_iterators
+Test(constructor, range)
+{
+	ft::map<char,int> m;
+	m['a'] = 10;
+	m['b'] = 20;
+	m['c'] = 30;
+	m['d'] = 40;
+
+	ft::map<char,int> m2(m.begin(), m.end());
+	ft::map<char,int>::iterator it, it2;
+	it = m.begin();
+	it2 = m2.begin();
+	while (it2 != m2.end())
+	{
+		// std::cout << it2->first << ": " << it2->second << std::endl;
+		cr_expect(*it2 == *it);
+		++it2;
+		++it;
+	}
+	cr_expect(m2.size() == m.size());
+}
+
+Test(constructor, copy, .init=setup)
+{
+	ft::map<int, std::string>m2(m);
+
+	ft::map<int, std::string>::iterator it, it2;
+	it = m.begin();
+	it2 = m2.begin();
+	while (it2 != m2.end())
+	{
+		// std::cout << it2->first << ": " << it2->second << std::endl;
+		cr_expect(*it2 == *it);
+		++it2;
+		++it;
+	}
+	cr_expect(m2.size() == m.size());
+}
+
+Test(assignation_operator, test, .init=setup)
+{
+	ft::map<int, std::string>m2(m);
+	m2[0] = "hello";
+	m2[1] = "there";
+
+	m2 = m;
+
+	ft::map<int, std::string>::iterator it, it2;
+	it = m.begin();
+	it2 = m2.begin();
+	while (it2 != m2.end())
+	{
+		// std::cout << it2->first << ": " << it2->second << std::endl;
+		cr_expect(*it2 == *it);
+		++it2;
+		++it;
+	}
+	cr_expect(m2.size() == m.size());
+}
+
+bool comp_f(int a, int b)
+{
+	return (a > b);
+}
+
+Test(constructor, pointer_to_function)
+{
+	bool (*fn_ptr)(int, int) = comp_f;
+
+	ft::map<int, int, bool (*)(int,int)> m(fn_ptr);
+	m[0] = 42;
+	m[1] = 42;
+	m[2] = 42;
+	m[3] = 42;
+
+	ft::map<int,int>::iterator it = m.begin();
+	cr_expect(it->first == 3);
+	// while (it != m.end())
+	// {
+	// 	std::cout << it->first << ": " << it->second << std::endl;
+	// 	++it;
+	// }
+
+	// std::map<int,int, bool (*)(int, int)> std_m(fn_ptr);
+	// std_m[0] = 42;
+	// std_m[1] = 42;
+
+	ft::map<int, int, bool (*)(int,int)> m2(m);
+	it = m2.begin();
+	cr_expect(it->first == 3);
+
+	m2.erase(3);
+	m = m2;
+	cr_expect((m.begin())->first == 2);
+}
+
+
+// TODO: reverse_const_iterators

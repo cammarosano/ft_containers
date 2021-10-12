@@ -104,6 +104,12 @@ private:
 		return (ft::make_pair(iterator(*root), false));
 	}
 
+	void update_end(void)
+	{
+		_end->left = _root;
+		_end->right = _root;
+	}
+
 	void clear(node **root)
 	{
 		if (*root)
@@ -233,20 +239,80 @@ private:
 		return (root);
 	}
 
-public:
-	// default constructor
-	map(): _size(0), _root(NULL)
+	void setup_end(void)
 	{
 		_end = _node_allocator.allocate(1);
-		_node_allocator.construct(_end, node(_allocator.allocate(1))); // pair is allocated but not constructed
+		// pair is allocated but not constructed
+		_node_allocator.construct(_end, node(_allocator.allocate(1)));
 	}
-	~map() // consider writing helper functions for allocation and deallocation of _end
+
+	void clear_end(void)
 	{
-		clear();
-		_allocator.deallocate(_end->content, 1);
+		_allocator.deallocate(_end->content, 1); // no pair to be destroyed
 		_node_allocator.destroy(_end);
 		_node_allocator.deallocate(_end, 1);
 	}
+
+	void copy_tree(node **root, node *parent, node *src)
+	{
+		if (!src)
+		{
+			*root = NULL;
+			return ;
+		}
+		*root = new_node(*src->content);
+		(*root)->parent = parent;
+		copy_tree(&(*root)->left, *root, src->left);
+		copy_tree(&(*root)->right, *root, src->right);
+	}
+
+// ------------------------------------------------------------------------
+public:
+	// default constructor
+	explicit map(key_compare const & comp = key_compare()):
+	_size(0), _root(NULL), _compare(comp)
+	{
+		setup_end();
+	}
+
+	// range constructor
+	template <typename It>
+	map(It first, It last, key_compare const & comp = key_compare()):
+	_size(0), _root(NULL), _compare(comp)
+	{
+		setup_end();
+		while (first != last)
+		{
+			insert(&_root, _end, *first);
+			++first;
+		}
+		update_end();
+	}
+
+	// copy constructor
+	map(map const & x):
+	_root(NULL), _compare(x._compare) // needed in case Compare is a pointer to function
+	{
+		setup_end();
+		*this = x;
+	}
+
+	map & operator=(map const & x) // what to do with _compare ?
+	{
+		clear(&_root);
+		copy_tree(&_root, _end, x._root);
+		update_end();
+		_size = x._size;
+		_compare = x._compare; // important in case it's a pointer to function
+		return (*this);
+	}
+
+	~map()
+	{
+		clear();
+		clear_end();
+	}
+
 
 	/* Iterators */
 
@@ -325,10 +391,7 @@ public:
 		root_change = !(_root);
 		ret = insert(&_root, _end, val);
 		if (root_change)
-		{
-			_end->left = _root;
-			_end->right = _root;
-		}
+			update_end();
 		return (ret);
 	}
 
