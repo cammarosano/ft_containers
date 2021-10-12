@@ -404,6 +404,8 @@ Test(swap, test, .init = setup)
 	cr_expect(m.size() == 5 && m2.size() == 4);
 	cr_expect(m2[0] == "zero" && m[10] == "ten");
 
+	swap(m, m2);
+	cr_expect(m.size() == 4 && m2.size() == 5);
 }
 
 Test(reverse_iterator, test, .init=setup)
@@ -424,13 +426,17 @@ Test(reverse_iterator, test, .init=setup)
 	}
 }
 
-// TODO
-// change < by _compare
 Test(get_allocator, test, .init=setup)
 {
-	std::map<int, std::string> std_map;
-	cr_expect(m.get_allocator().max_size() == std_map.get_allocator().max_size());
-
+	ft::map<int, std::string>::allocator_type my_allocator = m.get_allocator();
+	ft::map<int, std::string>::value_type * pair = my_allocator.allocate(2);
+	my_allocator.construct(pair, ft::make_pair(42, "forty-two"));
+	my_allocator.construct(pair + 1, ft::make_pair(19, "nineteen"));
+	cr_expect(pair->first == 42);
+	cr_expect((pair + 1)->second == "nineteen");
+	my_allocator.destroy(pair);
+	my_allocator.destroy(pair + 1);
+	my_allocator.deallocate(pair, 2);
 }
 
 Test(max_size, test, .init=setup)
@@ -440,11 +446,96 @@ Test(max_size, test, .init=setup)
 	// std::cout << "max_size(): " << std_map.max_size() << std::endl;
 	// std::cout << "get_allocator().max_size(): " << std_map.get_allocator().max_size() << std::endl;
 
-	std::map<int, double> m;
+	ft::map<int, double> m;
 	// std::cout << "ft::map\n";
 	// std::cout << "max_size(): " << m.max_size() << std::endl;
 	// std::cout << "get_allocator().max_size(): " << m.get_allocator().max_size() << std::endl;
 
 	cr_expect(std_map.max_size() == m.max_size());
+}
+
+Test(key_comp, test, .init=setup)
+{
+	ft::map<int, std::string>::key_compare my_comp = m.key_comp();
+
+	cr_expect(my_comp(1, 2));
+	cr_expect(!my_comp(2, 2));
+	cr_expect(!my_comp(3, 2));
 
 }
+
+Test(value_comp, test, .init=setup)
+{
+	ft::map<int, std::string>::iterator it = m.begin();
+	cr_expect(m.value_comp()(*it, *(++it)));
+}
+
+Test(pair, relational_operators)
+{
+	cr_expect(ft::make_pair(0, 0.0) == ft::make_pair(0, 0.0));
+
+	cr_expect(ft::make_pair(0, 0.0) != ft::make_pair(0, 0.1));
+	cr_expect(ft::make_pair(0, 0.0) != ft::make_pair(1, 0.0));
+
+	cr_expect(ft::make_pair(0, 0.0) < ft::make_pair(1, 0.0));
+	cr_expect(ft::make_pair(0, 0.0) < ft::make_pair(0, 0.1));
+	cr_expect(!(ft::make_pair(0, 0.0) < ft::make_pair(0, 0.0)));
+
+	cr_expect(ft::make_pair(0, 0.0) <= ft::make_pair(0, 0.1));
+	cr_expect(ft::make_pair(0, 0.0) <= ft::make_pair(0, 0.0));
+
+	cr_expect(ft::make_pair(1, 0.0) > ft::make_pair(0, 0.0));
+	cr_expect(ft::make_pair(0, 0.1) > ft::make_pair(0, 0.0));
+	cr_expect(!(ft::make_pair(0, 0.0) > ft::make_pair(0, 0.0)));
+
+	cr_expect(ft::make_pair(1, 0.0) >= ft::make_pair(0, 0.0));
+	cr_expect(ft::make_pair(0, 0.1) >= ft::make_pair(0, 0.0));
+	cr_expect(ft::make_pair(0, 0.0) >= ft::make_pair(0, 0.0));
+}
+
+Test(const_iterator, begin, .init=setup)
+{
+	ft::map<int, std::string> const m2;
+
+
+
+	ft::map<int, std::string>::const_iterator cit = m2.begin();
+	(void)cit;
+
+	// cr_expect(cit->first == 0); // read
+	// cit->second = "hello"; // should not compile
+}
+
+Test(relational_operators, equal, .init=setup)
+{
+	ft::map<int, std::string> m2;
+	m2[1] = "one";
+	m2[0] = "zero";
+	m2[2] = "two";
+	cr_expect(!(m == m2));
+
+	m2[3] = "three";
+	cr_expect(m == m2);
+
+	cr_expect(!(m != m2));
+	m2[4] = "four";
+	cr_expect(m != m2);
+}
+
+Test(relational_operator, others, .init=setup)
+{
+	ft::map<int, std::string> m2;
+	m2[1] = "one";
+	cr_expect(m < m2);
+
+	m2[0] = "zero";
+	cr_expect(!(m < m2));
+	cr_expect(m > m2);
+	cr_expect(m >= m2);
+
+	m2[2] = "z";
+	cr_expect(m < m2);
+	cr_expect(m <= m2);
+}
+
+// TODO: constructors, reverse_const_iterators

@@ -546,6 +546,9 @@ bool operator>=(ft::vector<T> const & lhs, ft::vector<T> const & rhs)
 
 // my implementation of std::distance
 
+// TODO: change this to resolve at COMPILE-TIME, using function overload
+// with a third parameter class std::random_access_iterator_tag
+
 template<typename InputIterator>
 typename std::iterator_traits<InputIterator>::difference_type
 ft::distance(InputIterator first, InputIterator last)

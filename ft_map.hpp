@@ -9,23 +9,39 @@
 
 namespace ft
 {
-	template <typename Key, typename T, typename Compare>
-	class map;
-}
 
 template < typename Key, typename T, typename Compare = ft::less<Key> >
-class ft::map
+class map
 {
 public:
 
-	typedef	Key									key_type;
-	typedef	T									mapped_type;
-	typedef pair<const key_type, mapped_type>	value_type;
-	typedef std::size_t							size_type;
-	typedef ft::map_iterator<value_type>		iterator;
-	typedef ft::reverse_iterator<iterator>		reverse_iterator;
-	typedef Compare								key_compare;
-	typedef std::allocator<value_type>			allocator_type;
+	typedef	Key										key_type;
+	typedef	T										mapped_type;
+	typedef pair<const key_type, mapped_type>		value_type;
+	typedef std::size_t								size_type;
+	typedef ft::map_iterator<value_type>			iterator;
+	typedef ft::map_iterator<const value_type>		const_iterator;
+	typedef ft::reverse_iterator<iterator>			reverse_iterator;
+	typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
+	typedef Compare									key_compare;
+	typedef std::allocator<value_type>				allocator_type;
+
+	class value_compare
+	{
+	private:
+		key_compare _compare;
+	
+	public:
+		value_compare(key_compare c): _compare(c) {} // made it public to avoid the use of friend
+
+		bool operator() (value_type const & x, value_type const & y)
+		{
+			return (_compare(x.first, y.first));
+		}
+
+		// some typedefs here (see reference)
+
+	};
 
 private:
 
@@ -37,6 +53,7 @@ private:
 	key_compare		_compare;
 	allocator_type	_allocator;
 	std::allocator<node> _node_allocator;
+
 
 	node * get_node_address(iterator const & it)
 	{
@@ -241,6 +258,16 @@ public:
 		return (iterator(ptr));
 	}
 
+	const_iterator begin() const
+	{
+		node *ptr = _end;
+		while (ptr->left)
+			ptr = ptr->left;
+
+		Node<const value_type> * p = reinterpret_cast<Node<const value_type>*>(ptr); 	
+		return (const_iterator(p));
+	}
+
 	reverse_iterator rbegin()
 	{
 		return (reverse_iterator(end()));
@@ -249,6 +276,11 @@ public:
 	iterator end()
 	{
 		return (iterator(_end));
+	}
+
+	const_iterator end() const
+	{
+		return (const_iterator(reinterpret_cast<Node<const value_type>*>(_end)));
 	}
 
 	reverse_iterator rend()
@@ -384,6 +416,20 @@ public:
 		_size = 0;
 	}
 
+
+	/* Observers */ 
+
+	key_compare key_comp(void) const
+	{
+		return (_compare);
+	}
+
+	value_compare value_comp(void) const
+	{
+		return (value_compare(_compare));
+	}
+
+
 	/* Operations */ 
 
 	iterator find(key_type const & k)
@@ -423,6 +469,7 @@ public:
 		return (ft::pair<iterator, iterator>(lower_bound(k), upper_bound(k)));
 	}
 
+
 	/* Allocator */
 	allocator_type get_allocator() const
 	{
@@ -430,5 +477,63 @@ public:
 	}
 };
 
+
+/* Relational operators(map) */
+
+template<typename Key, typename T, typename Compare>
+bool operator==(map<Key, T, Compare> const & lhs,
+				map<Key, T, Compare> const & rhs)
+{
+	if (!(lhs.size() == rhs.size()))
+		return (false);
+	return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
+}
+
+template<typename Key, typename T, typename Compare>
+bool operator!=(map<Key, T, Compare> const & lhs,
+				map<Key, T, Compare> const & rhs)
+{
+	return (!(lhs == rhs));
+}
+
+template<typename Key, typename T, typename Compare>
+bool operator<(map<Key, T, Compare> const & lhs,
+				map<Key, T, Compare> const & rhs)
+{
+	return (ft::lexicographical_compare(lhs.begin(), lhs.end(),
+										rhs.begin(), rhs.end()));
+}
+
+template<typename Key, typename T, typename Compare>
+bool operator<=(map<Key, T, Compare> const & lhs,
+				map<Key, T, Compare> const & rhs)
+{
+	return (!(rhs < lhs));
+}
+
+template<typename Key, typename T, typename Compare>
+bool operator>(map<Key, T, Compare> const & lhs,
+				map<Key, T, Compare> const & rhs)
+{
+	return (rhs < lhs);
+}
+
+template<typename Key, typename T, typename Compare>
+bool operator>=(map<Key, T, Compare> const & lhs,
+				map<Key, T, Compare> const & rhs)
+{
+	return (!(lhs < rhs));
+}
+
+
+/* swap overload */
+
+template<typename Key, typename T, typename Compare>
+void swap(map<Key, T, Compare> & x, map<Key, T, Compare> & y)
+{
+	x.swap(y);
+}
+
+} // ft namespace
 
 #endif
