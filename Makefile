@@ -1,6 +1,6 @@
 SRC = main.cpp
 OBJ = $(SRC:.cpp=.o)
-HEADER = ft_vector.hpp iterator.hpp reverse_iterator.hpp ft_map.hpp
+HEADER = ft_vector.hpp vector_iterator.hpp reverse_iterator.hpp ft_map.hpp 
 CC = clang++
 CFLAGS = -Wall -Wextra -Werror -g  -fsanitize=address
 NAME = a.out

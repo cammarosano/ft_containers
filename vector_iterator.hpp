@@ -1,13 +1,13 @@
 #ifndef ITERATOR_HPP
 # define ITERATOR_HPP
 
+# include <iterator> // category tag
+
 namespace ft
 {
-	template <typename T> class iterator;
-}
 
 template <typename T>
-class ft::iterator
+class vector_iterator
 {
 public:
 	// iterator_traits: (alternatively, write a template specialization of std::iterator_traits for this type?)
@@ -21,27 +21,27 @@ private:
 	T *	ptr;
 
 public:
-		iterator()
+		vector_iterator()
 		{
 			// std::cout << "iterator default constructor\n";
 		}
-		iterator(value_type *address): ptr(address)
+		vector_iterator(value_type *address): ptr(address)
 		{
 			// std::cout << "iterator parameter constructor\n";
 		}
-		iterator(iterator const & src): ptr(src.ptr) // copy constructor
+		vector_iterator(vector_iterator const & src): ptr(src.ptr) // copy constructor
 		{
 		}
-		~iterator()
+		~vector_iterator()
 		{
 		}
 		// enabling implict conversion from normal it to const_iterator (cast operator)
-		operator iterator<const T>() const
+		operator vector_iterator<const T>() const
 		{
-			return (iterator<const T>(ptr));
+			return (vector_iterator<const T>(ptr));
 		}
 
-		iterator & operator=(iterator const & rhs)
+		vector_iterator & operator=(vector_iterator const & rhs)
 		{
 			ptr = rhs.ptr;
 			return (*this);
@@ -50,72 +50,72 @@ public:
 		{
 			return (*ptr);
 		}
-		iterator & operator++()	// prefix increment
+		vector_iterator & operator++()	// prefix increment
 		{
 			ptr += 1; // pointer arithmetic must be supported by value_type *
 			return (*this);
 		}
-		iterator operator++(int) // postfix increment (returns a new object)
+		vector_iterator operator++(int) // postfix increment (returns a new object)
 		{
-			iterator temp(*this);
+			vector_iterator temp(*this);
 
 			ptr += 1;
 			return (temp);
 		}
-		iterator & operator--()
+		vector_iterator & operator--()
 		{
 			ptr -= 1;
 			return (*this);
 		}
-		iterator operator--(int)
+		vector_iterator operator--(int)
 		{
-			iterator temp(*this);
+			vector_iterator temp(*this);
 
 			ptr -= 1;
 			return (temp);
 		}
-		iterator operator+(difference_type n) const 
+		vector_iterator operator+(difference_type n) const 
 		{
-			return (iterator(ptr + n));
+			return (vector_iterator(ptr + n));
 		}
-		iterator operator-(difference_type n) const 
+		vector_iterator operator-(difference_type n) const 
 		{
-			return (iterator(ptr - n));
+			return (vector_iterator(ptr - n));
 		}
-		difference_type operator-(iterator const & rhs) const
+		difference_type operator-(vector_iterator const & rhs) const
 		{
 			return (ptr - rhs.ptr);
 		}
-		bool operator==(iterator const & rhs) const
+		bool operator==(vector_iterator const & rhs) const
 		{
 			return (ptr == rhs.ptr);
 		}
-		bool operator!=(iterator const & rhs) const
+		bool operator!=(vector_iterator const & rhs) const
 		{
 			return (ptr != rhs.ptr);
 		}
-		bool operator>(iterator const & rhs) const
+		bool operator>(vector_iterator const & rhs) const
 		{
 			return (ptr > rhs.ptr);
 		}
-		bool operator<(iterator const & rhs) const
+		bool operator<(vector_iterator const & rhs) const
 		{
 			return (ptr < rhs.ptr);
 		}
-		bool operator>=(iterator const & rhs) const
+		bool operator>=(vector_iterator const & rhs) const
 		{
 			return (ptr >= rhs.ptr);
 		}
-		bool operator<=(iterator const & rhs) const
+		bool operator<=(vector_iterator const & rhs) const
 		{
 			return (ptr <= rhs.ptr);
 		}
-		iterator & operator+=(difference_type n)
+		vector_iterator & operator+=(difference_type n)
 		{
 			ptr = ptr + n;
 			return (*this);
 		}	
-		iterator & operator-=(difference_type n)
+		vector_iterator & operator-=(difference_type n)
 		{
 			ptr = ptr - n;
 			return (*this);
@@ -131,10 +131,11 @@ public:
 };
 
 template <typename T>
-ft::iterator<T> operator+(typename ft::iterator<T>::difference_type n,
-							ft::iterator<T> it)
+vector_iterator<T> operator+(typename vector_iterator<T>::difference_type n,
+							vector_iterator<T> it)
 {
 	return (it + n);
 }
 
+} // namespace ft
 #endif

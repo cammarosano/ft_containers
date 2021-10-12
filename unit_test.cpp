@@ -169,7 +169,7 @@ public:
 	typedef std::input_iterator_tag iterator_category;
 
 	InputIteratorTest(int * address):
-	ft::vector<int>::iterator::iterator(address) {}
+	ft::vector<int>::iterator::vector_iterator(address) {}
 };
 
 Test(modify, assign_range_input_it, .init=setup)

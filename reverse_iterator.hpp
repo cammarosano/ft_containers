@@ -1,16 +1,11 @@
 #ifndef REVERSE_ITERATOR_HPP
 # define REVERSE_ITERATOR_HPP
 
-#include "iterator.hpp"
-#include <iterator>		// iterator_traits
-
 namespace ft
 {
-	template <typename I> class reverse_iterator;
-}
 
 template <typename I>
-class ft::reverse_iterator
+class reverse_iterator
 {
 public:
 	// preserving iterator "I"'s traits
@@ -178,5 +173,6 @@ typename ft::reverse_iterator<I>::difference_type operator-
 	return (rhs.base() - lhs.base());
 }
 
+}
 
 #endif

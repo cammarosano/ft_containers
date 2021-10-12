@@ -3,7 +3,7 @@
 
 # include <memory>
 # include <iostream> // debug messages
-# include "iterator.hpp"
+# include "vector_iterator.hpp"
 # include "reverse_iterator.hpp"
 # include <stdexcept>
 # include <iterator> // iterator_traits
@@ -28,8 +28,8 @@ class ft::vector
 public:
 	typedef T										value_type;
 	typedef std::allocator<T>						allocator_type;
-	typedef ft::iterator<T>							iterator;
-	typedef ft::iterator<T const>					const_iterator;
+	typedef ft::vector_iterator<T>							iterator;
+	typedef ft::vector_iterator<T const>					const_iterator;
 	typedef ft::reverse_iterator<iterator>			reverse_iterator;
 	typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	typedef size_t									size_type;
