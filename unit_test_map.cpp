@@ -425,8 +425,13 @@ Test(reverse_iterator, test, .init=setup)
 }
 
 // TODO
-// test get_allocator
 // change < by _compare
+Test(get_allocator, test, .init=setup)
+{
+	std::map<int, std::string> std_map;
+	cr_expect(m.get_allocator().max_size() == std_map.get_allocator().max_size());
+
+}
 
 Test(max_size, test, .init=setup)
 {

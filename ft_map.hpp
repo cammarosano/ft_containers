@@ -93,11 +93,7 @@ private:
 		{
 			clear(&(*root)->left);
 			clear(&(*root)->right);
-			// delete (*root);	// use std::allocator instead
 			delete_node(*root);
-			// _allocator.destroy(*root);
-			// _allocator.deallocate(*root, 1);
-			// *root = NULL;
 		}
 	}
 
@@ -185,10 +181,10 @@ private:
 	{
 		if (position == end())
 			return false;
-		if (!(position->first < key))
+		if (!_compare(position->first, key))
 			return false;
 		++position;
-		if (position != end() && !(key < (position->first)))
+		if (position != end() && !_compare(key, position->first))
 			return false;
 		return true;
 	}
@@ -197,9 +193,9 @@ private:
 	{
 		if (!root)
 			return (NULL);
-		if (key(root) < k)
+		if (_compare(key(root), k))
 			return (lower_bound(root->right, k));
-		if (k < key(root))
+		if (_compare(k, key(root)))
 		{
 			node * better_candidate = lower_bound(root->left, k);
 			if (better_candidate)
@@ -212,7 +208,7 @@ private:
 	{
 		if (!root)
 			return (NULL);
-		if (!(k < key(root)))
+		if (!_compare(k, key(root)))
 			return (upper_bound(root->right, k));
 		node * better_candidate = upper_bound(root->left, k);
 		if (better_candidate)
@@ -224,14 +220,12 @@ public:
 	// default constructor
 	map(): _size(0), _root(NULL)
 	{
-		// _end = new node();
 		_end = _node_allocator.allocate(1);
 		_node_allocator.construct(_end, node(_allocator.allocate(1))); // pair is allocated but not constructed
 	}
-	~map()
+	~map() // consider writing helper functions for allocation and deallocation of _end
 	{
 		clear();
-		// delete _end;
 		_allocator.deallocate(_end->content, 1);
 		_node_allocator.destroy(_end);
 		_node_allocator.deallocate(_end, 1);
@@ -276,7 +270,6 @@ public:
 
 	size_type max_size() const
 	{
-		// double factor = 1 / (1 + static_cast<double>(sizeof(node)) / sizeof(value_type));
 		return (_allocator.max_size() * sizeof(value_type) /
 						(sizeof(value_type) + sizeof(node)));
 	}
