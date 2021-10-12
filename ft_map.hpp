@@ -574,11 +574,13 @@ public:
 
 	ft::pair<const_iterator, const_iterator> equal_range(key_type const & k) const
 	{
-		return (ft::pair<iterator, iterator>(lower_bound(k), upper_bound(k)));
+		return (ft::pair<const_iterator, const_iterator>(lower_bound(k),
+														upper_bound(k)));
 	}
 
 
 	/* Allocator */
+
 	allocator_type get_allocator() const
 	{
 		return (_allocator);

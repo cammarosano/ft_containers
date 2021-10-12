@@ -681,5 +681,5 @@ Test(const_qualified, test, .init=setup)
 	cit = m2.upper_bound(2);
 	cr_expect(cit->first == 3);
 
-	// TODO: test equal_range	
+	cr_expect((m2.equal_range(2)).first == m2.lower_bound(2));
 }
