@@ -139,11 +139,11 @@ public:
 	// explicit keyword for constructors
 
 
-	vector(): _array(NULL), _size(0), _capacity(0)
+	explicit vector(): _array(NULL), _size(0), _capacity(0)
 	{
 	} 
 
-	vector(size_type n, value_type const & val = value_type()):
+	explicit vector(size_type n, value_type const & val = value_type()):
 	_size(n), _capacity(n)
 	{
 		_array = _allocator.allocate(_capacity);
