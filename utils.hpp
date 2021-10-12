@@ -159,7 +159,7 @@ namespace ft
 	}
 
 
-	/* Node */
+	/* class Node */
 
 	template < typename ValueType >
 	struct Node
@@ -174,24 +174,17 @@ namespace ft
 		{
 		}
 		// default contructor - should not be used
-		Node():
-		left(NULL), right(NULL), parent(NULL), content(NULL)
-		{
-		}
-		~Node()
-		{
-		}
-
-		operator Node<const ValueType>() const
-		{
-			Node<const ValueType> n;
-			n.left = left;
-			n.right = right;
-			n.parent = parent;
-			n.content = content;
-			return (n);
-		}
+		// Node():
+		// left(NULL), right(NULL), parent(NULL), content(NULL)
+		// {
+		// }
+		// ~Node() // implictily declared like this
+		// {
+		// }
 	};
+
+
+	/* class less */
 
 	template <typename T>
 	struct less
@@ -203,7 +196,6 @@ namespace ft
 	};
 
 }
-
 
 
 #endif

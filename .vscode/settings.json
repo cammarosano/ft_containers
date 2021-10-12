@@ -56,6 +56,7 @@
 		"__node_handle": "cpp",
 		"__tree": "cpp",
 		"__memory": "cpp",
-		"map": "cpp"
+		"map": "cpp",
+		"ios": "cpp"
 	}
 }

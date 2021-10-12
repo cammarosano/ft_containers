@@ -74,7 +74,8 @@ private:
 		pair = _allocator.allocate(1);
 		_allocator.construct(pair, val);
 		n = _node_allocator.allocate(1);
-		_node_allocator.construct(n, node(pair));
+		// _node_allocator.construct(n, node(pair));
+		_node_allocator.construct(n, pair);
 		return (n);
 	}
 
@@ -110,13 +111,13 @@ private:
 		_end->right = _root;
 	}
 
-	void clear(node **root)
+	void clear(node * &root)
 	{
-		if (*root)
+		if (root)
 		{
-			clear(&(*root)->left);
-			clear(&(*root)->right);
-			delete_node(*root);
+			clear(root->left);
+			clear(root->right);
+			delete_node(root);
 		}
 	}
 
@@ -212,7 +213,7 @@ private:
 		return true;
 	}
 
-	node * lower_bound(node *root, key_type const & k)
+	node * lower_bound(node *root, key_type const & k) const
 	{
 		if (!root)
 			return (NULL);
@@ -227,7 +228,7 @@ private:
 		return (root);
 	}
 
-	node * upper_bound(node *root, key_type const & k)
+	node * upper_bound(node *root, key_type const & k) const
 	{
 		if (!root)
 			return (NULL);
@@ -243,7 +244,8 @@ private:
 	{
 		_end = _node_allocator.allocate(1);
 		// pair is allocated but not constructed
-		_node_allocator.construct(_end, node(_allocator.allocate(1)));
+		// _node_allocator.construct(_end, node(_allocator.allocate(1)));
+		_node_allocator.construct(_end, _allocator.allocate(1));
 	}
 
 	void clear_end(void)
@@ -297,20 +299,20 @@ public:
 		*this = x;
 	}
 
+	~map()
+	{
+		clear();
+		clear_end();
+	}
+
 	map & operator=(map const & x) // what to do with _compare ?
 	{
-		clear(&_root);
+		clear(_root);
 		copy_tree(&_root, _end, x._root);
 		update_end();
 		_size = x._size;
 		_compare = x._compare; // important in case it's a pointer to function
 		return (*this);
-	}
-
-	~map()
-	{
-		clear();
-		clear_end();
 	}
 
 
@@ -321,7 +323,7 @@ public:
 		node *ptr = _end;
 		while (ptr->left)
 			ptr = ptr->left;
-		return (iterator(ptr));
+		return (ptr);
 	}
 
 	const_iterator begin() const
@@ -330,30 +332,40 @@ public:
 		while (ptr->left)
 			ptr = ptr->left;
 
-		Node<const value_type> * p = reinterpret_cast<Node<const value_type>*>(ptr); 	
-		return (const_iterator(p));
-	}
-
-	reverse_iterator rbegin()
-	{
-		return (reverse_iterator(end()));
+		return (reinterpret_cast<Node<const value_type>*>(ptr));
 	}
 
 	iterator end()
 	{
-		return (iterator(_end));
+		return (_end);
 	}
 
 	const_iterator end() const
 	{
-		return (const_iterator(reinterpret_cast<Node<const value_type>*>(_end)));
+		return (reinterpret_cast<Node<const value_type>*>(_end));
+	}
+
+	reverse_iterator rbegin()
+	{
+		return (end());
+	}
+
+	const_reverse_iterator rbegin() const
+	{
+		return (end());
 	}
 
 	reverse_iterator rend()
 	{
-		return (reverse_iterator(begin()));
+		return (begin());
+	}
+
+	const_reverse_iterator rend() const
+	{
+		return (begin());
 	}
 	
+
 	/* Capacity */
 
 	bool empty() const
@@ -372,6 +384,7 @@ public:
 						(sizeof(value_type) + sizeof(node)));
 	}
 
+
 	/* Element access */
 
 	mapped_type & operator[](key_type const & k)
@@ -380,6 +393,7 @@ public:
 		pair<iterator, bool> ret(insert(pr));
 		return ((ret.first)->second);
 	}
+
 
 	/* Modifiers */
 
@@ -420,17 +434,6 @@ public:
 			++first;
 		}
 	}
-	
-	size_type erase(key_type const & k)
-	{
-		node * target;
-		
-		target = find(k, _root);
-		if (target == _end)
-			return (0);
-		erase_node(target);
-		return (1);
-	}
 
 	void erase(iterator position)
 	{
@@ -440,7 +443,18 @@ public:
 		if (target != _end) // must be a valid iterator though
 			erase_node(target);
 	}
-	
+
+	size_type erase(key_type const & k)
+	{
+		node * target;
+
+		target = find(k, _root);
+		if (target == _end)
+			return (0);
+		erase_node(target);
+		return (1);
+	}
+
 	void erase(iterator first, iterator last)
 	{
 		node *target;
@@ -475,7 +489,8 @@ public:
 
 	void clear()
 	{
-		clear(&_root);
+		clear(_root);
+		update_end();
 		_size = 0;
 	}
 
@@ -489,7 +504,7 @@ public:
 
 	value_compare value_comp(void) const
 	{
-		return (value_compare(_compare));
+		return (_compare);
 	}
 
 
@@ -497,7 +512,12 @@ public:
 
 	iterator find(key_type const & k)
 	{
-		return (iterator(find(k, _root)));
+		return (find(k, _root));
+	}
+
+	const_iterator find(key_type const & k) const
+	{
+		return (reinterpret_cast<Node<const value_type>*>(find(k, _root)));
 	}
 
 	size_type count(key_type const & k) const
@@ -517,6 +537,16 @@ public:
 		return (iterator(ptr));
 	}
 	
+	const_iterator lower_bound(key_type const & k) const
+	{
+		node *ptr;
+
+		ptr = lower_bound(_root, k);
+		if (!ptr)
+			return (end());
+		return (iterator(ptr)); // choose between this and reinterpret_cast
+	}
+
 	iterator upper_bound(key_type const & k)
 	{
 		node *ptr;
@@ -527,7 +557,22 @@ public:
 		return (iterator(ptr));
 	}
 
-	ft::pair<iterator, iterator> equal_range (key_type const & k)
+	const_iterator upper_bound(key_type const & k) const
+	{
+		node *ptr;
+
+		ptr = upper_bound(_root, k);
+		if (!ptr)
+			return (end());
+		return (iterator(ptr));
+	}
+
+	ft::pair<iterator, iterator> equal_range(key_type const & k)
+	{
+		return (ft::pair<iterator, iterator>(lower_bound(k), upper_bound(k)));
+	}
+
+	ft::pair<const_iterator, const_iterator> equal_range(key_type const & k) const
 	{
 		return (ft::pair<iterator, iterator>(lower_bound(k), upper_bound(k)));
 	}

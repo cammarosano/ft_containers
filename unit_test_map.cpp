@@ -634,5 +634,52 @@ Test(constructor, pointer_to_function)
 	cr_expect((m.begin())->first == 2);
 }
 
+Test(const_reverse_iterator, test, .init=setup)
+{
+	ft::map<int, std::string> const m2(m);
 
-// TODO: reverse_const_iterators
+	ft::map<int, std::string>::reverse_iterator rit = m.rbegin();
+	ft::map<int, std::string>::const_reverse_iterator crit = m2.rbegin();
+
+	cr_expect(crit->first == 3);
+	// while (crit != m2.rend())
+	// {
+		// std::cout << crit->first << ": " << crit->second << std::endl;
+		// ++crit;
+	// }
+
+	// crit->second = "yo"; // does not compile (= good)
+	rit->second = "yooo";
+}
+
+Test(iterators_conversions, test, .init=setup)
+{
+	ft::map<int, std::string>::const_iterator cit = m.begin();
+	cr_expect(cit->second == "zero");
+
+	ft::map<int, std::string>::const_reverse_iterator crit = m.rbegin();
+	cr_expect(crit->second == "three");
+
+}
+
+Test(clear, test, .init=setup)
+{
+	m.clear();
+	ft::map<int, std::string>::iterator it = m.begin();
+	cr_expect(it == m.end());
+}
+
+Test(const_qualified, test, .init=setup)
+{
+	ft::map<int, std::string> const m2(m);
+	ft::map<int, std::string>::const_iterator cit = m2.find(2);
+	cr_expect(cit->first == 2);
+
+	cit = m2.lower_bound(1);
+	cr_expect(cit->first == 1);
+
+	cit = m2.upper_bound(2);
+	cr_expect(cit->first == 3);
+
+	// TODO: test equal_range	
+}
