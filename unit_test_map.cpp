@@ -684,15 +684,36 @@ Test(const_qualified, test, .init=setup)
 	cr_expect((m2.equal_range(2)).first == m2.lower_bound(2));
 }
 
-Test(rotations, test, .init=setup)
-{
-	ft::Node<ft::map<int, std::string>::value_type> *p;
+// Test(rotations, test, .init=setup)
+// {
+// 	ft::Node<ft::map<int, std::string>::value_type> *p;
 
-	p = m.get_node_address(m.begin()); // 0
-	p = p->parent; // 1
-	m.left_rotate(p);
-	m.right_rotate(p);
-	m.insert(ft::make_pair(-1, "hello"));
-	p = p->parent->parent; // 2 and root
-	m.right_rotate(p);
+// 	p = m.get_node_address(m.begin()); // 0
+// 	p = p->parent; // 1
+// 	m.left_rotate(p);
+// 	m.right_rotate(p);
+// 	m.insert(ft::make_pair(-1, "hello"));
+// 	p = p->parent->parent; // 2 and root
+// 	m.right_rotate(p);
+// }
+int	max(int a, int b)
+{
+	if (a > b)
+		return (a);
+	return (b);
 }
+
+Test(balancing, test)
+{
+	ft::map<int,int> m;
+
+	int i = -1;
+	while (++i < 100)
+	{
+		m[i] = i;
+		// // std::cout << i << " added to tree\n";
+		// std::cout << "tree size: " << m.size()
+		// 		<< " | tree depth: " << m.tree_level_count() << std::endl;
+	}
+}
+

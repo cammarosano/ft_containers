@@ -174,6 +174,7 @@ namespace ft
 		left(NULL), right(NULL), parent(NULL), content(content)
 		{
 		}
+
 		// default contructor - should not be used
 		// Node():
 		// left(NULL), right(NULL), parent(NULL), content(NULL)

@@ -1,6 +1,8 @@
 #ifndef FT_MAP
 # define FT_MAP
 
+#include <string> // debug
+
 #include <iostream> // for debug messages
 
 #include "utils.hpp"
@@ -154,55 +156,272 @@ private:
 
 	// find predecessor in subtree
 	// root->left must NOT be NULL
-	node *find_predecessor(node *root) const
+	node *find_successor(node *root) const
 	{
-		root = root->left;
-		while (root->right)
-			root = root->right;
+		root = root->right;
+		while (root->left)
+			root = root->left;
 		return (root);
 	}
 
-	// no memory freeing
-	void remove_node(node * target)
+	// a nil_node has content == NULL, color == black
+	node * create_nil_node()
 	{
+		node * nil_node = _node_allocator.allocate(1);
+		_node_allocator.construct(nil_node, node(NULL));
+		nil_node->color = node::black;
+		return (nil_node);
+	}
+
+	void remove_nil_node(node * nil)
+	{
+		update_parent_ptr2child(nil, NULL);
+		_node_allocator.destroy(nil);
+		_node_allocator.deallocate(nil, 1);
+		_root = _end->left; // update root, who could be the former nil
+	}
+
+	node * sibling(node *x)
+	{
+		if (x == _root) // debug only
+		{
+			std::cout << "sibling of root attempt ... " << std::endl;
+			return (NULL);
+		}
+		if (is_left_child(x))
+			return (x->parent->right);
+		return (x->parent->left);
+	}
+
+	int case_index(node *x)
+	{
+		if (x->color == node::red)
+			return (0);
+		// x is black
+		node * w = sibling(x);
+		if (!w) // debug
+		{
+			std::cout << "sibling is NULL!" << std::endl;
+			return (-1);
+		}
+		if (w->color == node::red)
+			return (1);
+		// w is black
+		if (is_black(w->left) && is_black(w->right))
+			return (2);
+		// at lest one of w's children is red
+		if (is_left_child(x))
+		{
+			if (is_black(w->right))
+				return (3);
+			return (4);
+		}
+		else // x is right_child
+		{
+			if (is_black(w->left))
+				return (3);
+			return (4);
+		}
+	}
+
+	void run_case(int index, node * x)
+	{
+		if (index < 0 || index > 4) // debug
+		{
+			std::cout << "bad index" << std::endl;
+			return ;
+		}
+		std::cout << "case " << index << "\n";
+
+		if (index == 0)
+			x->color = node::black;
+		else if (index == 1)
+			case_1(x);
+		else if (index == 2)
+			case_2(x);
+		else if (index == 3)
+			case_3(x);
+		else
+			case_4(x);
+	}
+
+// 	Case 1: Node x is black and its sibling w is red
+	void case_1(node *x)
+	{
+		node * w = sibling(x);
+
+		// 1. Color w black
+		w->color = node::black;
+
+		// 2. Color x.p red
+		x->parent->color = node::red;
+
+		// 3. Rotate x.p
+		// a. If x is the left child do a left rotation
+		if (is_left_child(x))
+			left_rotate(x->parent);
+		// b. If x is the right child do a right rotation
+		else
+			right_rotate(x->parent);
+
+		// 4. Now we have to change w
+		// a. If x is the left child set w = x.p.right
+		// b. If x is the right child set w = x.p.left
+		// 5. With x and our new w, decide on case 2, 3, or 4 from here.
+		int case_i = case_index(x);
+		if (case_i < 2)
+		{
+			std::cout << "case index should be 2, 3 or 4" << std::endl;
+			return ;
+		}
+		run_case(case_i, x);
+	}
+
+	// Node x is black and its sibling w is black and both of w's children
+	// are black
+	void case_2(node *x)
+	{
+		node * w = sibling(x);
+		w->color = node::red;
+		x = x->parent;
+		if (is_red(x))
+			x->color = node::black;
+		else if (x != _root)
+			run_case(case_index(x), x);
+	}
+
+	void case_3(node *x)
+	{
+		node * w = sibling(x);
+
+		w->color = node::red;
+
+		if (is_left_child(x))
+		{
+			w->left->color = node::black;
+			right_rotate(w);
+		}
+		else
+		{
+			w->right->color = node::black;
+			left_rotate(w);
+		}
+		run_case(4, x);
+	}
+
+	void case_4(node *x)
+	{
+		node * w = sibling(x);
+		
+		w->color = x->parent->color;
+		x->parent->color = node::black;
+		if (is_left_child(x))
+		{
+			w->right->color = node::black;
+			left_rotate(x->parent);
+		}
+		else
+		{
+			w->left->color = node::black;
+			right_rotate(x->parent);
+		}
+	}
+
+	void fix_remove(node * deleted, node * replacement, node * x)
+	{
+		if (deleted->color == node::red)
+		{
+			if (replacement->color == node::red || replacement->content == NULL) // first case
+			{
+				std::cout << "initial step # 1 \n";
+				return ;
+			}
+			// replacement is black - second case
+			replacement->color = node::red;
+			std::cout << "initial step # 2 \n";
+			run_case(case_index(x), x);
+		}
+		else // delete node is black
+		{
+			if (is_red(replacement)) // third case
+			{
+				std::cout << "initial step # 3 \n";
+				replacement->color = node::black;
+			}
+			else if (x != _root) // fourth case
+			{
+				std::cout << "initial step # 4 \n";
+				run_case(case_index(x), x);
+			}
+			// fifth case: x is the root, we are done.
+			else
+				std::cout << "initial step # 5 \n";
+		}
+	}
+	
+	// no memory freeing
+	void erase_node(node * target)
+	{
+		node * replacement;
+		node * x; 
+		node * nil = create_nil_node();
+
 		// 1. if node has no child, update parent's pointer
 		if (!target->left && !target->right)
-			update_parent_ptr2child(target, NULL);
+		{
+			replacement = x = nil;
+			replacement->parent = target->parent;
+			update_parent_ptr2child(target, replacement);
+		}
 
 		// 2. if node has one child, child replaces it
 		// left case
 		else if (target->left && !target->right)
 		{
-			update_parent_ptr2child(target, target->left);
-			target->left->parent = target->parent;
+			replacement = x = target->left;
+			update_parent_ptr2child(target, replacement);
+			replacement->parent = target->parent;
 		}
 		// right case
 		else if (target->right && !target->left)
 		{
-			update_parent_ptr2child(target, target->right);
-			target->right->parent = target->parent;
+			replacement = x = target->right;
+			update_parent_ptr2child(target, replacement);
+			replacement->parent = target->parent;
 		}
 		else // 3. node has two children
 		{
-			node *predecessor = find_predecessor(target);
-			remove_node(predecessor); 	// predec->right is NULL
+			replacement = find_successor(target);
+			x = replacement->right;
+			if (!x)
+				x = nil;
+			// detach replacement from tree
+			update_parent_ptr2child(replacement, x);
+			x->parent = replacement->parent;
 			// replace target
-			predecessor->left = target->left;
-			if (target->left) // it could have been changed when predecessor was removed
-				target->left->parent = predecessor;
-			predecessor->right = target->right;
-			target->right->parent = predecessor;
-			predecessor->parent = target->parent;
-			update_parent_ptr2child(target, predecessor);
+			replacement->left = target->left;
+			replacement->left->parent = replacement;
+			replacement->right = target->right;
+			replacement->right->parent = replacement;
+			update_parent_ptr2child(target, replacement);
+			replacement->parent = target->parent;
 		}
-	}
+		// update _root
+		_root = _end->left;
 
-	void erase_node(node *target)
-	{
-		remove_node(target);
-		if (target == _root)
-			_root = _end->left;
-		// delete target;
+		// fix_rb_tree
+		// std::cout << "deleted node: " << key(target) << "\n";
+		// if (replacement == nil)
+		// 	std::cout << "replacement: NIL" << "\n";
+		// else
+		// 	std::cout << "replacement: " << key(replacement) << "\n";
+		// if (x == nil)
+		// 	std::cout << "x: NIL" << "\n";
+		// else
+		// 	std::cout << "x: " << key(x) << "\n";
+		fix_remove(target, replacement, x);
+
+		remove_nil_node(nil);
 		delete_node(target);
 		_size -= 1;
 	}
@@ -270,11 +489,36 @@ private:
 		}
 		*root = new_node(*src->content);
 		(*root)->parent = parent;
+		(*root)->color = src->color;
 		copy_tree(&(*root)->left, *root, src->left);
 		copy_tree(&(*root)->right, *root, src->right);
 	}
 
 public: // for now !!!!!!!!!
+
+	void print(node *root, int space)
+	{
+		if (!root)
+			return;
+		space += 5;
+
+		print(root->right, space);
+		std::cout << std::endl;
+		for (int i = 0; i < space; i++)
+			std::cout << " ";
+		std::string color = " (r)";
+		if (root->color == node::black)
+			color = " (b)";
+		std::cout << root->content->first << color << std::endl;
+		print(root->left, space);
+	}
+
+	void print()
+	{
+		std::cout << "-----------------------------------------------------\n";
+		print(_root, 0);
+		std::cout << "-----------------------------------------------------\n";
+	}
 
 	// x->right cannot be NULL
 	void left_rotate(node * x)
@@ -337,12 +581,22 @@ bool is_left_child(node *x)
 	return (false);
 }
 
+bool is_right_child(node *x)
+{
+	return (!is_left_child(x));
+}
+
 // allows to check the color of NULL nodes (always black)
 bool is_red(node *x)
 {
 	if (x && x->color == node::red)
 		return (true);
 	return (false);
+}
+
+bool is_black(node *x)
+{
+	return (!is_red(x));
 }
 
 void insert_rb_fix(node * x)
@@ -403,6 +657,27 @@ void insert_rb_fix(node * x)
 	// the root is always black
 	_root->color = node::black;
 }
+
+// ---------------- DEBUG UTILS -------------------------
+
+public:
+	size_type max(size_type a, size_type b) const
+	{
+		return (a > b ? a : b);
+	}
+
+	size_type tree_level_count(node *root) const
+	{
+		if (!root)
+			return (0);
+		return (1 + max(tree_level_count(root->left), tree_level_count(root->right)));
+	}
+
+	size_type tree_level_count() const
+	{
+		return (tree_level_count(_root));
+	}
+
 
 // ------------------------------------------------------------------------
 public:
