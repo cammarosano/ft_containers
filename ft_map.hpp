@@ -55,11 +55,14 @@ private:
 	std::allocator<node> _node_allocator;
 
 
+public: // for now!!!!
 	node * get_node_address(iterator const & it)
 	{
 		// nasty stuff!!!
 		return (*reinterpret_cast<node * const *>(&it));
 	}
+
+private:
 
 	key_type const & key(node *n) const
 	{
@@ -93,10 +96,13 @@ private:
 	{
 		if (*root == NULL)
 		{
-			*root = new_node(val);
-			(*root)->parent = parent;
+			node * inserted_node = new_node(val);
+			*root = inserted_node;
+			inserted_node->parent = parent;
 			_size += 1;
-			return (ft::make_pair(iterator(*root), true));
+			update_end();
+			insert_rb_fix(inserted_node);
+			return (ft::make_pair(iterator(inserted_node), true));
 		}
 		if (_compare(val.first, key(*root)))
 			return (insert(&(*root)->left, *root, val));
@@ -268,6 +274,136 @@ private:
 		copy_tree(&(*root)->right, *root, src->right);
 	}
 
+public: // for now !!!!!!!!!
+
+	// x->right cannot be NULL
+	void left_rotate(node * x)
+	{
+		if (!x->right) // sanity check for debugging porpouses
+		{
+			std::cout << "left_rotate with x->right being NULL" << std::endl;
+			return ;
+		}
+
+		node * y;
+
+		y = x->right;
+		// turn y's left subtree into x's right sub-tree
+		x->right = y->left;
+		if (y->left)
+			y->left->parent = x;
+		// turn x's parent into y's parent
+		y->parent = x->parent;
+		update_parent_ptr2child(x, y);
+		// make x y's left child
+		y->left = x;
+		x->parent = y;
+
+		// the root could have been changed
+		_root = _end->left;
+	}
+
+// x->left cannot be NULL
+void right_rotate(node *x)
+{
+	if (!x->left) // debug
+	{
+		std::cout << "right_rotate with x->left being NULL" << std::endl;
+		return ;
+	}
+
+	node * y;
+
+	y = x->left;
+	// turn y's right subtree into x's left subtree
+	x->left = y->right;
+	if (y->right)
+		y->right->parent = x;
+	// turn x's parent into y's parent
+	y->parent = x->parent;
+	update_parent_ptr2child(x, y);
+	// make x y's right child
+	y->right = x;
+	x->parent = y;
+
+	// the root could have been changed
+	_root = _end->left;
+}
+
+bool is_left_child(node *x)
+{
+	if (x->parent->left == x)
+		return (true);
+	return (false);
+}
+
+// allows to check the color of NULL nodes (always black)
+bool is_red(node *x)
+{
+	if (x && x->color == node::red)
+		return (true);
+	return (false);
+}
+
+void insert_rb_fix(node * x)
+{
+	node * uncle;
+
+	x->color = node::red;
+	while (x != _root && x->parent->color == node::red)
+	{
+		if (is_left_child(x->parent))
+		{
+			uncle = x->parent->parent->right; 
+			if (is_red(uncle)) // case 1: change colors
+			{
+				 x->parent->color = node::black;
+				 uncle->color = node::black;
+				 x->parent->parent->color = node::red;
+				 // move x up the tree
+				 x = x->parent->parent;
+			}
+			else	// y is black
+			{
+				if (!is_left_child(x)) // x is a right child
+				{	// case 2 (triangle): move x up and rotate
+					x = x->parent;
+					left_rotate(x); // this leads always to case 3
+				}
+				// case 3 (line): recolor parent and grandparent, rotate right grandparent
+				x->parent->color = node::black;
+				x->parent->parent->color = node::red;
+				right_rotate(x->parent->parent);
+			}
+		}
+		else // x's parent is a right child
+		{
+			uncle = x->parent->parent->left;
+			if (is_red(uncle))
+			{
+				x->parent->color = node::black;
+				uncle->color = node::black;
+				x->parent->parent->color = node::red;
+				x = x->parent->parent;
+			}
+			else
+			{
+				if (is_left_child(x)) // triangle case
+				{
+					x = x->parent;
+					right_rotate(x);
+				}
+				// line case
+				x->parent->color = node::black;
+				x->parent->parent->color = node::red;
+				left_rotate(x->parent->parent);
+			}
+		}
+	}
+	// the root is always black
+	_root->color = node::black;
+}
+
 // ------------------------------------------------------------------------
 public:
 	// default constructor
@@ -391,6 +527,10 @@ public:
 	{
 		value_type pr(k, mapped_type());
 		pair<iterator, bool> ret(insert(pr));
+		// debug
+		if (get_node_address(ret.first) == NULL)
+			std::cout << "key: " << k << ", iterator points to NULL" << std::endl;
+		//
 		return ((ret.first)->second);
 	}
 
@@ -399,13 +539,13 @@ public:
 
 	ft::pair<iterator, bool> insert (value_type const & val)
 	{
-		bool	root_change;
+		// bool	root_change;
 		ft::pair<iterator, bool> ret;
 	
-		root_change = !(_root);
+		// root_change = !(_root);
 		ret = insert(&_root, _end, val);
-		if (root_change)
-			update_end();
+		// if (root_change)
+		update_end();
 		return (ret);
 	}
 

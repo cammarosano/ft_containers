@@ -168,6 +168,7 @@ namespace ft
 		Node *		right;
 		Node *		parent;
 		ValueType *	content;
+		enum {red, black} color;
 
 		Node(ValueType *content):
 		left(NULL), right(NULL), parent(NULL), content(content)

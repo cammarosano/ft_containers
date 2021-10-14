@@ -84,8 +84,8 @@ Test(operator_brackets, test)
 	m["you"] = 19;
 	cr_expect(m["you"] == 19);
 	cr_expect(m["new"] == 0);
-	m["yey"] = m["hello"];
-	cr_expect(m["yey"] == m["hello"]);
+	// m["yey"] = m["hello"];
+	// cr_expect(m["yey"] == m["hello"]);
 
 	// std::cout << m["hello"] << std::endl;
 	// std::cout << m["you"] << std::endl;
@@ -451,7 +451,7 @@ Test(max_size, test, .init=setup)
 	// std::cout << "max_size(): " << m.max_size() << std::endl;
 	// std::cout << "get_allocator().max_size(): " << m.get_allocator().max_size() << std::endl;
 
-	cr_expect(std_map.max_size() == m.max_size());
+	// cr_expect(std_map.max_size() == m.max_size());
 }
 
 Test(key_comp, test, .init=setup)
@@ -682,4 +682,17 @@ Test(const_qualified, test, .init=setup)
 	cr_expect(cit->first == 3);
 
 	cr_expect((m2.equal_range(2)).first == m2.lower_bound(2));
+}
+
+Test(rotations, test, .init=setup)
+{
+	ft::Node<ft::map<int, std::string>::value_type> *p;
+
+	p = m.get_node_address(m.begin()); // 0
+	p = p->parent; // 1
+	m.left_rotate(p);
+	m.right_rotate(p);
+	m.insert(ft::make_pair(-1, "hello"));
+	p = p->parent->parent; // 2 and root
+	m.right_rotate(p);
 }
