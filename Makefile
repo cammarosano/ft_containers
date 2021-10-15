@@ -19,6 +19,10 @@ map_test:	ft_map.hpp map_iterator.hpp utils.hpp
 my_map_test:	my_map_test.o
 			$(CC) $(CFLAGS) $^ -o $@
 
+rb_tree_test:	Rbtree.hpp
+			@  $(CC) $(CFLAGS) unit_test_Rbtree.cpp -lcriterion -o $@
+			@ ./$@
+
 
 $(NAME):	$(OBJ)
 			$(CC) $(CFLAGS) $^ -o $@
@@ -34,4 +38,4 @@ fclean:		clean
 
 re:			fclean all
 
-.PHONY:		all clean fclean re unit_test map_test
+.PHONY:		all clean fclean re unit_test map_test rb_tree_test

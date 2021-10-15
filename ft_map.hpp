@@ -431,7 +431,7 @@ private:
 		if (position == end())
 			return false;
 		if (!_compare(position->first, key))
-			return false;
+			return false; value_typ
 		++position;
 		if (position != end() && !_compare(key, position->first))
 			return false;
