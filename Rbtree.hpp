@@ -28,45 +28,56 @@ struct CompValue // value comparision
 
 };
 
-struct node
+template <typename value_type>
+struct Node
 {
-	int	 *value;
-	node *left, *right, *parent;
+	value_type *value;
+	Node *left, *right, *parent;
 	bool color;
 
-	node(int *val): value(val), left(0), right(0), parent(0), color(rbt_red)
+	Node(value_type *val): value(val),
+	left(0), right(0), parent(0), color(rbt_red)
 	{
 	}
 };
 
+template <typename T, typename Compare>
 class Rbtree
 {
 private:
-	typedef	std::size_t size_type;
+	typedef	T					value_type;
+	typedef	std::size_t			size_type;
+	typedef	Node<T>				node; 
 
-	CompValue		_comp;
+	Compare			_comp; // templated comparision object
 	node 			_end;	// stack variable
 	node *			&_root;	// reference to _end.left
 	node			_nil;
 	size_type		_size;
 
-	void	update_end();
-	bool	insert(node* &root, node* parent, int const &value);
+	// insertion
+	node *	insert(node* &root, node* parent, value_type const &value);
 	void	insert_fix(node *inserted_node);
-	node *	new_node(int const &value);
+	node *	new_node(value_type const &value);
+
+	// remove
+	void	remove_node(node *target);
+
+	// clear
 	void	clear_node(node* &x);
 	void	clear_tree(node* &root);
-	void	print(node* root, int space) const;
+
+	// helpers and utils
 	bool	is_left_child(node *x) const;
 	bool	is_red(node *x) const;
 	bool	is_black(node *x) const;
 	void	left_rotate(node * x);
 	void	right_rotate(node * x);
-	node*	find(node *root, int const &value);
-	void	remove_node(node *target);
-	void	transplant(node *old, node *new_node);
-	void	detach_nil_node();
 	node *	successor(node *x) const;
+	node*	find(node *root, value_type const &value);
+	void	detach_nil_node();
+	void	transplant(node *old, node *new_node);
+	void	update_end();
 
 	// fix_remove
 	void	fix_remove(node * deleted, node * replacement, node * x);
@@ -78,88 +89,92 @@ private:
 	void	case_3(node *x);
 	void	case_4(node *x);
 
-
+	// debug utils
+	void	print(node* root, int space) const;
+	
 public:
 	Rbtree();
+	Rbtree(Compare const &comp_obj);
 	~Rbtree();
 
-	void		insert(int const &value); 
-	size_type	erase(int const &value);
+	node *		insert(value_type const &value); 
+	size_type	erase(value_type const &value);
 	void 		clear();
-	void 		print() const;
-	node*		find(int const &value);
+	node*		find(value_type const &value);
+	size_type	size() const;
 
+	// debug tools
 	node const *	getEnd() const; // debug only
-	size_type		size() const;
+	void 			print() const;
+	bool			check_rb() const;
 };
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Rbtree::Rbtree():_end(0), _root(_end.left), _nil(0), _size(0)
+template<typename T, typename C>
+Rbtree<T,C>::Rbtree():_end(0), _root(_end.left), _nil(0), _size(0)
 {
 	_nil.color = rbt_black;
 }
 
-Rbtree::~Rbtree()
+template<typename T, typename C>
+Rbtree<T,C>::Rbtree(C const &comp_obj):
+_comp(comp_obj), _end(0), _root(_end.left), _nil(0), _size(0)
+{
+	_nil.color = rbt_black;
+}
+
+template<typename T, typename C>
+Rbtree<T,C>::~Rbtree()
 {
 	clear();
 }
 
-Rbtree::size_type	Rbtree::size() const
+template<typename T, typename C>
+typename Rbtree<T,C>::size_type	Rbtree<T,C>::size() const
 {
 	return (_size);
 }
 
 // whenever the root changes, _end.left holds its address, but _end.righ
 // needs to be updated
-void	Rbtree::update_end()
+template<typename T, typename C>
+void	Rbtree<T,C>::update_end()
 {
 	_end.right = _end.left;
 }
 
-void Rbtree::insert(int const &value)
+template<typename T, typename C>
+typename Rbtree<T,C>::node * Rbtree<T,C>::insert(T const &value)
 {
-	insert(_root, &_end, value);
+	return insert(_root, &_end, value);
 }
 
-bool Rbtree::insert(node* &root, node* parent, int const &value)
+template<typename T, typename C>
+typename Rbtree<T,C>::node *
+Rbtree<T,C>::insert(node* &root, node* parent, T const &value)
 {
 	if (!root)
 	{
-		std::cout << "inserting " << value << std::endl;
-		root = new_node(value);
+		// std::cout << "inserting " << value << std::endl;
+		node * inserted_node = new_node(value);
+		root = inserted_node;
 		root->parent = parent;
 		insert_fix(root);
 		update_end();
 		++_size;
-		return true;
+		return inserted_node;
 	}
 	if (_comp(value, *root->value))
 		return insert(root->left, root, value);
 	if (_comp(*root->value, value))
 		return insert(root->right, root, value);
-	return false;
+	return root;
 }
 
-void Rbtree::insert_fix(node *x)
+template<typename T, typename C>
+void Rbtree<T,C>::insert_fix(node *x)
 {
 	node * uncle;
 
@@ -218,7 +233,8 @@ void Rbtree::insert_fix(node *x)
 }
 
 // x cannot be null
-bool Rbtree::is_left_child(node *x) const
+template<typename T, typename C>
+bool Rbtree<T,C>::is_left_child(node *x) const
 {
 	//////////////////////
 	if (!x)
@@ -233,7 +249,8 @@ bool Rbtree::is_left_child(node *x) const
 }
 
 // x can be null
-bool	Rbtree::is_red(node *x) const
+template<typename T, typename C>
+bool	Rbtree<T,C>::is_red(node *x) const
 {
 	if (x && x->color == rbt_red)
 		return true;
@@ -241,13 +258,15 @@ bool	Rbtree::is_red(node *x) const
 }
 
 // x can be null
-bool	Rbtree::is_black(node *x) const
+template<typename T, typename C>
+bool	Rbtree<T,C>::is_black(node *x) const
 {
 	return (!is_red(x));
 }
 
 // x->right cannot be NULL
-void Rbtree::left_rotate(node * x)
+template<typename T, typename C>
+void Rbtree<T,C>::left_rotate(node * x)
 {
 	if (!x->right) // sanity check for debugging porpouses
 	{
@@ -274,7 +293,8 @@ void Rbtree::left_rotate(node * x)
 }
 
 // x->left cannot be NULL
-void Rbtree::right_rotate(node *x)
+template<typename T, typename C>
+void Rbtree<T,C>::right_rotate(node *x)
 {
 	if (!x->left) // debug
 	{
@@ -304,7 +324,8 @@ void Rbtree::right_rotate(node *x)
 #define INCREM 5
 #define RED "\033[1;31m"
 #define NC "\033[0m"
-void Rbtree::print(node *root, int space) const
+template<typename T, typename C>
+void Rbtree<T,C>::print(node *root, int space) const
 {
 	if (!root)
 		return;
@@ -317,27 +338,31 @@ void Rbtree::print(node *root, int space) const
 	print(root->left, space + INCREM);
 }
 
-void Rbtree::print() const
+template<typename T, typename C>
+void Rbtree<T,C>::print() const
 {
 	print(_root, 0);
 	std::cout << "---------------------------\n";
 }
 
-node * Rbtree::new_node(int const &value)
+template<typename T, typename C>
+typename Rbtree<T,C>::node * Rbtree<T,C>::new_node(T const &value)
 {
-	int * content = new int(value);
+	T * content = new T(value);
 
 	return (new node(content));
 }
 
-void Rbtree::clear_node(node* &x)
+template<typename T, typename C>
+void Rbtree<T,C>::clear_node(node* &x)
 {
 	delete x->value;
 	delete x;
 	x = NULL;
 }
 
-void Rbtree::clear_tree(node* &root)
+template<typename T, typename C>
+void Rbtree<T,C>::clear_tree(node* &root)
 {
 	if (root)
 	{
@@ -347,7 +372,8 @@ void Rbtree::clear_tree(node* &root)
 	}
 }
 
-void Rbtree::clear()
+template<typename T, typename C>
+void Rbtree<T,C>::clear()
 {
 	clear_tree(_root);
 	update_end();
@@ -355,7 +381,8 @@ void Rbtree::clear()
 }
 
 
-node* Rbtree::find(node *root, int const &value)
+template<typename T, typename C>
+typename Rbtree<T,C>::node* Rbtree<T,C>::find(node *root, T const &value)
 {
 	if (!root)
 		return (&_end);
@@ -367,30 +394,34 @@ node* Rbtree::find(node *root, int const &value)
 }
 
 // returns pointer to _end if no match
-node* Rbtree::find(int const &value)
+template<typename T, typename C>
+typename Rbtree<T,C>::node* Rbtree<T,C>::find(T const &value)
 {
 	return (find(_root, value));
 }
 
 
-node const * Rbtree::getEnd() const
+template<typename T, typename C>
+typename Rbtree<T,C>::node const * Rbtree<T,C>::getEnd() const
 {
 	return (&_end);
 }
 
 
-Rbtree::size_type	Rbtree::erase(int const &value)
+template<typename T, typename C>
+typename Rbtree<T,C>::size_type	Rbtree<T,C>::erase(T const &value)
 {
 	node *target = find(value);
 	if (target == &_end)
 		return (0);
 
-	std::cout << "deleting " << value << std::endl;
+	// std::cout << "deleting " << value << std::endl;
 	remove_node(target);
 	return (1);
 }
 
-void	Rbtree::transplant(node *old, node *new_node)
+template<typename T, typename C>
+void	Rbtree<T,C>::transplant(node *old, node *new_node)
 {
 	// update parent
 	if (old == old->parent->left) // old is a left child
@@ -401,7 +432,8 @@ void	Rbtree::transplant(node *old, node *new_node)
 	new_node->parent = old->parent;
 }
 
-void	Rbtree::remove_node(node *target)
+template<typename T, typename C>
+void	Rbtree<T,C>::remove_node(node *target)
 {
 	node * replacement;
 	node * x;
@@ -436,7 +468,8 @@ void	Rbtree::remove_node(node *target)
 	update_end();
 }
 
-void	Rbtree::detach_nil_node()
+template<typename T, typename C>
+void	Rbtree<T,C>::detach_nil_node()
 {
 	if (_nil.parent)
 	{
@@ -449,7 +482,8 @@ void	Rbtree::detach_nil_node()
 }
 
 // x->right cannot be NULL
-node *	Rbtree::successor(node *x) const
+template<typename T, typename C>
+typename Rbtree<T,C>::node *	Rbtree<T,C>::successor(node *x) const
 {
 	x = x->right;
 
@@ -458,39 +492,30 @@ node *	Rbtree::successor(node *x) const
 	return (x);
 }
 
-void Rbtree::fix_remove(node * deleted, node * replacement, node * x)
+// Algorithm for deleting fix:
+// https://github.com/alenachang/red-black-deletion-steps
+template<typename T, typename C>
+void Rbtree<T,C>::fix_remove(node * deleted, node * replacement, node * x)
 {
 	if (deleted->color == rbt_red)
 	{
-		if (replacement->color == rbt_red || replacement == &_nil) // first case
+		if (!(replacement->color == rbt_red || replacement == &_nil)) // second case
 		{
-			// std::cout << "initial step # 1 \n";
-			return ;
+			replacement->color = rbt_red;
+			run_case(case_index(x), x);
 		}
-		// replacement is black - second case
-		replacement->color = rbt_red;
-		// std::cout << "initial step # 2 \n";
-		run_case(case_index(x), x);
 	}
 	else // delete node is black
 	{
 		if (is_red(replacement)) // third case
-		{
-			// std::cout << "initial step # 3 \n";
 			replacement->color = rbt_black;
-		}
 		else if (x != _root) // fourth case
-		{
-			// std::cout << "initial step # 4 \n";
 			run_case(case_index(x), x);
-		}
-		// fifth case: x is the root, we are done.
-		// else
-			// std::cout << "initial step # 5 \n";
 	}
 }
 
-node * Rbtree::sibling(node *x)
+template<typename T, typename C>
+typename Rbtree<T,C>::node * Rbtree<T,C>::sibling(node *x)
 {
 	if (x == _root) // debug only
 	{
@@ -502,7 +527,8 @@ node * Rbtree::sibling(node *x)
 	return (x->parent->left);
 }
 
-int Rbtree::case_index(node *x)
+template<typename T, typename C>
+int Rbtree<T,C>::case_index(node *x)
 {
 	if (x->color == rbt_red)
 		return (0);
@@ -533,7 +559,8 @@ int Rbtree::case_index(node *x)
 	}
 }
 
-void Rbtree::run_case(int index, node * x)
+template<typename T, typename C>
+void Rbtree<T,C>::run_case(int index, node * x)
 {
 	if (index < 0 || index > 4) // debug
 	{
@@ -555,28 +582,18 @@ void Rbtree::run_case(int index, node * x)
 }
 
 // 	Case 1: Node x is black and its sibling w is red
-void Rbtree::case_1(node *x)
+template<typename T, typename C>
+void Rbtree<T,C>::case_1(node *x)
 {
 	node * w = sibling(x);
 
-	// 1. Color w black
 	w->color = rbt_black;
-
-	// 2. Color x.p red
 	x->parent->color = rbt_red;
-
-	// 3. Rotate x.p
-	// a. If x is the left child do a left rotation
 	if (is_left_child(x))
 		left_rotate(x->parent);
-	// b. If x is the right child do a right rotation
 	else
 		right_rotate(x->parent);
-
-	// 4. Now we have to change w
-	// a. If x is the left child set w = x.p.right
-	// b. If x is the right child set w = x.p.left
-	// 5. With x and our new w, decide on case 2, 3, or 4 from here.
+	
 	int case_i = case_index(x);
 	if (case_i < 2)
 	{
@@ -588,7 +605,8 @@ void Rbtree::case_1(node *x)
 
 // Node x is black and its sibling w is black and both of w's children
 // are black
-void Rbtree::case_2(node *x)
+template<typename T, typename C>
+void Rbtree<T,C>::case_2(node *x)
 {
 	node * w = sibling(x);
 	w->color = rbt_red;
@@ -599,7 +617,8 @@ void Rbtree::case_2(node *x)
 		run_case(case_index(x), x);
 }
 
-void Rbtree::case_3(node *x)
+template<typename T, typename C>
+void Rbtree<T,C>::case_3(node *x)
 {
 	node * w = sibling(x);
 
@@ -618,7 +637,8 @@ void Rbtree::case_3(node *x)
 	run_case(4, x);
 }
 
-void Rbtree::case_4(node *x)
+template<typename T, typename C>
+void Rbtree<T,C>::case_4(node *x)
 {
 	node * w = sibling(x);
 	
@@ -634,6 +654,69 @@ void Rbtree::case_4(node *x)
 		w->left->color = rbt_black;
 		right_rotate(x->parent);
 	}
+}
+
+////////// debug Utils
+
+int max (int a, int b)
+{
+	return (a > b ? a : b);
+}
+
+int min (int a, int b)
+{
+	return (a < b ? a : b);
+}
+
+template<typename T>
+int max_black_depth(Node<T> *root)
+{
+	if (!root)
+		return (0);
+	return (root->color +
+			max(max_black_depth(root->left), max_black_depth(root->right)));
+}
+
+template<typename T>
+int min_black_depth(Node<T> *root)
+{
+	if (!root)
+		return (0);
+	return (root->color +
+			min(min_black_depth(root->left), min_black_depth(root->right)));
+}
+
+template<typename T>
+bool check_reds(Node<T> *root, int parent_color)
+{
+	int node_color;
+
+	if (!root)
+		return true;
+	node_color = root->color;
+	if (node_color == rbt_red && parent_color == rbt_red)
+		return false;
+	return (check_reds(root->left, node_color)
+			&& check_reds(root->right, node_color));
+}
+
+template<typename T, typename C>
+bool Rbtree<T,C>::check_rb() const
+{
+	bool black_depth = true;
+	bool consec_red = true;
+
+	if (max_black_depth<T>(_root) != min_black_depth<T>(_root))
+	{
+		std::cout << "check_rb failed: black depth not uniform" << std::endl;
+		black_depth = false;
+	}
+	if (!check_reds<T>(_root, rbt_red))
+	{
+		std::cout << "check_rb failed: consecutive reds" << std::endl;
+		consec_red = false;
+	}
+	return (black_depth && consec_red);
 }
 
 #endif

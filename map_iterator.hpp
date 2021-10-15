@@ -17,7 +17,7 @@ namespace ft
 		typedef std::bidirectional_iterator_tag	iterator_category;
 
 	private:
-		typedef ft::Node<T> node;
+		typedef ::Node<T> node;
 
 		node *_ptr;
 
@@ -84,12 +84,12 @@ namespace ft
 
 		reference operator*() const
 		{
-			return (*_ptr->content);
+			return (*_ptr->value);
 		}
 
 		pointer operator->() const
 		{
-			return (_ptr->content);
+			return (_ptr->value);
 		}
 
 		map_iterator & operator++()

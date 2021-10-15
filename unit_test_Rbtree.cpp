@@ -4,7 +4,9 @@
 #include <ctime>
 #include <vector>
 
-Rbtree t;
+Rbtree<int, CompValue> t;
+
+typedef Node<int> node;
 
 // int main()
 void setup()
@@ -21,6 +23,15 @@ void setup()
 	t.insert(24);
 	t.insert(26);
 	t.insert(28);
+}
+
+Test(rb_check, rb_check, .init=setup)
+{
+	cr_expect(t.check_rb());
+	node *x = t.getEnd()->left; // root
+	x = x->left;
+	x->color = rbt_red;
+	// cr_expect(!t.check_rb());
 }
 
 Test(find, test, .init=setup)
@@ -69,7 +80,7 @@ void infix_add2vector(node *root, std::vector<int> &v)
 	infix_add2vector(root->right, v);
 }
 
-std::vector<int> btree2vector(Rbtree &t)
+std::vector<int> btree2vector(Rbtree<int,CompValue> &t)
 {
 	std::vector<int> v;
 	node * root = ((t.getEnd())->left);
@@ -81,32 +92,41 @@ std::vector<int> btree2vector(Rbtree &t)
 
 Test(remove, random)
 {
-	Rbtree tree;
 	int const n = 1000;
 	int index;
 	int	new_nb;
+	int delete_count = 0;
+	int insert_count = 0;
+	size_t tree_size;
 
 	std::srand(std::time(NULL));
+
 	for (int i = 0; i < n; i++)
-		tree.insert(std::rand() % n);
+	{
+		t.insert(std::rand() % n);
+		cr_expect(t.check_rb());
+	}
 	
-	std::vector<int> v = btree2vector(tree);
-	// for (size_t i = 0; i < v.size(); i++)
-	// {
-	// 	std::cout << v[i] << ' ';
-	// }
+	std::vector<int> v = btree2vector(t);
 	
 	while (v.size())
 	{
 		index = std::rand() % v.size();
-		tree.erase(v[index]);
+		delete_count += t.erase(v[index]);
 		v.erase(v.begin() + index);
+		cr_expect(t.check_rb());
 		if (index % 2)
 		{
 			new_nb = std::rand() % n;
-			tree.insert(new_nb);
+			tree_size = t.size();
+			t.insert(new_nb);
+			insert_count += t.size() > tree_size;
+			cr_expect(t.check_rb());
 			v.push_back(new_nb);
 		}
 	}
+	std::cout << "remove test with randon numbers: "
+		<< delete_count << " deletions and "
+		<< insert_count << " insertions" << std::endl;
 
 }

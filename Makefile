@@ -23,6 +23,10 @@ rb_tree_test:	Rbtree.hpp
 			@  $(CC) $(CFLAGS) unit_test_Rbtree.cpp -lcriterion -o $@
 			@ ./$@
 
+new_map_test:	ft_map.hpp  unit_test_new_map.cpp
+			@  $(CC) $(CFLAGS) unit_test_new_map.cpp -lcriterion -o $@
+			@ ./$@
+
 
 $(NAME):	$(OBJ)
 			$(CC) $(CFLAGS) $^ -o $@
@@ -34,7 +38,7 @@ clean:
 			rm -f $(OBJ) my_map_test.o
 
 fclean:		clean
-			rm -f $(NAME) unit_test map_test my_map_test
+			rm -f $(NAME) unit_test map_test my_map_test rb_tree_test new_map_test
 
 re:			fclean all
 
