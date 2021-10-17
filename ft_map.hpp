@@ -49,11 +49,13 @@ private:
 
 	typedef	::Node<value_type>	node;
 
-	key_compare _compare;
+	key_compare _key_comp;
 	Rbtree<value_type, value_compare> _tree;
 
 public:
-	map();
+	explicit map(key_compare const & comp = key_compare());
+	map(map const & x);
+	map & operator=(map const & x);
 	~map();
 	
 	// Iterators
@@ -89,8 +91,23 @@ public:
 // Constructors
 
 template <typename K, typename T, typename C>
-map<K,T,C>::map(): _tree(value_compare(_compare))
+map<K,T,C>::map(key_compare const & comp):
+_key_comp(comp), _tree(value_compare(_key_comp))
 {
+}
+
+template <typename K, typename T, typename C>
+map<K,T,C>::map(map const & x):
+_key_comp(x._key_comp), _tree(value_compare(_key_comp))
+{
+	*this = x;
+}
+
+template <typename K, typename T, typename C>
+map<K,T,C> & map<K,T,C>::operator=(map const & x)
+{
+	_tree = x._tree;
+	return (*this);
 }
 
 template <typename K, typename T, typename C>

@@ -16,6 +16,29 @@ void setup()
 	m[10] = "ten";
 }
 
+Test(constructor, copy, .init=setup)
+{
+	ft::map<int,std::string> m2(m);
+	cr_expect(m2.size() == m.size());
+	cr_expect(m2.begin()->first == m.begin()->first);
+	cr_expect((--(m2.end()))->first == (--(m.end()))->first);
+}
+
+bool comp_func(int a, int b)
+{
+	return (a > b);
+}
+
+Test(constructor, pointer2function)
+{
+	ft::map<int,int,bool (*)(int,int)> m(comp_func);
+	m[1] = 1;
+	m[2] = 1;
+	m[3] = 1;
+	m[4] = 1;
+	cr_expect(m.begin()->first == 4);
+}
+
 Test(capacity, empty)
 {
 	cr_expect(m.empty());
