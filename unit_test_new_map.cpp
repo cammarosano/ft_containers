@@ -55,4 +55,17 @@ Test(iterators, begin, .init=setup)
 {
 	it = m.begin();
 	cr_expect(it->first == 0);
+	size_t i = 0;
+	while (it != m.end())
+	{
+		++it;
+		++i;
+	}
+	cr_expect(m.size() == i);
+}
+
+Test(const_iterator, begin)
+{
+	// todo: make a copy constructor, instantiate const map by copy, get iterators
+	
 }

@@ -164,3 +164,19 @@ Test(max, test, .init=setup)
 	t.clear();
 	cr_expect(t.max() == t.getEnd());
 }
+
+Test(copy_construction, test, .init=setup)
+{
+	Rbtree<int, CompValue> t2(t);
+	cr_expect(*t2.min()->value == *t.min()->value);
+	cr_expect(*t2.max()->value == *t.max()->value);
+	cr_expect(t2.size() == t.size());
+
+	Rbtree<int, CompValue> t3;
+	t3.insert(3);
+	t3.insert(5);
+	t3 = t2;
+	cr_expect(*t2.min()->value == *t3.min()->value);
+	cr_expect(*t2.max()->value == *t3.max()->value);
+	cr_expect(t2.size() == t3.size());
+}

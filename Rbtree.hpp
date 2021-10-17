@@ -60,6 +60,7 @@ private:
 	void	detach_nil_node();
 	void	transplant(node *old, node *new_node);
 	void	update_end();
+	void	copy_tree(node * &dest, node const *src, node *parent);
 
 	// remove
 	void	remove_node(node *target);
@@ -78,6 +79,8 @@ private:
 public:
 	Rbtree();
 	Rbtree(Compare const &comp_obj);
+	Rbtree(Rbtree const & src);
+	Rbtree & operator=(Rbtree const & rhs);
 	~Rbtree();
 
 	node *		insert(value_type const &value); 
@@ -108,6 +111,43 @@ Rbtree<T,C>::Rbtree(C const &comp_obj):
 _comp(comp_obj), _end(0), _root(_end.left), _nil(0), _size(0)
 {
 	initial_setup();
+}
+
+template<typename T, typename C>
+Rbtree<T,C>::Rbtree(Rbtree const & src):
+_comp(src._comp), _end(0), _root(_end.left), _nil(0), _size(0)
+{
+	initial_setup();
+	*this = src;
+}
+
+template<typename T, typename C>
+Rbtree<T,C> & Rbtree<T,C>::operator=(Rbtree const & rhs)
+{
+	if (this != &rhs)
+	{
+		clear();
+		copy_tree(_root, rhs._root, &_end);
+		update_end();
+		_size = rhs._size;
+	}
+	return (*this);
+}
+
+template<typename T, typename C>
+void
+Rbtree<T,C>::copy_tree(node * &dest, node const *src, node *parent)
+{
+	if (!src)
+		dest = NULL;
+	else
+	{
+		dest = new_node(*src->value);
+		dest->parent = parent;
+		dest->color = src->color;
+		copy_tree(dest->left, src->left, dest);
+		copy_tree(dest->right, src->right, dest);
+	}
 }
 
 template<typename T, typename C>

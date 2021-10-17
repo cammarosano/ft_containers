@@ -23,7 +23,7 @@ rb_tree_test:	Rbtree.hpp
 			@  $(CC) $(CFLAGS) unit_test_Rbtree.cpp -lcriterion -o $@
 			@ ./$@
 
-new_map_test:	ft_map.hpp  unit_test_new_map.cpp
+new_map_test:	
 			@  $(CC) $(CFLAGS) unit_test_new_map.cpp -lcriterion -o $@
 			@ ./$@
 
@@ -42,4 +42,4 @@ fclean:		clean
 
 re:			fclean all
 
-.PHONY:		all clean fclean re unit_test map_test rb_tree_test
+.PHONY:		all clean fclean re unit_test map_test rb_tree_test new_map_test

@@ -107,6 +107,11 @@ typename map<K,T,C>::iterator map<K,T,C>::begin()
 	return (_tree.min());
 }
 
+template <typename K, typename T, typename C>
+typename map<K,T,C>::const_iterator map<K,T,C>::begin() const
+{
+	return (reinterpret_cast<Node<const value_type>*>(_tree.min()));
+}
 
 template <typename K, typename T, typename C>
 typename map<K,T,C>::iterator map<K,T,C>::end()
