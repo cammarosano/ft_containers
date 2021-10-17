@@ -3,29 +3,11 @@
 
 # include <iostream>
 # include <string>
+# include <memory> // std::allocator
 
 enum e_rbnode_color
 {
 	rbt_red = 0, rbt_black = 1
-};
-
-struct CompInt // key comparision
-{
-	bool operator()(int const & a, int b)
-	{
-		return (a < b);
-	}
-};
-
-struct CompValue // value comparision
-{
-	CompInt key_comp;
-
-	bool operator()(int const &a, int const &b)
-	{
-		return (key_comp(a, b)); // shall be a.first in case of pairs
-	}
-
 };
 
 template <typename value_type>
@@ -49,25 +31,25 @@ private:
 	typedef	std::size_t			size_type;
 	typedef	Node<T>				node; 
 
-	Compare			_comp; // templated comparision object
-	node 			_end;	// stack variable
-	node *			&_root;	// reference to _end.left
-	node			_nil;
-	size_type		_size;
+	Compare					_comp; // templated comparision object
+	node 					_end;	// stack variable
+	node *					&_root;	// reference to _end.left
+	node					_nil;
+	size_type				_size;
+	std::allocator<T>		_value_allocator;
+	std::allocator<node>	_node_allocator;
 
 	// insertion
 	node *	insert(node* &root, node* parent, value_type const &value);
 	void	insert_fix(node *inserted_node);
 	node *	new_node(value_type const &value);
 
-	// remove
-	void	remove_node(node *target);
-
 	// clear
 	void	clear_node(node* &x);
 	void	clear_tree(node* &root);
 
 	// helpers and utils
+	void	initial_setup();
 	bool	is_left_child(node *x) const;
 	bool	is_red(node *x) const;
 	bool	is_black(node *x) const;
@@ -79,7 +61,8 @@ private:
 	void	transplant(node *old, node *new_node);
 	void	update_end();
 
-	// fix_remove
+	// remove
+	void	remove_node(node *target);
 	void	fix_remove(node * deleted, node * replacement, node * x);
 	node *	sibling(node *x);
 	int		case_index(node *x);
@@ -102,9 +85,11 @@ public:
 	void 		clear();
 	node*		find(value_type const &value);
 	size_type	size() const;
+	node *		min();
+	node *		max();
+	node *		getEnd();
 
 	// debug tools
-	node const *	getEnd() const; // debug only
 	void 			print() const;
 	bool			check_rb() const;
 };
@@ -115,20 +100,28 @@ public:
 template<typename T, typename C>
 Rbtree<T,C>::Rbtree():_end(0), _root(_end.left), _nil(0), _size(0)
 {
-	_nil.color = rbt_black;
+	initial_setup();
 }
 
 template<typename T, typename C>
 Rbtree<T,C>::Rbtree(C const &comp_obj):
 _comp(comp_obj), _end(0), _root(_end.left), _nil(0), _size(0)
 {
+	initial_setup();
+}
+
+template<typename T, typename C>
+void	Rbtree<T,C>::initial_setup()
+{
 	_nil.color = rbt_black;
+	_end.value = _value_allocator.allocate(1); // allocation without construction
 }
 
 template<typename T, typename C>
 Rbtree<T,C>::~Rbtree()
 {
 	clear();
+	_value_allocator.deallocate(_end.value, 1);
 }
 
 template<typename T, typename C>
@@ -137,12 +130,30 @@ typename Rbtree<T,C>::size_type	Rbtree<T,C>::size() const
 	return (_size);
 }
 
-// whenever the root changes, _end.left holds its address, but _end.righ
+// whenever the root changes, _end.left holds its address, but _end.right
 // needs to be updated
 template<typename T, typename C>
 void	Rbtree<T,C>::update_end()
 {
 	_end.right = _end.left;
+}
+
+template<typename T, typename C>
+typename Rbtree<T,C>::node * Rbtree<T,C>::min()
+{
+	node * ptr = &_end;
+	while (ptr->left)
+		ptr = ptr->left;
+	return (ptr);
+}
+
+template<typename T, typename C>
+typename Rbtree<T,C>::node * Rbtree<T,C>::max()
+{
+	node * ptr = &_end;
+	while (ptr->right)
+		ptr = ptr->right;
+	return (ptr);
 }
 
 template<typename T, typename C>
@@ -346,18 +357,28 @@ void Rbtree<T,C>::print() const
 }
 
 template<typename T, typename C>
-typename Rbtree<T,C>::node * Rbtree<T,C>::new_node(T const &value)
+typename Rbtree<T,C>::node * Rbtree<T,C>::new_node(value_type const &value)
 {
-	T * content = new T(value);
+	value_type * v = _value_allocator.allocate(1);
+	_value_allocator.construct(v, value);
 
-	return (new node(content));
+	node * n = _node_allocator.allocate(1);
+	_node_allocator.construct(n,v);
+
+	return (n);
 }
 
 template<typename T, typename C>
 void Rbtree<T,C>::clear_node(node* &x)
 {
-	delete x->value;
-	delete x;
+	// destroy and deallocate value
+	_value_allocator.destroy(x->value);
+	_value_allocator.deallocate(x->value, 1);
+
+	// destroy and deallocate node
+	_node_allocator.destroy(x);
+	_node_allocator.deallocate(x, 1);
+
 	x = NULL;
 }
 
@@ -402,7 +423,7 @@ typename Rbtree<T,C>::node* Rbtree<T,C>::find(T const &value)
 
 
 template<typename T, typename C>
-typename Rbtree<T,C>::node const * Rbtree<T,C>::getEnd() const
+typename Rbtree<T,C>::node * Rbtree<T,C>::getEnd()
 {
 	return (&_end);
 }

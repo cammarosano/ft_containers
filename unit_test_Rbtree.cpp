@@ -4,6 +4,25 @@
 #include <ctime>
 #include <vector>
 
+struct CompInt // key comparision
+{
+	bool operator()(int const & a, int b)
+	{
+		return (a < b);
+	}
+};
+
+struct CompValue // value comparision
+{
+	CompInt key_comp;
+
+	bool operator()(int const &a, int const &b)
+	{
+		return (key_comp(a, b)); // shall be a.first in case of pairs
+	}
+
+};
+
 Rbtree<int, CompValue> t;
 
 typedef Node<int> node;
@@ -129,4 +148,19 @@ Test(remove, random)
 		<< delete_count << " deletions and "
 		<< insert_count << " insertions" << std::endl;
 
+}
+
+Test(min, test, .init=setup)
+{
+	cr_expect(*t.min()->value == 0);
+	t.clear();
+	cr_expect(t.size() == 0);
+	cr_expect(t.min() == t.getEnd());
+}
+
+Test(max, test, .init=setup)
+{
+	cr_expect(*t.max()->value == 28);
+	t.clear();
+	cr_expect(t.max() == t.getEnd());
 }
