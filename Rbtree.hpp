@@ -56,7 +56,7 @@ private:
 	void	left_rotate(node * x);
 	void	right_rotate(node * x);
 	node *	successor(node *x) const;
-	node*	find(node *root, value_type const &value);
+	node *	find(node *root, value_type const &value);
 	void	detach_nil_node();
 	void	transplant(node *old, node *new_node);
 	void	update_end();
@@ -86,11 +86,13 @@ public:
 	node const *	insert(value_type const &value);
 	size_type		erase(value_type const &value);
 	void 			clear();
-	node*			find(value_type const &value);
+	node const *	find(value_type const &value);
 	size_type		size() const;
 	node const *	min() const;
 	node const *	max() const;
 	node const *	end() const;
+
+	std::allocator<T> get_allocator() const;
 
 	// debug tools
 	void 			print() const;
@@ -178,15 +180,6 @@ void	Rbtree<T,C>::update_end()
 	_end.right = _end.left;
 }
 
-// template<typename T, typename C>
-// typename Rbtree<T,C>::node * Rbtree<T,C>::min() 
-// {
-// 	node * ptr = &_end;
-// 	while (ptr->left)
-// 		ptr = ptr->left;
-// 	return (ptr);
-// }
-
 template<typename T, typename C>
 typename Rbtree<T,C>::node const * Rbtree<T,C>::min() const
 {
@@ -203,6 +196,12 @@ typename Rbtree<T,C>::node const * Rbtree<T,C>::max() const
 	while (ptr->right)
 		ptr = ptr->right;
 	return (ptr);
+}
+
+template<typename T, typename C>
+std::allocator<T> Rbtree<T,C>::get_allocator() const
+{
+	return (_value_allocator);
 }
 
 template<typename T, typename C>
@@ -452,7 +451,8 @@ void Rbtree<T,C>::clear()
 
 
 template<typename T, typename C>
-typename Rbtree<T,C>::node* Rbtree<T,C>::find(node *root, T const &value)
+typename Rbtree<T,C>::node *
+Rbtree<T,C>::find(node *root, T const &value) 
 {
 	if (!root)
 		return (&_end);
@@ -463,9 +463,10 @@ typename Rbtree<T,C>::node* Rbtree<T,C>::find(node *root, T const &value)
 	return (root);
 }
 
+
 // returns pointer to _end if no match
 template<typename T, typename C>
-typename Rbtree<T,C>::node* Rbtree<T,C>::find(T const &value)
+typename Rbtree<T,C>::node const * Rbtree<T,C>::find(T const &value)
 {
 	return (find(_root, value));
 }
@@ -481,7 +482,7 @@ typename Rbtree<T,C>::node const * Rbtree<T,C>::end() const
 template<typename T, typename C>
 typename Rbtree<T,C>::size_type	Rbtree<T,C>::erase(T const &value)
 {
-	node *target = find(value);
+	node *target = find(_root, value);
 	if (target == &_end)
 		return (0);
 

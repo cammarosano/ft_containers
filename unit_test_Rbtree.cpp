@@ -17,7 +17,7 @@ struct CompValue // value comparision
 {
 	CompInt key_comp;
 
-	bool operator()(int const &a, int const &b)
+	bool operator()(int const &a, int const &b) 
 	{
 		return (key_comp(a, b)); // shall be a.first in case of pairs
 	}

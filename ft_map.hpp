@@ -47,7 +47,7 @@ public:
 
 private:
 
-	typedef	::RbNode<value_type>	node;
+	typedef	RbNode<value_type>	node; // check if needed
 	typedef Rbtree<value_type, value_compare> tree_type;
 
 	key_compare _key_comp;
