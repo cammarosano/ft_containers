@@ -128,7 +128,7 @@ typename map<K,T,C>::iterator map<K,T,C>::begin()
 template <typename K, typename T, typename C>
 typename map<K,T,C>::const_iterator map<K,T,C>::begin() const
 {
-	return (reinterpret_cast<RbNode<const value_type>const *>(_tree.min()));
+	return (iterator(_tree.min()));
 }
 
 template <typename K, typename T, typename C>
@@ -137,6 +137,11 @@ typename map<K,T,C>::iterator map<K,T,C>::end()
 	return (_tree.end());
 }
 
+template <typename K, typename T, typename C>
+typename map<K,T,C>::const_iterator map<K,T,C>::end() const
+{
+	return (iterator(_tree.end()));
+}
 
 // Capacity
 

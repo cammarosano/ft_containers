@@ -93,7 +93,11 @@ Test(const_iterator, begin, .init=setup)
 	ft::map<int,std::string> const m2(m);
 
 	ft::map<int,std::string>::const_iterator cit = m2.begin();
+	while (cit != m2.end())
+	{
+		std::cout << cit->first << std::endl;
+		cit++;
+	}
 
-	std::cout << cit->first << std::endl;
 
 }
