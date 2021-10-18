@@ -1,5 +1,6 @@
 #include <criterion/criterion.h>
 #include "Rbtree.hpp"
+#include "tree_iterator.hpp"
 #include <cstdlib>
 #include <ctime>
 #include <vector>
@@ -25,7 +26,7 @@ struct CompValue // value comparision
 
 Rbtree<int, CompValue> t;
 
-typedef Node<int> node;
+typedef RbNode<int> node;
 
 // int main()
 void setup()
@@ -47,7 +48,7 @@ void setup()
 Test(rb_check, rb_check, .init=setup)
 {
 	cr_expect(t.check_rb());
-	node *x = t.getEnd()->left; // root
+	node *x = t.end()->left; // root
 	x = x->left;
 	x->color = rbt_red;
 	// cr_expect(!t.check_rb());
@@ -55,9 +56,9 @@ Test(rb_check, rb_check, .init=setup)
 
 Test(find, test, .init=setup)
 {
-	cr_expect(t.find(5) != t.getEnd());
-	cr_expect(t.find(3) != t.getEnd());
-	cr_expect(t.find(50) == t.getEnd());
+	cr_expect(t.find(5) != t.end());
+	cr_expect(t.find(3) != t.end());
+	cr_expect(t.find(50) == t.end());
 
 }
 
@@ -102,7 +103,7 @@ void infix_add2vector(node *root, std::vector<int> &v)
 std::vector<int> btree2vector(Rbtree<int,CompValue> &t)
 {
 	std::vector<int> v;
-	node * root = ((t.getEnd())->left);
+	node * root = ((t.end())->left);
 	// node * root = const_cast<node *>((t.getEnd())->left);
 	infix_add2vector(root, v);
 	return (v);
@@ -155,14 +156,14 @@ Test(min, test, .init=setup)
 	cr_expect(*t.min()->value == 0);
 	t.clear();
 	cr_expect(t.size() == 0);
-	cr_expect(t.min() == t.getEnd());
+	cr_expect(t.min() == t.end());
 }
 
 Test(max, test, .init=setup)
 {
 	cr_expect(*t.max()->value == 28);
 	t.clear();
-	cr_expect(t.max() == t.getEnd());
+	cr_expect(t.max() == t.end());
 }
 
 Test(copy_construction, test, .init=setup)
@@ -179,4 +180,18 @@ Test(copy_construction, test, .init=setup)
 	cr_expect(*t2.min()->value == *t3.min()->value);
 	cr_expect(*t2.max()->value == *t3.max()->value);
 	cr_expect(t2.size() == t3.size());
+}
+
+Test(tree_iterator, test, .init=setup)
+{
+	ft::tree_iterator<int> it(t.min());
+	ft::tree_iterator<int> ite(t.end());
+	cr_expect(*it == 0);
+	while (it != ite)
+	{
+		// std::cout << *it << std::endl;
+		++it;
+	}
+	--it;
+	cr_expect(*it == 28);
 }

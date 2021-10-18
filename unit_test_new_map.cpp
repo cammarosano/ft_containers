@@ -87,8 +87,13 @@ Test(iterators, begin, .init=setup)
 	cr_expect(m.size() == i);
 }
 
-Test(const_iterator, begin)
+Test(const_iterator, begin, .init=setup)
 {
 	// todo: make a copy constructor, instantiate const map by copy, get iterators
-	
+	ft::map<int,std::string> const m2(m);
+
+	ft::map<int,std::string>::const_iterator cit = m2.begin();
+
+	std::cout << cit->first << std::endl;
+
 }

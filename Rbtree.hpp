@@ -2,7 +2,7 @@
 # define RBTREE_HPP
 
 # include <iostream>
-# include <string>
+# include <string> // print function for debugging
 # include <memory> // std::allocator
 
 enum e_rbnode_color
@@ -11,13 +11,13 @@ enum e_rbnode_color
 };
 
 template <typename value_type>
-struct Node
+struct RbNode
 {
 	value_type *value;
-	Node *left, *right, *parent;
+	RbNode *left, *right, *parent;
 	bool color;
 
-	Node(value_type *val): value(val),
+	RbNode(value_type *val): value(val),
 	left(0), right(0), parent(0), color(rbt_red)
 	{
 	}
@@ -29,7 +29,7 @@ class Rbtree
 private:
 	typedef	T					value_type;
 	typedef	std::size_t			size_type;
-	typedef	Node<T>				node; 
+	typedef	RbNode<T>				node; 
 
 	Compare					_comp; // templated comparision object
 	node 					_end;	// stack variable
@@ -83,14 +83,14 @@ public:
 	Rbtree & operator=(Rbtree const & rhs);
 	~Rbtree();
 
-	node *		insert(value_type const &value); 
-	size_type	erase(value_type const &value);
-	void 		clear();
-	node*		find(value_type const &value);
-	size_type	size() const;
-	node *		min();
-	node *		max();
-	node *		getEnd();
+	node const *	insert(value_type const &value);
+	size_type		erase(value_type const &value);
+	void 			clear();
+	node*			find(value_type const &value);
+	size_type		size() const;
+	node const *	min() const;
+	node const *	max() const;
+	node const *	end() const;
 
 	// debug tools
 	void 			print() const;
@@ -178,26 +178,35 @@ void	Rbtree<T,C>::update_end()
 	_end.right = _end.left;
 }
 
+// template<typename T, typename C>
+// typename Rbtree<T,C>::node * Rbtree<T,C>::min() 
+// {
+// 	node * ptr = &_end;
+// 	while (ptr->left)
+// 		ptr = ptr->left;
+// 	return (ptr);
+// }
+
 template<typename T, typename C>
-typename Rbtree<T,C>::node * Rbtree<T,C>::min()
+typename Rbtree<T,C>::node const * Rbtree<T,C>::min() const
 {
-	node * ptr = &_end;
+	node const * ptr = &_end;
 	while (ptr->left)
 		ptr = ptr->left;
 	return (ptr);
 }
 
 template<typename T, typename C>
-typename Rbtree<T,C>::node * Rbtree<T,C>::max()
+typename Rbtree<T,C>::node const * Rbtree<T,C>::max() const
 {
-	node * ptr = &_end;
+	node const * ptr = &_end;
 	while (ptr->right)
 		ptr = ptr->right;
 	return (ptr);
 }
 
 template<typename T, typename C>
-typename Rbtree<T,C>::node * Rbtree<T,C>::insert(T const &value)
+typename Rbtree<T,C>::node const * Rbtree<T,C>::insert(T const &value)
 {
 	return insert(_root, &_end, value);
 }
@@ -463,7 +472,7 @@ typename Rbtree<T,C>::node* Rbtree<T,C>::find(T const &value)
 
 
 template<typename T, typename C>
-typename Rbtree<T,C>::node * Rbtree<T,C>::getEnd()
+typename Rbtree<T,C>::node const * Rbtree<T,C>::end() const
 {
 	return (&_end);
 }
@@ -730,7 +739,7 @@ int min (int a, int b)
 }
 
 template<typename T>
-int max_black_depth(Node<T> *root)
+int max_black_depth(RbNode<T> *root)
 {
 	if (!root)
 		return (0);
@@ -739,7 +748,7 @@ int max_black_depth(Node<T> *root)
 }
 
 template<typename T>
-int min_black_depth(Node<T> *root)
+int min_black_depth(RbNode<T> *root)
 {
 	if (!root)
 		return (0);
@@ -748,7 +757,7 @@ int min_black_depth(Node<T> *root)
 }
 
 template<typename T>
-bool check_reds(Node<T> *root, int parent_color)
+bool check_reds(RbNode<T> *root, int parent_color)
 {
 	int node_color;
 

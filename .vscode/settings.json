@@ -57,6 +57,9 @@
 		"__tree": "cpp",
 		"__memory": "cpp",
 		"map": "cpp",
-		"ios": "cpp"
+		"ios": "cpp",
+		"csignal": "cpp",
+		"ctime": "cpp",
+		"set": "cpp"
 	}
 }

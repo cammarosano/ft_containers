@@ -1,14 +1,15 @@
-#ifndef MAP_ITERATOR_HPP
-# define MAP_ITERATOR_HPP
+#ifndef TREE_ITERATOR_HPP
+# define TREE_ITERATOR_HPP
 
-# include "utils.hpp"
+#include <iterator> // bidirection_iterator_tag
+#include "Rbtree.hpp" // RbNode
 
 namespace ft
 {
 	template <typename T>
-	class map_iterator
+	class tree_iterator
 	{
-	public: // should I just inherit from a base class of iterator?
+	public:
 
 		typedef std::ptrdiff_t					difference_type;
 		typedef T								value_type;
@@ -17,20 +18,20 @@ namespace ft
 		typedef std::bidirectional_iterator_tag	iterator_category;
 
 	private:
-		typedef ::RbNode<T> node;
+		typedef RbNode<T> node;
 
-		node *_ptr;
+		node const *_ptr;
 
 		// root must not be NULL
 		// returns the mininum node of a subtree
-		node * min(node * root) const
+		node const * min(node const * root) const
 		{
 			while (root->left)
 				root = root->left;
 			return (root);
 		}
 
-		node * max(node * root) const
+		node const * max(node const * root) const
 		{
 			while (root->right)
 				root = root->right;
@@ -38,7 +39,7 @@ namespace ft
 		}
 
 		// returns pointer to next node of sorted sequence
-		node * next(node *ptr) const
+		node const * next(node const * ptr) const
 		{
 			if (ptr->right)
 				return (min(ptr->right));
@@ -52,7 +53,7 @@ namespace ft
 		}
 
 		// returns pointer to previous node of sorted sequence
-		node * previous(node *ptr) const
+		node const * previous(node const *ptr) const
 		{
 			if (ptr->left)
 				return (max(ptr->left));
@@ -66,20 +67,21 @@ namespace ft
 		}
 
 	public:
-		map_iterator() {}
-		map_iterator(node * address): _ptr(address) {}
-		map_iterator(map_iterator const & src): _ptr(src._ptr) {}
-		map_iterator & operator=(map_iterator const & src)
+		tree_iterator() {}
+		tree_iterator(node const * address): _ptr(address) {}
+		tree_iterator(tree_iterator const & src): _ptr(src._ptr) {}
+		tree_iterator & operator=(tree_iterator const & src)
 		{
 			_ptr = src._ptr;
 			return (*this);
 		}
 
 		// iterator must be convertible to const_iterator
-		operator map_iterator<const T>() const
+		operator tree_iterator<const T>() const
 		{
 			// std::cout << "conversion from interator to const_iterator" << std::endl; // debug message
-			return (map_iterator<const T>(reinterpret_cast<RbNode<const T>*>(_ptr)));
+			return (tree_iterator<const T>
+				(reinterpret_cast<RbNode<const T> const *>(_ptr)));
 		}
 
 		reference operator*() const
@@ -92,40 +94,40 @@ namespace ft
 			return (_ptr->value);
 		}
 
-		map_iterator & operator++()
+		tree_iterator & operator++()
 		{
 			_ptr = next(_ptr);
 			return (*this);
 		}
 
-		map_iterator operator++(int)
+		tree_iterator operator++(int)
 		{
-			map_iterator temp(*this);
+			tree_iterator temp(*this);
 
 			_ptr = next(_ptr);
 			return (temp);
 		}
 
-		map_iterator & operator--()
+		tree_iterator & operator--()
 		{
 			_ptr = previous(_ptr);
 			return (*this);
 		}
 
-		map_iterator operator--(int)
+		tree_iterator operator--(int)
 		{
-			map_iterator temp(*this);
+			tree_iterator temp(*this);
 
 			_ptr = previous(_ptr);
 			return (temp);
 		}
 
-		bool operator==(map_iterator const & rhs)
+		bool operator==(tree_iterator const & rhs) const
 		{
 			return (_ptr == rhs._ptr);
 		}
 
-		bool operator!=(map_iterator const & rhs)
+		bool operator!=(tree_iterator const & rhs) const
 		{
 			return (_ptr != rhs._ptr);
 		}

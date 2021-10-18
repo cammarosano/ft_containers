@@ -161,29 +161,29 @@ namespace ft
 
 	/* class Node */
 
-	template < typename ValueType >
-	struct Node
-	{
-		Node *		left;
-		Node *		right;
-		Node *		parent;
-		ValueType *	content;
-		enum {red, black} color;
+	// template < typename ValueType >
+	// struct Node
+	// {
+	// 	Node *		left;
+	// 	Node *		right;
+	// 	Node *		parent;
+	// 	ValueType *	content;
+	// 	enum {red, black} color;
 
-		Node(ValueType *content):
-		left(NULL), right(NULL), parent(NULL), content(content)
-		{
-		}
+	// 	Node(ValueType *content):
+	// 	left(NULL), right(NULL), parent(NULL), content(content)
+	// 	{
+	// 	}
 
-		// default contructor - should not be used
-		// Node():
-		// left(NULL), right(NULL), parent(NULL), content(NULL)
-		// {
-		// }
-		// ~Node() // implictily declared like this
-		// {
-		// }
-	};
+	// 	// default contructor - should not be used
+	// 	// Node():
+	// 	// left(NULL), right(NULL), parent(NULL), content(NULL)
+	// 	// {
+	// 	// }
+	// 	// ~Node() // implictily declared like this
+	// 	// {
+	// 	// }
+	// };
 
 
 	/* class less */

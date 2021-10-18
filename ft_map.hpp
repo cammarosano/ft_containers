@@ -7,7 +7,7 @@
 
 #include "Rbtree.hpp"
 #include "utils.hpp"
-#include "map_iterator.hpp"
+#include "tree_iterator.hpp"
 #include "reverse_iterator.hpp"
 
 namespace ft
@@ -22,8 +22,8 @@ public:
 	typedef	T										mapped_type;
 	typedef pair<const key_type, mapped_type>		value_type;
 	typedef std::size_t								size_type;
-	typedef ft::map_iterator<value_type>			iterator;
-	typedef ft::map_iterator<const value_type>		const_iterator;
+	typedef ft::tree_iterator<value_type>			iterator;
+	typedef ft::tree_iterator<const value_type>		const_iterator;
 	typedef ft::reverse_iterator<iterator>			reverse_iterator;
 	typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	typedef Compare									key_compare;
@@ -47,10 +47,11 @@ public:
 
 private:
 
-	typedef	::Node<value_type>	node;
+	typedef	::RbNode<value_type>	node;
+	typedef Rbtree<value_type, value_compare> tree_type;
 
 	key_compare _key_comp;
-	Rbtree<value_type, value_compare> _tree;
+	tree_type _tree;
 
 public:
 	explicit map(key_compare const & comp = key_compare());
@@ -127,13 +128,13 @@ typename map<K,T,C>::iterator map<K,T,C>::begin()
 template <typename K, typename T, typename C>
 typename map<K,T,C>::const_iterator map<K,T,C>::begin() const
 {
-	return (reinterpret_cast<Node<const value_type>*>(_tree.min()));
+	return (reinterpret_cast<RbNode<const value_type>const *>(_tree.min()));
 }
 
 template <typename K, typename T, typename C>
 typename map<K,T,C>::iterator map<K,T,C>::end()
 {
-	return (_tree.getEnd());
+	return (_tree.end());
 }
 
 
