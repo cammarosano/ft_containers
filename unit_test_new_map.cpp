@@ -5,6 +5,7 @@
 
 ft::map<int,std::string> m;
 ft::map<int,std::string>::iterator it;
+ft::map<int,std::string>::reverse_iterator rit;
 
 void setup()
 {
@@ -93,11 +94,32 @@ Test(const_iterator, begin, .init=setup)
 	ft::map<int,std::string> const m2(m);
 
 	ft::map<int,std::string>::const_iterator cit = m2.begin();
+	cr_expect(cit->first == 0);
 	while (cit != m2.end())
 	{
-		std::cout << cit->first << std::endl;
+		// std::cout << cit->first << std::endl;
 		cit++;
 	}
+	cr_expect((--cit)->first == 10);
 
+}
 
+Test(reverse_iterator, rbegin, .init=setup)
+{
+	rit = m.rbegin();
+	cr_expect(rit->first == 10);
+	cr_expect((--(m.rend()))->first == 0);
+}
+
+Test(const_reverse_iterator, test, .init=setup)
+{
+	ft::map<int, std::string> const m2(m);
+	ft::map<int, std::string>::const_reverse_iterator crit = m2.rbegin();
+	cr_expect(crit->first == 10);
+	cr_expect((--(m2.rend()))->first == 0);
+	// while (crit != m2.rend())
+	// {
+		// std::cout << crit->first << std::endl;
+		// ++crit;
+	// }
 }

@@ -24,7 +24,7 @@ rb_tree_test:	Rbtree.hpp
 			@ ./$@
 
 new_map_test:	
-			@  $(CC) $(CFLAGS) unit_test_new_map.cpp -lcriterion -o $@
+			@  $(CC) $(CFLAGS) unit_test_new_map.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
 
 

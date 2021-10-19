@@ -59,17 +59,50 @@ public:
 	map & operator=(map const & x);
 	~map();
 	
-	// Iterators
-	iterator begin();
-	const_iterator begin() const;
-	iterator end();
-	const_iterator end() const;
-	reverse_iterator rbegin();
-	const_reverse_iterator rbegin() const;
-	reverse_iterator rend();
-	const_reverse_iterator rend() const;
+	// --------------- Iterators -------------------------- //
 
-	// Capacity
+	iterator begin()
+	{
+		return (_tree.min());
+	}
+
+	const_iterator begin() const
+	{
+		return (iterator(_tree.min()));
+	}
+
+	iterator end()
+	{
+		return(_tree.end());
+	}
+
+	const_iterator end() const
+	{
+		return (iterator(_tree.end()));
+	}
+
+	reverse_iterator rbegin()
+	{
+		return (end());
+	}
+
+	const_reverse_iterator rbegin() const
+	{
+		return (end());
+	}
+
+	reverse_iterator rend()
+	{
+		return (begin());
+	}
+
+	const_reverse_iterator rend() const
+	{
+		return (begin());
+	}
+
+	// ------------- Capacity ------------------------ //
+
 	bool empty() const;
 	size_type size() const;
 	size_type max_size() const;
@@ -119,29 +152,29 @@ map<K,T,C>::~map()
 
 // Iterators
 
-template <typename K, typename T, typename C>
-typename map<K,T,C>::iterator map<K,T,C>::begin()
-{
-	return (_tree.min());
-}
+// template <typename K, typename T, typename C>
+// typename map<K,T,C>::iterator map<K,T,C>::begin()
+// {
+// 	return (_tree.min());
+// }
 
-template <typename K, typename T, typename C>
-typename map<K,T,C>::const_iterator map<K,T,C>::begin() const
-{
-	return (iterator(_tree.min()));
-}
+// template <typename K, typename T, typename C>
+// typename map<K,T,C>::const_iterator map<K,T,C>::begin() const
+// {
+	// return (iterator(_tree.min()));
+// }
 
-template <typename K, typename T, typename C>
-typename map<K,T,C>::iterator map<K,T,C>::end()
-{
-	return (_tree.end());
-}
+// template <typename K, typename T, typename C>
+// typename map<K,T,C>::iterator map<K,T,C>::end()
+// {
+// 	return (_tree.end());
+// }
 
-template <typename K, typename T, typename C>
-typename map<K,T,C>::const_iterator map<K,T,C>::end() const
-{
-	return (iterator(_tree.end()));
-}
+// template <typename K, typename T, typename C>
+// typename map<K,T,C>::const_iterator map<K,T,C>::end() const
+// {
+// 	return (iterator(_tree.end()));
+// }
 
 // Capacity
 
