@@ -130,3 +130,33 @@ Test(max_size, test)
 {
 	cr_expect(m.max_size() <= std_map.max_size());
 }
+
+Test(insert, hint, .init=setup)
+{
+	it = m.begin();
+	while (it->first != 8)
+		++it;
+	m.insert(it, ft::make_pair(9, "nine"));
+	// m.print_tree();
+}
+
+Test(erase, position, .init=setup)
+{
+	it = m.begin();
+	m.erase(++it);
+}
+
+Test(erase, range, .init=setup)
+{
+	m.erase(m.begin(), --(m.end()));
+}
+
+Test(erase, key, .init=setup)
+{
+	m.print_tree();
+	m.erase(6);
+	m.print_tree();
+	m.erase(2);
+	m.print_tree();
+
+}

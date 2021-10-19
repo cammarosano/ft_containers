@@ -44,7 +44,7 @@ private:
 	void	insert_fix(node *inserted_node);
 	node *	new_node(value_type const &value);
 	bool	validate_hint(node const * hint, value_type const & value);
-	node const *	next_node(node const * x) const;
+	node const *	next(node const * x) const;
 
 	// clear
 	void	clear_node(node* &x);
@@ -88,6 +88,7 @@ public:
 	node const *	insert(value_type const &value);
 	node const *	insert(node * hint, value_type const &value);
 	size_type		erase(value_type const &value);
+	void			erase(node * target);
 	void 			clear();
 	node const *	find(value_type const &value);
 	size_type		size() const;
@@ -225,23 +226,25 @@ template<typename T, typename C>
 typename Rbtree<T,C>::node const *
 Rbtree<T,C>::insert(node * hint, value_type const &value)
 {
-	// validate hint
-		// if node is == _end, false
-		// if _compare(value, node->value), false
-		// get next element (write function)
-		// if _end, false
-		// if _compare(node->value, value), true
-		// else false
-
-
-	// if good, insert(hint->right, right, value)
-	return (NULL);
-
-
+	if (validate_hint(hint, value))
+		return (insert(hint->right, hint, value));
+	return (insert(_root, &_end, value));
 }
 
 template<typename T, typename C>
-typename Rbtree<T,C>::node const * next_node(node const * ptr) const
+bool	Rbtree<T,C>::validate_hint(node const * hint, value_type const & value)
+{
+	if (hint == &_end || !_comp(*hint->value, value))
+		return (false);
+	node const * next_node = next(hint);
+	if (next_node == &_end || !_comp(value, *next_node->value))
+		return (false);
+	return (true);
+}
+
+// returns the next node (in sorted order)
+template<typename T, typename C>
+typename Rbtree<T,C>::node const * Rbtree<T,C>::next(node const * ptr) const
 {	
 	if (ptr->right)
 	{
@@ -538,6 +541,13 @@ typename Rbtree<T,C>::size_type	Rbtree<T,C>::erase(T const &value)
 	// std::cout << "deleting " << value << std::endl;
 	remove_node(target);
 	return (1);
+}
+
+template<typename T, typename C>
+void Rbtree<T,C>::erase(node * target)
+{
+	if (target != &_end)
+		remove_node(target);
 }
 
 template<typename T, typename C>

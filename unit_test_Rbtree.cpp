@@ -198,5 +198,12 @@ Test(tree_iterator, test, .init=setup)
 
 Test(max_size, test)
 {
-	std::cout << t.max_size() << std::endl;
+	cr_expect(t.max_size());
+}
+
+Test(insert_hint, test, .init=setup)
+{
+	RbNode<int> const * hint = t.find(22);
+	t.insert(const_cast<RbNode<int>*>(hint), 23);
+	t.print();
 }

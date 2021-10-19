@@ -138,20 +138,50 @@ public:
 
 	iterator insert(iterator position, value_type const & val)
 	{
-		node *predecessor;
-		ft::pair<iterator, bool> ret;
+		iterator it = _tree.insert(node_ptr(position), val);
+		return (it);
+	}
 
-		if (check_hint(position, val.first))
+	template <typename It>
+	void insert(It first, It last)
+	{
+		iterator hint = end();
+		while (first != last)
 		{
-			predecessor = get_node_address(position);
-			ret = insert(&predecessor->right, predecessor, val);
+			hint = insert(hint, *first);
+			++first;
 		}
-		else
-			ret = insert(val);
-		return (ret.first);
+	}
+
+	void erase(iterator position)
+	{
+		_tree.erase(node_ptr(position));
+	}
+
+	size_type erase(key_type const & k)
+	{
+		value_type value(k, mapped_type());
+		return (_tree.erase(value));
+	}
+
+	void erase(iterator first, iterator last)
+	{
+		node *target;
+
+		while (first != last)
+		{
+			target = node_ptr(first);
+			++first;
+			_tree.erase(target);
+		}
 	}
 
 
+
+
+	// ----------- Operations --------------- //
+
+	iterator find(key_type const & k);
 
 
 
@@ -161,7 +191,7 @@ public:
 private:
 	node * node_ptr(iterator const & it)
 	{
-		return (reinterpret_cast<node * )
+		return (*reinterpret_cast<node * const *>(&it));
 	}
 
 };
