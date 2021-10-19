@@ -43,6 +43,8 @@ private:
 	node *	insert(node* &root, node* parent, value_type const &value);
 	void	insert_fix(node *inserted_node);
 	node *	new_node(value_type const &value);
+	bool	validate_hint(node const * hint, value_type const & value);
+	node const *	next_node(node const * x) const;
 
 	// clear
 	void	clear_node(node* &x);
@@ -84,10 +86,12 @@ public:
 	~Rbtree();
 
 	node const *	insert(value_type const &value);
+	node const *	insert(node * hint, value_type const &value);
 	size_type		erase(value_type const &value);
 	void 			clear();
 	node const *	find(value_type const &value);
 	size_type		size() const;
+	size_type		max_size() const;
 	node const *	min() const;
 	node const *	max() const;
 	node const *	end() const;
@@ -172,6 +176,13 @@ typename Rbtree<T,C>::size_type	Rbtree<T,C>::size() const
 	return (_size);
 }
 
+template<typename T, typename C>
+typename Rbtree<T,C>::size_type	Rbtree<T,C>::max_size() const
+{
+	return (_node_allocator.max_size() * sizeof(node)
+	/ (sizeof(node) + sizeof(value_type)));
+}
+
 // whenever the root changes, _end.left holds its address, but _end.right
 // needs to be updated
 template<typename T, typename C>
@@ -208,6 +219,44 @@ template<typename T, typename C>
 typename Rbtree<T,C>::node const * Rbtree<T,C>::insert(T const &value)
 {
 	return insert(_root, &_end, value);
+}
+
+template<typename T, typename C>
+typename Rbtree<T,C>::node const *
+Rbtree<T,C>::insert(node * hint, value_type const &value)
+{
+	// validate hint
+		// if node is == _end, false
+		// if _compare(value, node->value), false
+		// get next element (write function)
+		// if _end, false
+		// if _compare(node->value, value), true
+		// else false
+
+
+	// if good, insert(hint->right, right, value)
+	return (NULL);
+
+
+}
+
+template<typename T, typename C>
+typename Rbtree<T,C>::node const * next_node(node const * ptr) const
+{	
+	if (ptr->right)
+	{
+		ptr = ptr->right;
+		while (ptr->left)
+			ptr = ptr->left;
+		return (ptr);
+	}
+	while (ptr->parent)
+	{
+		if (ptr->parent->left == ptr) // ptr is a left child
+			return (ptr->parent);
+		ptr = ptr->parent;
+	}
+	return (ptr); 
 }
 
 template<typename T, typename C>

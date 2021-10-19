@@ -195,3 +195,8 @@ Test(tree_iterator, test, .init=setup)
 	--it;
 	cr_expect(*it == 28);
 }
+
+Test(max_size, test)
+{
+	std::cout << t.max_size() << std::endl;
+}

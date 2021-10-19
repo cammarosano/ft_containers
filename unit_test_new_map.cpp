@@ -1,8 +1,10 @@
 #include <criterion/criterion.h>
 #include <iostream>
+#include <map>
 #include "ft_map.hpp"
 
 
+std::map<int,std::string> std_map;
 ft::map<int,std::string> m;
 ft::map<int,std::string>::iterator it;
 ft::map<int,std::string>::reverse_iterator rit;
@@ -122,4 +124,9 @@ Test(const_reverse_iterator, test, .init=setup)
 		// std::cout << crit->first << std::endl;
 		// ++crit;
 	// }
+}
+
+Test(max_size, test)
+{
+	cr_expect(m.max_size() <= std_map.max_size());
 }

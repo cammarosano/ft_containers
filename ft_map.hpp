@@ -103,20 +103,66 @@ public:
 
 	// ------------- Capacity ------------------------ //
 
-	bool empty() const;
-	size_type size() const;
-	size_type max_size() const;
+	bool empty() const
+	{
+		return (!size());
+	}
 
-	// Element access
-	mapped_type & operator[](key_type const & k);
+	size_type size() const
+	{
+		return (_tree.size());
+	}
+
+	size_type max_size() const
+	{
+		return (_tree.max_size());
+	}
+
+	// ------------- Element access ------------------------ //
+
+	mapped_type & operator[](key_type const & k)
+	{
+		value_type value(k, mapped_type());
+		return ((insert(value).first)->second);
+	}
 
 
-	// Modifiers
-	ft::pair<iterator, bool> insert (value_type const & val);
+	// ------------- Modifiers ----------------------------- //
+
+	ft::pair<iterator, bool> insert (value_type const & val)
+	{
+		size_type	pre_size = _tree.size();
+		iterator	it = _tree.insert(val);
+		return (ft::make_pair(it, (_tree.size() > pre_size)));	
+	}
+
+	iterator insert(iterator position, value_type const & val)
+	{
+		node *predecessor;
+		ft::pair<iterator, bool> ret;
+
+		if (check_hint(position, val.first))
+		{
+			predecessor = get_node_address(position);
+			ret = insert(&predecessor->right, predecessor, val);
+		}
+		else
+			ret = insert(val);
+		return (ret.first);
+	}
+
+
+
 
 
 	// debug utils
 	void print_tree() const;
+
+private:
+	node * node_ptr(iterator const & it)
+	{
+		return (reinterpret_cast<node * )
+	}
 
 };
 
@@ -178,40 +224,40 @@ map<K,T,C>::~map()
 
 // Capacity
 
-template <typename K, typename T, typename C>
-bool map<K,T,C>::empty() const
-{
-	return (!size());
-}
+// template <typename K, typename T, typename C>
+// bool map<K,T,C>::empty() const
+// {
+// 	return (!size());
+// }
 
-template <typename K, typename T, typename C>
-typename map<K,T,C>::size_type
-map<K,T,C>::size() const
-{
-	return (_tree.size());
-}
+// template <typename K, typename T, typename C>
+// typename map<K,T,C>::size_type
+// map<K,T,C>::size() const
+// {
+// 	return (_tree.size());
+// }
 
 
 // Element access
 
-template <typename K, typename T, typename C>
-T & map<K,T,C>::operator[](key_type const & k)
-{
-	value_type value(k, mapped_type());
-	return ((insert(value).first)->second);
-}
+// template <typename K, typename T, typename C>
+// T & map<K,T,C>::operator[](key_type const & k)
+// {
+// 	value_type value(k, mapped_type());
+// 	return ((insert(value).first)->second);
+// }
 
 
 // Modifiers
 
-template <typename K, typename T, typename C>
-ft::pair<typename map<K,T,C>::iterator, bool>
-map<K,T,C>::insert(value_type const &val)
-{
-	size_type	pre_size = _tree.size();
-	iterator p = _tree.insert(val);
-	return (ft::make_pair(p, (_tree.size() > pre_size)));	
-}
+// template <typename K, typename T, typename C>
+// ft::pair<typename map<K,T,C>::iterator, bool>
+// map<K,T,C>::insert(value_type const &val)
+// {
+// 	size_type	pre_size = _tree.size();
+// 	iterator p = _tree.insert(val);
+// 	return (ft::make_pair(p, (_tree.size() > pre_size)));	
+// }
 
 
 // Debug utils

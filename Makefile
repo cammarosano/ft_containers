@@ -20,7 +20,7 @@ my_map_test:	my_map_test.o
 			$(CC) $(CFLAGS) $^ -o $@
 
 rb_tree_test:	Rbtree.hpp
-			@  $(CC) $(CFLAGS) unit_test_Rbtree.cpp -lcriterion -o $@
+			@  $(CC) $(CFLAGS) unit_test_Rbtree.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
 
 new_map_test:	
