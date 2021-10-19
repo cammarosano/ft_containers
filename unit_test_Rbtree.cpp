@@ -205,5 +205,14 @@ Test(insert_hint, test, .init=setup)
 {
 	RbNode<int> const * hint = t.find(22);
 	t.insert(const_cast<RbNode<int>*>(hint), 23);
-	t.print();
+}
+
+Test(swap, test, .init=setup)
+{
+	Rbtree<int, CompValue> t2;
+	t2.insert(19);
+	t2.insert(42);
+	t2.insert(21);
+	t.swap(t2);
+	cr_expect(t.size() == 3);
 }

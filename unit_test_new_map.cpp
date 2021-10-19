@@ -153,10 +153,25 @@ Test(erase, range, .init=setup)
 
 Test(erase, key, .init=setup)
 {
-	m.print_tree();
 	m.erase(6);
-	m.print_tree();
+	// m.print_tree();
 	m.erase(2);
-	m.print_tree();
+}
 
+Test(swap, test, .init=setup)
+{
+	ft::map<int,std::string> m2;
+
+	m2[42] = "yo";
+	m2[18] = "yey";
+
+	m2.swap(m);
+	cr_expect(m.size() == 2);
+	cr_expect(m2.size() == 6);
+}
+
+Test(clear, test, .init=setup)
+{
+	m.clear();
+	cr_expect(m.size() == 0);
 }

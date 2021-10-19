@@ -96,6 +96,7 @@ public:
 	node const *	min() const;
 	node const *	max() const;
 	node const *	end() const;
+	void			swap(Rbtree & x);
 
 	std::allocator<T> get_allocator() const;
 
@@ -155,6 +156,21 @@ Rbtree<T,C>::copy_tree(node * &dest, node const *src, node *parent)
 		copy_tree(dest->left, src->left, dest);
 		copy_tree(dest->right, src->right, dest);
 	}
+}
+
+template<typename T, typename C>
+void	Rbtree<T,C>::swap(Rbtree & x)
+{
+	// swap _roots
+	_root = x._root;
+	x._root = _end.right;
+	update_end();
+	x.update_end();
+
+	// swap _sizes
+	size_type temp_size = _size;
+	_size = x._size;
+	x._size = temp_size;
 }
 
 template<typename T, typename C>

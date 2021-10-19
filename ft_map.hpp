@@ -176,8 +176,28 @@ public:
 		}
 	}
 
+	void swap(map& x)
+	{
+		_tree.swap(x._tree);
+	}
 
 
+	void clear()
+	{
+		_tree.clear();
+	}
+
+	// ----------- Observers -----------------//
+
+	key_compare key_comp(void) const
+	{
+		return (_key_comp);
+	}
+
+	value_compare value_comp(void) const
+	{
+		return (value_compare(_key_comp));
+	}
 
 	// ----------- Operations --------------- //
 
