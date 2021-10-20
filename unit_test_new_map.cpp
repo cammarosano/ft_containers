@@ -7,7 +7,9 @@
 std::map<int,std::string> std_map;
 ft::map<int,std::string> m;
 ft::map<int,std::string>::iterator it;
+ft::map<int,std::string>::const_iterator cit;
 ft::map<int,std::string>::reverse_iterator rit;
+ft::map<int,std::string>::const_reverse_iterator crit;
 
 void setup()
 {
@@ -174,4 +176,20 @@ Test(clear, test, .init=setup)
 {
 	m.clear();
 	cr_expect(m.size() == 0);
+}
+
+Test(find, test, .init=setup)
+{
+	it = m.find(4);
+	cr_expect(it->first == 4);
+	it = m.find(3);
+	cr_expect(it == m.end());
+}
+
+Test(find, const_obj, .init=setup)
+{
+	ft::map<int,std::string> const m2(m);
+
+	cit = m2.find(8);
+	cr_expect(cit->second == "eight");
 }

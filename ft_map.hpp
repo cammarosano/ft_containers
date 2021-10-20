@@ -37,7 +37,7 @@ public:
 	public:
 		value_compare(key_compare c): _compare(c) {} // made it public to avoid the use of friend
 
-		bool operator() (value_type const & x, value_type const & y)
+		bool operator() (value_type const & x, value_type const & y) const
 		{
 			return (_compare(x.first, y.first));
 		}
@@ -201,8 +201,17 @@ public:
 
 	// ----------- Operations --------------- //
 
-	iterator find(key_type const & k);
+	iterator find(key_type const & k)
+	{
+		value_type value(k, mapped_type());
+		return (_tree.find(value));
+	}
 
+	const_iterator find(key_type const & k) const
+	{
+		value_type value(k, mapped_type());
+		return (iterator(_tree.find(value)));
+	}
 
 
 	// debug utils

@@ -58,6 +58,7 @@ private:
 	void	left_rotate(node * x);
 	void	right_rotate(node * x);
 	node *	successor(node *x) const;
+	node const *	find(node *root, value_type const &value) const;
 	node *	find(node *root, value_type const &value);
 	void	detach_nil_node();
 	void	transplant(node *old, node *new_node);
@@ -90,7 +91,7 @@ public:
 	size_type		erase(value_type const &value);
 	void			erase(node * target);
 	void 			clear();
-	node const *	find(value_type const &value);
+	node const *	find(value_type const &value) const;
 	size_type		size() const;
 	size_type		max_size() const;
 	node const *	min() const;
@@ -519,6 +520,20 @@ void Rbtree<T,C>::clear()
 
 
 template<typename T, typename C>
+typename Rbtree<T,C>::node const *
+Rbtree<T,C>::find(node *root, T const &value) const
+{
+	if (!root)
+		return (&_end);
+	if(_comp(value, *root->value))
+		return (find(root->left, value));
+	if(_comp(*root->value, value))
+		return (find(root->right, value));
+	return (root);
+}
+
+// this overload is necessary because erase needs a node * to remove it
+template<typename T, typename C>
 typename Rbtree<T,C>::node *
 Rbtree<T,C>::find(node *root, T const &value) 
 {
@@ -531,10 +546,9 @@ Rbtree<T,C>::find(node *root, T const &value)
 	return (root);
 }
 
-
 // returns pointer to _end if no match
 template<typename T, typename C>
-typename Rbtree<T,C>::node const * Rbtree<T,C>::find(T const &value)
+typename Rbtree<T,C>::node const * Rbtree<T,C>::find(T const &value) const
 {
 	return (find(_root, value));
 }
