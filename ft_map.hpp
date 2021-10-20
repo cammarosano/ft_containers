@@ -54,10 +54,29 @@ private:
 	tree_type _tree;
 
 public:
-	explicit map(key_compare const & comp = key_compare());
-	map(map const & x);
-	map & operator=(map const & x);
-	~map();
+
+	// ------ Constructors, Assignation Operator and Destructor -------//
+
+	explicit map(key_compare const & comp = key_compare()):
+	_key_comp(comp), _tree(value_compare(_key_comp))
+	{
+	}
+
+	map(map const & x):
+	_key_comp(x._key_comp), _tree(value_compare(_key_comp))
+	{
+		*this = x;
+	}
+
+	map & operator=(map const & x)
+	{
+		_tree = x._tree;
+		return (*this);
+	}
+
+	~map()
+	{
+	}
 	
 	// --------------- Iterators -------------------------- //
 
@@ -213,8 +232,65 @@ public:
 		return (iterator(_tree.find(value)));
 	}
 
+	size_type count(key_type const & k) const
+	{
+		value_type value(k, mapped_type());
 
-	// debug utils
+		if (_tree.find(value) == _tree.end())
+			return (0);
+		return (1);
+	}
+
+	iterator lower_bound(key_type const & k)
+	{
+		value_type value(k, mapped_type());
+
+		return (_tree.lower_bound(value));
+	}
+
+	const_iterator lower_bound(key_type const & k) const
+	{
+		value_type value(k, mapped_type());
+
+		return (iterator(_tree.lower_bound(value)));
+	}
+
+	iterator upper_bound(key_type const & k)
+	{
+		value_type value(k, mapped_type());
+
+		return (_tree.upper_bound(value));
+	}
+
+	const_iterator upper_bound(key_type const & k) const
+	{
+		value_type value(k, mapped_type());
+
+		return (iterator(_tree.upper_bound(value)));
+	}
+
+	ft::pair<iterator, iterator> equal_range(key_type const & k)
+	{
+		return (ft::make_pair(lower_bound(k), upper_bound(k)));
+	}
+
+	ft::pair<const_iterator, const_iterator>
+	equal_range(key_type const & k) const
+	{
+		return (ft::make_pair(lower_bound(k), upper_bound(k)));
+	}
+
+	// ----------- Allocator --------------- //
+
+	allocator_type get_allocator() const
+	{
+		return (_tree.get_allocator());
+	}
+
+
+
+
+	// +++++++++ DEBUG UTILS ++++++++++++ // 
 	void print_tree() const;
 
 private:
@@ -225,98 +301,62 @@ private:
 
 };
 
+// ---------- Relational Operators (map) ------------ //
 
-
-// Constructors
-
-template <typename K, typename T, typename C>
-map<K,T,C>::map(key_compare const & comp):
-_key_comp(comp), _tree(value_compare(_key_comp))
+template<typename Key, typename T, typename Compare>
+bool operator==(map<Key, T, Compare> const & lhs,
+				map<Key, T, Compare> const & rhs)
 {
+	if (!(lhs.size() == rhs.size()))
+		return (false);
+	return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
 }
 
-template <typename K, typename T, typename C>
-map<K,T,C>::map(map const & x):
-_key_comp(x._key_comp), _tree(value_compare(_key_comp))
+template<typename Key, typename T, typename Compare>
+bool operator!=(map<Key, T, Compare> const & lhs,
+				map<Key, T, Compare> const & rhs)
 {
-	*this = x;
+	return (!(lhs == rhs));
 }
 
-template <typename K, typename T, typename C>
-map<K,T,C> & map<K,T,C>::operator=(map const & x)
+template<typename Key, typename T, typename Compare>
+bool operator<(map<Key, T, Compare> const & lhs,
+				map<Key, T, Compare> const & rhs)
 {
-	_tree = x._tree;
-	return (*this);
+	return (ft::lexicographical_compare(lhs.begin(), lhs.end(),
+										rhs.begin(), rhs.end()));
 }
 
-template <typename K, typename T, typename C>
-map<K,T,C>::~map()
+template<typename Key, typename T, typename Compare>
+bool operator<=(map<Key, T, Compare> const & lhs,
+				map<Key, T, Compare> const & rhs)
 {
+	return (!(rhs < lhs));
+}
+
+template<typename Key, typename T, typename Compare>
+bool operator>(map<Key, T, Compare> const & lhs,
+				map<Key, T, Compare> const & rhs)
+{
+	return (rhs < lhs);
+}
+
+template<typename Key, typename T, typename Compare>
+bool operator>=(map<Key, T, Compare> const & lhs,
+				map<Key, T, Compare> const & rhs)
+{
+	return (!(lhs < rhs));
 }
 
 
-// Iterators
+/* swap overload */
 
-// template <typename K, typename T, typename C>
-// typename map<K,T,C>::iterator map<K,T,C>::begin()
-// {
-// 	return (_tree.min());
-// }
+template<typename Key, typename T, typename Compare>
+void swap(map<Key, T, Compare> & x, map<Key, T, Compare> & y)
+{
+	x.swap(y);
+}
 
-// template <typename K, typename T, typename C>
-// typename map<K,T,C>::const_iterator map<K,T,C>::begin() const
-// {
-	// return (iterator(_tree.min()));
-// }
-
-// template <typename K, typename T, typename C>
-// typename map<K,T,C>::iterator map<K,T,C>::end()
-// {
-// 	return (_tree.end());
-// }
-
-// template <typename K, typename T, typename C>
-// typename map<K,T,C>::const_iterator map<K,T,C>::end() const
-// {
-// 	return (iterator(_tree.end()));
-// }
-
-// Capacity
-
-// template <typename K, typename T, typename C>
-// bool map<K,T,C>::empty() const
-// {
-// 	return (!size());
-// }
-
-// template <typename K, typename T, typename C>
-// typename map<K,T,C>::size_type
-// map<K,T,C>::size() const
-// {
-// 	return (_tree.size());
-// }
-
-
-// Element access
-
-// template <typename K, typename T, typename C>
-// T & map<K,T,C>::operator[](key_type const & k)
-// {
-// 	value_type value(k, mapped_type());
-// 	return ((insert(value).first)->second);
-// }
-
-
-// Modifiers
-
-// template <typename K, typename T, typename C>
-// ft::pair<typename map<K,T,C>::iterator, bool>
-// map<K,T,C>::insert(value_type const &val)
-// {
-// 	size_type	pre_size = _tree.size();
-// 	iterator p = _tree.insert(val);
-// 	return (ft::make_pair(p, (_tree.size() > pre_size)));	
-// }
 
 
 // Debug utils

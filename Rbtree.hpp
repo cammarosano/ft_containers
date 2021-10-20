@@ -64,6 +64,8 @@ private:
 	void	transplant(node *old, node *new_node);
 	void	update_end();
 	void	copy_tree(node * &dest, node const *src, node *parent);
+	node const * lower_bound(node const *root, value_type const &value) const;
+	node const * upper_bound(node const *root, value_type const &value) const;
 
 	// remove
 	void	remove_node(node *target);
@@ -96,6 +98,8 @@ public:
 	size_type		max_size() const;
 	node const *	min() const;
 	node const *	max() const;
+	node const *	lower_bound(value_type const &value) const;
+	node const *	upper_bound(value_type const &value) const;
 	node const *	end() const;
 	void			swap(Rbtree & x);
 
@@ -225,6 +229,57 @@ typename Rbtree<T,C>::node const * Rbtree<T,C>::max() const
 	while (ptr->right)
 		ptr = ptr->right;
 	return (ptr);
+}
+
+template<typename T, typename C>
+typename Rbtree<T,C>::node const *
+Rbtree<T,C>::lower_bound(node const * root, value_type const &value) const
+{
+	if (!root)
+		return (NULL);
+	if (_comp(*root->value, value)) // if node is less than value: look in right subtree
+		return (lower_bound(root->right, value));
+	if  (_comp(value, *root->value)) // if value is less than key: check left subtree for better candidate
+	{
+		node const * better_candidate = lower_bound(root->left, value);
+		if (better_candidate)
+			return (better_candidate);
+	}
+	return (root);
+}
+
+template<typename T, typename C>
+typename Rbtree<T,C>::node const *
+Rbtree<T,C>::upper_bound(node const * root, value_type const &value) const
+{
+	if (!root)
+		return (NULL);
+	if  (!_comp(value, *root->value)) // if node is smaller or equal to ref_value
+		return (upper_bound(root->right, value)); // search in right sub-tree
+	node const * better_candidate = upper_bound(root->left, value);
+	if (better_candidate)
+		return (better_candidate);
+	return (root);
+}
+
+template<typename T, typename C>
+typename Rbtree<T,C>::node const *
+Rbtree<T,C>::lower_bound(value_type const &value) const
+{
+	node const * lb = lower_bound(_root, value);
+	if (!lb)
+		return (&_end);
+	return (lb);
+}
+
+template<typename T, typename C>
+typename Rbtree<T,C>::node const *
+Rbtree<T,C>::upper_bound(value_type const &value) const
+{
+	node const * ub = upper_bound(_root, value);
+	if (!ub)
+		return (&_end);
+	return (ub);
 }
 
 template<typename T, typename C>

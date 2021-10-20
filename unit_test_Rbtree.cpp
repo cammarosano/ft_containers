@@ -216,3 +216,12 @@ Test(swap, test, .init=setup)
 	t.swap(t2);
 	cr_expect(t.size() == 3);
 }
+
+Test (lower_upper_bound, test, .init=setup)
+{
+	cr_expect(*t.lower_bound(11)->value == 11);
+	cr_expect(*t.upper_bound(11)->value == 15);
+	cr_expect(t.lower_bound(29) == t.end());
+	cr_expect(t.upper_bound(29) == t.end());
+}
+

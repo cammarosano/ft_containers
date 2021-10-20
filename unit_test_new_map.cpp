@@ -193,3 +193,42 @@ Test(find, const_obj, .init=setup)
 	cit = m2.find(8);
 	cr_expect(cit->second == "eight");
 }
+
+Test(count, test, .init=setup)
+{
+	cr_expect(m.count(2) == 1);
+	cr_expect(m.count(3) == 0);
+}
+
+Test(bounds, test, .init=setup)
+{
+	cr_expect(m.lower_bound(4)->first == 4);
+	cr_expect(m.upper_bound(4)->first == 6);
+	cr_expect(m.lower_bound(15) == m.end());
+	cr_expect(m.upper_bound(15) == m.end());
+	cr_expect(m.equal_range(2).first->first == 2);
+	cr_expect(m.equal_range(2).second->first == 4);
+
+	ft::map<int,std::string> const m2(m);
+
+	cr_expect(m2.lower_bound(4)->first == 4);
+	cr_expect(m2.upper_bound(4)->first == 6);
+	cr_expect(m2.lower_bound(15) == m2.end());
+	cr_expect(m2.upper_bound(15) == m2.end());
+	cr_expect(m2.equal_range(2).first->first == 2);
+	cr_expect(m2.equal_range(2).second->first == 4);
+
+}
+
+Test(get_allocator, test, .init=setup)
+{
+	ft::map<int, std::string>::allocator_type my_allocator = m.get_allocator();
+	ft::map<int, std::string>::value_type * pair = my_allocator.allocate(2);
+	my_allocator.construct(pair, ft::make_pair(42, "forty-two"));
+	my_allocator.construct(pair + 1, ft::make_pair(19, "nineteen"));
+	cr_expect(pair->first == 42);
+	cr_expect((pair + 1)->second == "nineteen");
+	my_allocator.destroy(pair);
+	my_allocator.destroy(pair + 1);
+	my_allocator.deallocate(pair, 2);
+}

@@ -538,27 +538,27 @@ Test(relational_operator, others, .init=setup)
 	cr_expect(m <= m2);
 }
 
-Test(constructor, range)
-{
-	ft::map<char,int> m;
-	m['a'] = 10;
-	m['b'] = 20;
-	m['c'] = 30;
-	m['d'] = 40;
+// Test(constructor, range)
+// {
+// 	ft::map<char,int> m;
+// 	m['a'] = 10;
+// 	m['b'] = 20;
+// 	m['c'] = 30;
+// 	m['d'] = 40;
 
-	ft::map<char,int> m2(m.begin(), m.end());
-	ft::map<char,int>::iterator it, it2;
-	it = m.begin();
-	it2 = m2.begin();
-	while (it2 != m2.end())
-	{
-		// std::cout << it2->first << ": " << it2->second << std::endl;
-		cr_expect(*it2 == *it);
-		++it2;
-		++it;
-	}
-	cr_expect(m2.size() == m.size());
-}
+// 	ft::map<char,int> m2(m.begin(), m.end());
+// 	ft::map<char,int>::iterator it, it2;
+// 	it = m.begin();
+// 	it2 = m2.begin();
+// 	while (it2 != m2.end())
+// 	{
+// 		// std::cout << it2->first << ": " << it2->second << std::endl;
+// 		cr_expect(*it2 == *it);
+// 		++it2;
+// 		++it;
+// 	}
+// 	cr_expect(m2.size() == m.size());
+// }
 
 Test(constructor, copy, .init=setup)
 {
@@ -696,12 +696,12 @@ Test(const_qualified, test, .init=setup)
 // 	p = p->parent->parent; // 2 and root
 // 	m.right_rotate(p);
 // }
-int	max(int a, int b)
-{
-	if (a > b)
-		return (a);
-	return (b);
-}
+// int	max(int a, int b)
+// {
+// 	if (a > b)
+// 		return (a);
+// 	return (b);
+// }
 
 Test(balancing, test)
 {
