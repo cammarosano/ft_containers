@@ -31,6 +31,10 @@ set_test:
 			@  $(CC) $(CFLAGS) unit_test_set.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
 
+stack_test:	
+			@  $(CC) $(CFLAGS) unit_test_stack.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
+			@ ./$@
+
 $(NAME):	$(OBJ)
 			$(CC) $(CFLAGS) $^ -o $@
 
@@ -45,4 +49,4 @@ fclean:		clean
 
 re:			fclean all
 
-.PHONY:		all clean fclean re vector_test map_test rb_tree_test new_map_test set_test
+.PHONY:		all clean fclean re vector_test map_test rb_tree_test new_map_test set_test stack_test
