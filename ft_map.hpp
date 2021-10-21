@@ -28,6 +28,8 @@ public:
 	typedef Compare									key_compare;
 	typedef std::allocator<value_type>				allocator_type;
 
+	// some typedefs are missing
+
 	class value_compare
 	{
 	private:

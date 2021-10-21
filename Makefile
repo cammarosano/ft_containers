@@ -7,9 +7,9 @@ NAME = a.out
 
 all:	$(NAME)
 
-unit_test:	$(HEADER)
+vector_test:	$(HEADER)
 			@	# @ $(CC) $(CFLAGS) unit_test.cpp -lcriterion -o $@ # linux	
-			@ $(CC) $(CFLAGS) unit_test.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
+			@ $(CC) $(CFLAGS) unit_test_vector.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
 
 map_test:	ft_map.hpp map_iterator.hpp utils.hpp
@@ -27,6 +27,9 @@ new_map_test:
 			@  $(CC) $(CFLAGS) unit_test_new_map.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
 
+set_test:	
+			@  $(CC) $(CFLAGS) unit_test_set.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
+			@ ./$@
 
 $(NAME):	$(OBJ)
 			$(CC) $(CFLAGS) $^ -o $@
@@ -42,4 +45,4 @@ fclean:		clean
 
 re:			fclean all
 
-.PHONY:		all clean fclean re unit_test map_test rb_tree_test new_map_test
+.PHONY:		all clean fclean re vector_test map_test rb_tree_test new_map_test set_test

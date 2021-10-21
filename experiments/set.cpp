@@ -14,6 +14,7 @@ int main()
 	std::set<int>::iterator it = s.begin();
 
 	std::cout << *it << std::endl;
+	// *it = 15; // can't be done
 
 	std::map<int, int> m;
 	m[5] = 0;
