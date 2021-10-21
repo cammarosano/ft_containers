@@ -538,27 +538,27 @@ Test(relational_operator, others, .init=setup)
 	cr_expect(m <= m2);
 }
 
-// Test(constructor, range)
-// {
-// 	ft::map<char,int> m;
-// 	m['a'] = 10;
-// 	m['b'] = 20;
-// 	m['c'] = 30;
-// 	m['d'] = 40;
+Test(constructor, range)
+{
+	ft::map<char,int> m;
+	m['a'] = 10;
+	m['b'] = 20;
+	m['c'] = 30;
+	m['d'] = 40;
 
-// 	ft::map<char,int> m2(m.begin(), m.end());
-// 	ft::map<char,int>::iterator it, it2;
-// 	it = m.begin();
-// 	it2 = m2.begin();
-// 	while (it2 != m2.end())
-// 	{
-// 		// std::cout << it2->first << ": " << it2->second << std::endl;
-// 		cr_expect(*it2 == *it);
-// 		++it2;
-// 		++it;
-// 	}
-// 	cr_expect(m2.size() == m.size());
-// }
+	ft::map<char,int> m2(m.begin(), m.end());
+	ft::map<char,int>::iterator it, it2;
+	it = m.begin();
+	it2 = m2.begin();
+	while (it2 != m2.end())
+	{
+		// std::cout << it2->first << ": " << it2->second << std::endl;
+		cr_expect(*it2 == *it);
+		++it2;
+		++it;
+	}
+	cr_expect(m2.size() == m.size());
+}
 
 Test(constructor, copy, .init=setup)
 {
@@ -703,17 +703,33 @@ Test(const_qualified, test, .init=setup)
 // 	return (b);
 // }
 
-Test(balancing, test)
+// Test(balancing, test)
+// {
+// 	ft::map<int,int> m;
+
+// 	int i = -1;
+// 	while (++i < 100)
+// 	{
+// 		m[i] = i;
+// 		// // std::cout << i << " added to tree\n";
+// 		// std::cout << "tree size: " << m.size()
+// 		// 		<< " | tree depth: " << m.tree_level_count() << std::endl;
+// 	}
+// }
+
+
+Test(constructors, const_map, .init=setup)
 {
-	ft::map<int,int> m;
+	ft::map<int,std::string> const m_const(m.begin(), m.end());
 
-	int i = -1;
-	while (++i < 100)
+
+	ft::map<int,std::string>::const_iterator cit = m_const.begin(); 
+
+	while (cit != m_const.end())
 	{
-		m[i] = i;
-		// // std::cout << i << " added to tree\n";
-		// std::cout << "tree size: " << m.size()
-		// 		<< " | tree depth: " << m.tree_level_count() << std::endl;
+		std::cout << cit->first << " ";
+		++cit;
 	}
+	std::cout << std::endl;
+	m_const.print_tree();
 }
-

@@ -2,7 +2,6 @@
 # define FT_MAP
 
 #include <string> // debug
-
 #include <iostream> // for debug messages
 
 #include "Rbtree.hpp"
@@ -47,7 +46,7 @@ public:
 
 private:
 
-	typedef	RbNode<value_type>	node; // check if needed
+	typedef	RbNode<value_type>	node;
 	typedef Rbtree<value_type, value_compare> tree_type;
 
 	key_compare _key_comp;
@@ -57,23 +56,35 @@ public:
 
 	// ------ Constructors, Assignation Operator and Destructor -------//
 
+	// Default constructor
 	explicit map(key_compare const & comp = key_compare()):
 	_key_comp(comp), _tree(value_compare(_key_comp))
 	{
 	}
 
+	// Range constructor
+	template <typename It>
+	map(It first, It last, key_compare const & comp = key_compare()):
+	_key_comp(comp), _tree(value_compare(_key_comp))
+	{
+		insert(first, last);
+	}
+
+	// Copy constructor
 	map(map const & x):
 	_key_comp(x._key_comp), _tree(value_compare(_key_comp))
 	{
 		*this = x;
 	}
 
+	// Assignation operator overload
 	map & operator=(map const & x)
 	{
 		_tree = x._tree;
 		return (*this);
 	}
 
+	// Destructor
 	~map()
 	{
 	}
@@ -349,7 +360,7 @@ bool operator>=(map<Key, T, Compare> const & lhs,
 }
 
 
-/* swap overload */
+//------------- Swap overload ------------------- //
 
 template<typename Key, typename T, typename Compare>
 void swap(map<Key, T, Compare> & x, map<Key, T, Compare> & y)
