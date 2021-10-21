@@ -100,7 +100,7 @@ Test(swap, test, .init=setup)
 	cr_expect(s.size() == 4);
 	cr_expect(s2.size() == 5);
 
-	s2.swap(s);
+	swap(s, s2);
 	cr_expect(s2.size() == 4);
 	cr_expect(s.size() == 5);
 }
@@ -212,4 +212,12 @@ Test(relational_operators, test, .init=setup)
 	cr_expect(!(s < s2));
 
 	// todo : test > <= >=
+	cr_expect(s > s2);
+	cr_expect(s >= s2);
+	s.erase(30);
+	cr_expect(s >= s2);
+	cr_expect(s <= s2);
+	cr_expect(!(s < s2));
+	s.erase(5);
+	cr_expect(!(s2 > s)); // 1st elem of s is 10, s2's is 5
 }

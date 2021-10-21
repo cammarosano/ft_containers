@@ -297,6 +297,16 @@ bool operator>=(const set<T,C>& lhs, const set<T,C>& rhs)
 
 }
 
+
+// ------------- Swap overload ---------------- //
+
+template <typename T, typename C>
+void swap(set<T,C> & x, set<T,C> & y)
+{
+	x.swap(y);
+}
+
+
 } // namespace ft
 
 
