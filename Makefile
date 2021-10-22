@@ -12,7 +12,7 @@ vector_test:	$(HEADER)
 			@ $(CC) $(CFLAGS) unit_test_vector.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
 
-map_test:	ft_map.hpp map_iterator.hpp utils.hpp
+map_test:	
 			@ $(CC) $(CFLAGS) unit_test_map.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
 
@@ -45,7 +45,7 @@ clean:
 			rm -f $(OBJ) my_map_test.o
 
 fclean:		clean
-			rm -f $(NAME) unit_test map_test my_map_test rb_tree_test new_map_test
+			rm -f $(NAME) unit_test map_test my_map_test rb_tree_test new_map_test set_test stack_test
 
 re:			fclean all
 

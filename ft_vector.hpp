@@ -12,18 +12,18 @@
 
 namespace ft
 {
-	template <typename T> class vector;
+	// template <typename T> class vector;
 
-	template<typename InputIterator>
-	typename std::iterator_traits<InputIterator>::difference_type
-	distance(InputIterator first, InputIterator last);
+	// template<typename InputIterator>
+	// typename std::iterator_traits<InputIterator>::difference_type
+	// distance(InputIterator first, InputIterator last);
 
-	template <typename T>
-	void swap(ft::vector<T> & x, ft::vector<T> & y);
-}
+	// template <typename T>
+	// void swap(ft::vector<T> & x, ft::vector<T> & y);
+// }
 
 template <typename T>
-class ft::vector
+class vector
 {
 public:
 	typedef T										value_type;
@@ -497,15 +497,17 @@ public:
 /* Non-member functions overloads */
 
 template<typename T>
-void ft::swap(ft::vector<T> & x, ft::vector<T> & y)
+void swap(vector<T> & x, vector<T> & y)
 {
 	x.swap(y);
 }
 
+
+
 /* Relational operators */
 
 template <typename T>
-bool operator==(ft::vector<T> const & lhs, ft::vector<T> const & rhs)
+bool operator==(vector<T> const & lhs, vector<T> const & rhs)
 {
 	if (lhs.size() != rhs.size())
 		return (false);
@@ -513,60 +515,39 @@ bool operator==(ft::vector<T> const & lhs, ft::vector<T> const & rhs)
 }
 
 template <typename T>
-bool operator!=(ft::vector<T> const & lhs, ft::vector<T> const & rhs)
+bool operator!=(vector<T> const & lhs, vector<T> const & rhs)
 {
 	return (!(lhs == rhs));
 }
 
 template <typename T>
-bool operator<(ft::vector<T> const & lhs, ft::vector<T> const & rhs)
+bool operator<(vector<T> const & lhs, vector<T> const & rhs)
 {
 	return (ft::lexicographical_compare(lhs.begin(), lhs.end(),
 										rhs.begin(), rhs.end()));
 }
 
 template <typename T>
-bool operator>(ft::vector<T> const & lhs, ft::vector<T> const & rhs)
+bool operator>(vector<T> const & lhs, vector<T> const & rhs)
 {
 	return (rhs < lhs);
 }
 
 template <typename T>
-bool operator<=(ft::vector<T> const & lhs, ft::vector<T> const & rhs)
+bool operator<=(vector<T> const & lhs, vector<T> const & rhs)
 {
 	return !(rhs < lhs);
 }
 
 template <typename T>
-bool operator>=(ft::vector<T> const & lhs, ft::vector<T> const & rhs)
+bool operator>=(vector<T> const & lhs, vector<T> const & rhs)
 {
 	return !(lhs < rhs);
 }
 
 
-// my implementation of std::distance
 
-// TODO: change this to resolve at COMPILE-TIME, using function overload
-// with a third parameter class std::random_access_iterator_tag
-
-template<typename InputIterator>
-typename std::iterator_traits<InputIterator>::difference_type
-ft::distance(InputIterator first, InputIterator last)
-{
-	if (typeid(typename std::iterator_traits<InputIterator>::iterator_category)
-		== typeid(std::random_access_iterator_tag))
-		// std::cout << "Iterator of type random-access\n";
-		return (last - first);
-	
-	typename std::iterator_traits<InputIterator>::difference_type n;
-
-	n = 0;
-	while (first++ != last)
-		++n;
-	return (n);
-}
-
-
+} // namespace ft
 
 
 

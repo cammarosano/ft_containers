@@ -15,45 +15,73 @@ public:
 	typedef	typename container_type::size_type	size_type;
 
 protected:
-	container_type c;
+	container_type _container;
 
 public:
 	explicit stack (const container_type& ctnr = container_type()):
-	c(ctnr)
+	_container(ctnr)
 	{
 	}
 
 	bool empty() const
 	{
-		return (c.empty());
+		return (_container.empty());
 	}
 
 	size_type size() const
 	{
-		return (c.size());
+		return (_container.size());
 
 	}
 
 	value_type& top()
 	{
-		return (c.back());
+		return (_container.back());
 	}
 
-	void push (const value_type& val)
+	void push(const value_type& val)
 	{
-		c.push_back(val);
+		_container.push_back(val);
 	}
 
 	void pop()
 	{
-		c.pop_back();
+		_container.pop_back();
 	}
 
+	friend bool operator==(stack const & lhs, stack const & rhs)
+	{
+		return (lhs._container == rhs._container);
+	}
+
+	friend bool operator!=(stack const & lhs, stack const & rhs)
+	{
+		return (lhs._container != rhs._container);
+	}
+
+	friend bool operator<(stack const & lhs, stack const & rhs)
+	{
+		return (lhs._container < rhs._container);
+	}
+
+	friend bool operator>(stack const & lhs, stack const & rhs)
+	{
+		return (lhs._container > rhs._container);
+	}
+
+	friend bool operator<=(stack const & lhs, stack const & rhs)
+	{
+		return (lhs._container <= rhs._container);
+	}
+
+	friend bool operator>=(stack const & lhs, stack const & rhs)
+	{
+		return (lhs._container >= rhs._container);
+	}
 };
 
-	
-} // namespace ft
 
+} // namespace ft
 
 
 #endif

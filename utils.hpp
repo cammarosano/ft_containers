@@ -197,7 +197,29 @@ namespace ft
 		}
 	};
 
-}
+// my implementation of std::distance
+
+// TODO: change this to resolve at COMPILE-TIME, using function overload
+// with a third parameter class std::random_access_iterator_tag
+
+	template<typename InputIterator>
+	typename std::iterator_traits<InputIterator>::difference_type
+	distance(InputIterator first, InputIterator last)
+	{
+		if (typeid(typename std::iterator_traits<InputIterator>::iterator_category)
+			== typeid(std::random_access_iterator_tag))
+			// std::cout << "Iterator of type random-access\n";
+			return (last - first);
+		
+		typename std::iterator_traits<InputIterator>::difference_type n;
+
+		n = 0;
+		while (first++ != last)
+			++n;
+		return (n);
+	}
+
+} // namespace ft
 
 
 #endif

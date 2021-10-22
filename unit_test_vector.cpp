@@ -241,7 +241,8 @@ Test(modify, swap_non_member, .init=setup)
 	ft::vector<int> v2(5, 42);
 
 	size_t v_old_size = v.size();
-	ft::swap(v, v2);
+	// ft::swap(v, v2);
+	swap(v, v2);
 	cr_expect(v.size() == 5);
 	cr_expect(v.front() == 42);
 	cr_expect(v.back() == 42);

@@ -60,6 +60,8 @@
 		"ios": "cpp",
 		"csignal": "cpp",
 		"ctime": "cpp",
-		"set": "cpp"
+		"set": "cpp",
+		"__string": "cpp",
+		"stack": "cpp"
 	}
 }
