@@ -136,7 +136,6 @@ private:
 public:
 	// TODO: default constructor, copy constructor, =op overload
 	// other constructors
-	// explicit keyword for constructors
 
 
 	explicit vector(): _array(NULL), _size(0), _capacity(0)

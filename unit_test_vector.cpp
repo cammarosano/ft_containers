@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <string>
 #include <csignal>
+#include <set>
 
 ft::vector<int> v;
 std::vector<int> stl_vector;
@@ -466,4 +467,16 @@ Test(relational_operators, others)
 	cr_expect(v1 >= v2);
 	cr_expect(v2 < v1);
 	cr_expect(v2 <= v1);
+}
+
+Test(distance, test)
+{
+	ft::vector<int> v;
+	// std::vector<int> v;
+	std::set<int> s;
+	s.insert(1);
+	s.insert(3);
+	s.insert(5);
+	s.insert(-1);
+	v.assign(s.begin(), s.end());
 }

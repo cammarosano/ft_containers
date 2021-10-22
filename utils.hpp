@@ -1,6 +1,8 @@
 #ifndef FT_IS_INTEGRAL_HPP
 # define FT_IS_INTEGRAL_HPP
 
+#include <iostream> // debug only
+
 namespace ft
 {
 	/* is_integral */
@@ -199,24 +201,43 @@ namespace ft
 
 // my implementation of std::distance
 
-// TODO: change this to resolve at COMPILE-TIME, using function overload
-// with a third parameter class std::random_access_iterator_tag
+	namespace distance_dispatcher
+	{
+
+	template<typename It, typename Tag>
+	typename std::iterator_traits<It>::difference_type
+	distance(It first, It last, Tag)
+	{
+		// std::cout << "not a RA iterator...\n";
+		typename std::iterator_traits<It>::difference_type n;
+
+		n = 0;
+		while (first != last)
+		{
+			++n;
+			++first;
+		}
+		// std::cout << "distance is " << n << std::endl;
+		return (n);
+	}
+
+	// specialization of distance for Random Access iterator
+	template<typename RAiterator>
+	typename std::iterator_traits<RAiterator>::difference_type
+	distance(RAiterator first, RAiterator last, std::random_access_iterator_tag)
+	{
+		// std::cout << "RA iterator!!!\n";
+		return (last - first);
+	}
+
+	} // namespace distance_dipatcher
 
 	template<typename InputIterator>
 	typename std::iterator_traits<InputIterator>::difference_type
 	distance(InputIterator first, InputIterator last)
 	{
-		if (typeid(typename std::iterator_traits<InputIterator>::iterator_category)
-			== typeid(std::random_access_iterator_tag))
-			// std::cout << "Iterator of type random-access\n";
-			return (last - first);
-		
-		typename std::iterator_traits<InputIterator>::difference_type n;
-
-		n = 0;
-		while (first++ != last)
-			++n;
-		return (n);
+		return (distance_dispatcher::distance(first, last, 
+			typename std::iterator_traits<InputIterator>::iterator_category()));
 	}
 
 } // namespace ft
