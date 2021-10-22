@@ -1,0 +1,11 @@
+write ft::iterator_traits
+
+substitute std::iterator_traits in the code by the ft version
+
+resolve vector insert and assign at compile time with template specializations
+
+compare speed with STL
+	{
+		write a main with a macro to be defined as ft or std (or templated test!)
+		output results and timing
+	}

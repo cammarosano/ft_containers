@@ -7,6 +7,12 @@ NAME = a.out
 
 all:	$(NAME)
 
+time_test:
+			@ $(CC) $(CFLAGS) -std=c++98 -D NS=ft time_test.cpp -o $@
+			@ ./$@
+			@ $(CC) $(CFLAGS) -std=c++98 -D NS=std time_test.cpp -o $@
+			@ ./$@
+
 vector_test:	$(HEADER)
 			@	# @ $(CC) $(CFLAGS) unit_test.cpp -lcriterion -o $@ # linux	
 			@ $(CC) $(CFLAGS) unit_test_vector.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
@@ -49,4 +55,4 @@ fclean:		clean
 
 re:			fclean all
 
-.PHONY:		all clean fclean re vector_test map_test rb_tree_test new_map_test set_test stack_test
+.PHONY:		all clean fclean re vector_test map_test rb_tree_test new_map_test set_test stack_test time_test
