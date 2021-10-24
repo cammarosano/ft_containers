@@ -11,3 +11,5 @@ compare speed with STL
 		write a main with a macro to be defined as ft or std (or templated test!)
 		output results and timing
 	}
+
+watch out for operators overload as member functions in tree_iterator (and elsewhere?)
