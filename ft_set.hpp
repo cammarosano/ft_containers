@@ -26,8 +26,10 @@ public:
 	typedef std::size_t								size_type;
 
 private:
-	typedef RbNode<const value_type>	node;
-	typedef Rbtree<const value_type, value_compare> tree_type;
+	typedef tree_iterator<value_type>				temp_iterator;
+
+	typedef RbNode<value_type>	node;
+	typedef Rbtree<value_type, value_compare> tree_type;
 
 	key_compare _key_comp;
 	tree_type	_tree;
@@ -71,23 +73,23 @@ public:
 
 	iterator begin()
 	{
-		return (_tree.min());
+		return (temp_iterator(_tree.min()));
 	}
 
 	const_iterator begin() const
 	{
-		return (_tree.min());
+		return (temp_iterator(_tree.min()));
 
 	}
 
 	iterator end()
 	{
-		return(_tree.end());
+		return(temp_iterator(_tree.end()));
 	}
 
 	const_iterator end() const
 	{
-		return(_tree.end());
+		return(temp_iterator(_tree.end()));
 	}
 
 	reverse_iterator rbegin()
@@ -134,13 +136,13 @@ public:
 	ft::pair<iterator,bool> insert (const value_type& val)	
 	{
 		size_type	pre_size = _tree.size();
-		iterator	it = _tree.insert(val);
+		iterator	it = temp_iterator(_tree.insert(val));
 		return (ft::make_pair(it, (_tree.size() > pre_size)));	
 	}
 
 	iterator insert (iterator position, const value_type& val)
 	{
-		iterator it = _tree.insert(node_ptr(position), val);
+		iterator it = temp_iterator(_tree.insert(node_ptr(position), val));
 		return (it);
 	}
 
@@ -205,7 +207,7 @@ public:
 
 	iterator find (const value_type& val) const
 	{
-		return (_tree.find(val));
+		return (temp_iterator(_tree.find(val)));
 	}
 
 	size_type count (const value_type& val) const
@@ -217,12 +219,12 @@ public:
 
 	iterator lower_bound (const value_type& val) const
 	{
-		return (_tree.lower_bound(val));
+		return (temp_iterator(_tree.lower_bound(val)));
 	}
 
 	iterator upper_bound (const value_type& val) const
 	{
-		return (_tree.upper_bound(val));
+		return (temp_iterator(_tree.upper_bound(val)));
 	}
 
 	pair<iterator,iterator> equal_range (const value_type& val) const
