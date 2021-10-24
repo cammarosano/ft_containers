@@ -1,8 +1,9 @@
 SRC = main.cpp
 OBJ = $(SRC:.cpp=.o)
 HEADER = ft_vector.hpp vector_iterator.hpp reverse_iterator.hpp ft_map.hpp 
+INCLUDE = -I includes -I containers
 CC = clang++
-CFLAGS = -Wall -Wextra -Werror -g  -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -g -fsanitize=address $(INCLUDE)
 NAME = a.out
 
 all:	$(NAME)
@@ -13,32 +14,32 @@ time_test:
 			@ $(CC) $(CFLAGS) -std=c++98 -D NS=std time_test.cpp -o $@
 			@ ./$@
 
-vector_test:	$(HEADER)
+vector_test:
 			@	# @ $(CC) $(CFLAGS) unit_test.cpp -lcriterion -o $@ # linux	
-			@ $(CC) $(CFLAGS) unit_test_vector.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
+			 $(CC) $(CFLAGS) unit_tests/unit_test_vector.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
 
 map_test:	
-			@ $(CC) $(CFLAGS) unit_test_map.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
+			@ $(CC) $(CFLAGS) unit_tests/unit_test_map.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
 
 my_map_test:	my_map_test.o
 			$(CC) $(CFLAGS) $^ -o $@
 
 rb_tree_test:	Rbtree.hpp
-			@  $(CC) $(CFLAGS) unit_test_Rbtree.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
+			@  $(CC) $(CFLAGS) unit_tests/unit_test_Rbtree.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
 
 new_map_test:	
-			@  $(CC) $(CFLAGS) unit_test_new_map.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
+			@  $(CC) $(CFLAGS) unit_tests/unit_test_new_map.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
 
 set_test:	
-			@  $(CC) $(CFLAGS) unit_test_set.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
+			@  $(CC) $(CFLAGS) unit_tests/unit_test_set.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
 
 stack_test:	
-			@  $(CC) $(CFLAGS) unit_test_stack.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
+			@  $(CC) $(CFLAGS) unit_tests/unit_test_stack.cpp -lcriterion -o $@ -I ~/.brew/include -L ~/.brew/lib  -std=c++11
 			@ ./$@
 
 $(NAME):	$(OBJ)
@@ -51,7 +52,7 @@ clean:
 			rm -f $(OBJ) my_map_test.o
 
 fclean:		clean
-			rm -f $(NAME) unit_test map_test my_map_test rb_tree_test new_map_test set_test stack_test
+			rm -f $(NAME) vector map_test my_map_test rb_tree_test new_map_test set_test stack_test
 
 re:			fclean all
 
