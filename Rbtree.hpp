@@ -31,13 +31,12 @@ private:
 	typedef	std::size_t			size_type;
 	typedef	RbNode<T>				node; 
 
+	std::allocator<T>		_value_allocator;
+	std::allocator<node>	_node_allocator;
 	Compare					_comp; // templated comparision object
 	node 					_end;	// stack variable
 	node *					&_root;	// reference to _end.left
-	node					_nil;
 	size_type				_size;
-	std::allocator<T>		_value_allocator;
-	std::allocator<node>	_node_allocator;
 
 	// insertion
 	node *	insert(node* &root, node* parent, value_type const &value);
@@ -51,7 +50,6 @@ private:
 	void	clear_tree(node* &root);
 
 	// helpers and utils
-	void	initial_setup();
 	bool	is_left_child(node *x) const;
 	bool	is_red(node *x) const;
 	bool	is_black(node *x) const;
@@ -60,7 +58,7 @@ private:
 	node *	successor(node *x) const;
 	node const *	find(node *root, value_type const &value) const;
 	node *	find(node *root, value_type const &value);
-	void	detach_nil_node();
+	void	detach_nil_node(node & nil);
 	void	transplant(node *old, node *new_node);
 	void	update_end();
 	void	copy_tree(node * &dest, node const *src, node *parent);
@@ -82,8 +80,7 @@ private:
 	void	print(node* root, int space) const;
 	
 public:
-	Rbtree();
-	Rbtree(Compare const &comp_obj);
+	Rbtree(Compare const &comp_obj = Compare());
 	Rbtree(Rbtree const & src);
 	Rbtree & operator=(Rbtree const & rhs);
 	~Rbtree();
@@ -111,26 +108,16 @@ public:
 };
 
 
-
-
-template<typename T, typename C>
-Rbtree<T,C>::Rbtree():_end(0), _root(_end.left), _nil(0), _size(0)
-{
-	initial_setup();
-}
-
 template<typename T, typename C>
 Rbtree<T,C>::Rbtree(C const &comp_obj):
-_comp(comp_obj), _end(0), _root(_end.left), _nil(0), _size(0)
+_comp(comp_obj), _end(_value_allocator.allocate(1)), _root(_end.left), _size(0)
 {
-	initial_setup();
 }
 
 template<typename T, typename C>
 Rbtree<T,C>::Rbtree(Rbtree const & src):
-_comp(src._comp), _end(0), _root(_end.left), _nil(0), _size(0)
+_comp(src._comp), _end(_value_allocator.allocate(1)), _root(_end.left), _size(0)
 {
-	initial_setup();
 	*this = src;
 }
 
@@ -176,13 +163,6 @@ void	Rbtree<T,C>::swap(Rbtree & x)
 	size_type temp_size = _size;
 	_size = x._size;
 	x._size = temp_size;
-}
-
-template<typename T, typename C>
-void	Rbtree<T,C>::initial_setup()
-{
-	_nil.color = rbt_black;
-	_end.value = _value_allocator.allocate(1); // allocation without construction
 }
 
 template<typename T, typename C>
@@ -652,13 +632,16 @@ void	Rbtree<T,C>::remove_node(node *target)
 {
 	node * replacement;
 	node * x;
+	node nil(NULL);
+
+	nil.color = rbt_black;
 
 	if (target->left && target->right) // node has two children
 	{
 		replacement = successor(target);
 		x = replacement->right;
 		if (!x)
-			x = &_nil;
+			x = &nil;
 		transplant(replacement, x); // detach replacement from tree
 		transplant(target, replacement); // replace target
 		replacement->left = target->left;
@@ -673,26 +656,26 @@ void	Rbtree<T,C>::remove_node(node *target)
 		else if (target->right) // right child only
 			replacement = x = target->right;
 		else	// no children
-			replacement = x = &_nil;
+			replacement = x = &nil;
 		transplant(target, replacement);
 	}
 	fix_remove(target, replacement, x);
-	detach_nil_node();
+	detach_nil_node(nil);
 	clear_node(target); 
 	--_size;
 	update_end();
 }
 
 template<typename T, typename C>
-void	Rbtree<T,C>::detach_nil_node()
+void	Rbtree<T,C>::detach_nil_node(node & nil)
 {
-	if (_nil.parent)
+	if (nil.parent)
 	{
-		if (&_nil == _nil.parent->left)
-			_nil.parent->left = NULL;
+		if (&nil == nil.parent->left)
+			nil.parent->left = NULL;
 		else
-			_nil.parent->right = NULL;
-		_nil.parent = NULL;
+			nil.parent->right = NULL;
+		nil.parent = NULL;
 	}
 }
 
@@ -714,7 +697,7 @@ void Rbtree<T,C>::fix_remove(node * deleted, node * replacement, node * x)
 {
 	if (deleted->color == rbt_red)
 	{
-		if (!(replacement->color == rbt_red || replacement == &_nil)) // second case
+		if (!(replacement->color == rbt_red || !replacement->value)) // second case
 		{
 			replacement->color = rbt_red;
 			run_case(case_index(x), x);
