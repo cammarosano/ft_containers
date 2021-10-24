@@ -79,7 +79,6 @@ public:
 	const_iterator begin() const
 	{
 		return (temp_iterator(_tree.min()));
-
 	}
 
 	iterator end()

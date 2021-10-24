@@ -733,4 +733,3 @@ Test(constructors, const_map, .init=setup)
 	std::cout << std::endl;
 	m_const.print_tree();
 }
-

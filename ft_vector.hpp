@@ -226,14 +226,13 @@ private:
 	}
 
 public:
-	// TODO: default constructor, copy constructor, =op overload
-	// other constructors
 
-
+	// Default constructor
 	explicit vector(): _array(NULL), _size(0), _capacity(0)
 	{
 	} 
 
+	// Fill constructor
 	explicit vector(size_type n, value_type const & val = value_type()):
 	_size(n), _capacity(n)
 	{
@@ -242,6 +241,7 @@ public:
 			_allocator.construct(_array + i, val);
 	}
 
+	// Range constructor
 	template<typename I>
 	vector(typename ft::enable_if<!ft::is_integral<I>::value, I>::type first,
 			I last): _array(0), _size(0), _capacity(0)
@@ -249,17 +249,21 @@ public:
 		assign(first, last);
 	}
 
+	// Copy constructor
 	vector(vector const & x):
-	_array(NULL), _size(0), _capacity(0) 	// const_iterator version
-	// _size(x.size()), _capacity(x.size()) 
+	_array(NULL), _size(0), _capacity(0)
 	{
-		assign(x.begin(), x.end()); // I need a const iterator for that
-
-		// _array = _allocator.allocate(_capacity);
-		// for (size_t i = 0; i < _size; i++)
-		// 	_allocator.construct(_array + i, x[i]);
+		*this = x;
 	}
 
+	// Assignation operator
+	vector & operator=(vector const & x)
+	{
+		assign(x.begin(), x.end());
+		return (*this);
+	}
+
+	// Destructor
 	~vector()
 	{
 		if (_capacity)

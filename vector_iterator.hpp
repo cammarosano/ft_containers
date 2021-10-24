@@ -137,4 +137,5 @@ vector_iterator<T> operator+(typename vector_iterator<T>::difference_type n,
 }
 
 } // namespace ft
+
 #endif

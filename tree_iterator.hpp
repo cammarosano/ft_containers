@@ -79,7 +79,6 @@ namespace ft
 		// iterator must be convertible to const_iterator
 		operator tree_iterator<const T>() const
 		{
-			// std::cout << "conversion from interator to const_iterator" << std::endl; // debug message
 			return (tree_iterator<const T>
 				(reinterpret_cast<RbNode<const T> const *>(_ptr)));
 		}
@@ -122,17 +121,16 @@ namespace ft
 			return (temp);
 		}
 
-		bool operator==(tree_iterator const & rhs) const
+		bool operator==(tree_iterator const & rhs)
 		{
 			return (_ptr == rhs._ptr);
 		}
 
-		bool operator!=(tree_iterator const & rhs) const
+		bool operator!=(tree_iterator const & rhs)
 		{
 			return (_ptr != rhs._ptr);
 		}
 	};
-
 
 }
 #endif

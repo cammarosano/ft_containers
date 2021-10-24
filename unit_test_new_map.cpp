@@ -232,4 +232,3 @@ Test(get_allocator, test, .init=setup)
 	my_allocator.destroy(pair + 1);
 	my_allocator.deallocate(pair, 2);
 }
-

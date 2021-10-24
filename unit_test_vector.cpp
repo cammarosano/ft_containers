@@ -480,3 +480,15 @@ Test(distance, test)
 	s.insert(-1);
 	v.assign(s.begin(), s.end());
 }
+
+Test(assignation_op, test, .init=setup)
+{
+	ft::vector<int> v2;
+
+	v2 = v;
+
+	cr_expect(v2.size() == v.size());
+	for (size_t i = 0; i < v.size(); i++)
+		cr_expect(v2[i] == v[i]);
+}
+

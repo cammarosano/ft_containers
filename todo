@@ -2,8 +2,6 @@
 
 try again a iterator base class?
 
-assignation operator for vector
-
 check exceptions for vector
 
 compare speed with STL
@@ -12,4 +10,3 @@ compare speed with STL
 		output results and timing
 	}
 
-watch out for operators overload as member functions in tree_iterator (and elsewhere?)

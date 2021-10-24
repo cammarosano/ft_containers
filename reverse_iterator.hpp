@@ -11,12 +11,12 @@ class reverse_iterator
 {
 public:
 	// preserving iterator "I"'s traits
-	typedef I														iterator_type;
-	typedef typename ft::iterator_traits<I>::iterator_category		iterator_category;
+	typedef I													iterator_type;
+	typedef typename ft::iterator_traits<I>::iterator_category	iterator_category;
 	typedef typename ft::iterator_traits<I>::value_type			value_type;
-	typedef typename ft::iterator_traits<I>::difference_type		difference_type;
-	typedef typename ft::iterator_traits<I>::pointer				pointer;
-	typedef typename ft::iterator_traits<I>::reference				reference;
+	typedef typename ft::iterator_traits<I>::difference_type	difference_type;
+	typedef typename ft::iterator_traits<I>::pointer			pointer;
+	typedef typename ft::iterator_traits<I>::reference			reference;
 
 private:
 	iterator_type _base;
