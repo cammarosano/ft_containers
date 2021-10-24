@@ -1,8 +1,10 @@
-write ft::iterator_traits
 
-substitute std::iterator_traits in the code by the ft version
 
-resolve vector insert and assign at compile time with template specializations
+try again a iterator base class?
+
+assignation operator for vector
+
+check exceptions for vector
 
 compare speed with STL
 	{

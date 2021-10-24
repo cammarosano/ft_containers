@@ -6,21 +6,12 @@
 # include "vector_iterator.hpp"
 # include "reverse_iterator.hpp"
 # include <stdexcept>
-# include <iterator> // iterator_traits
+# include <iterator> // iterator_tags
 # include <typeinfo> // type_info
 # include "utils.hpp"
 
 namespace ft
 {
-	// template <typename T> class vector;
-
-	// template<typename InputIterator>
-	// typename std::iterator_traits<InputIterator>::difference_type
-	// distance(InputIterator first, InputIterator last);
-
-	// template <typename T>
-	// void swap(ft::vector<T> & x, ft::vector<T> & y);
-// }
 
 template <typename T>
 class vector
@@ -131,6 +122,107 @@ private:
 			p_position = reallocate4insertion(p_position, n);
 		_size += n;
 		return (p_position);
+	}
+
+
+	template <typename InputIt>
+	void assign_dispatcher(InputIt first, InputIt last, std::input_iterator_tag)
+	{
+		clear();
+		
+		while (first != last)
+			push_back(*first++);
+	}
+
+	template <typename FwdIt>
+	void assign_dispatcher(FwdIt first, FwdIt last, std::forward_iterator_tag)
+	{
+		return assign_fwd_iterator(first, last);
+	}
+
+	template <typename BDIt>
+	void assign_dispatcher(BDIt first, BDIt last, std::bidirectional_iterator_tag)
+	{
+		return assign_fwd_iterator(first, last);
+	}
+
+	template <typename RAIt>
+	void assign_dispatcher(RAIt first, RAIt last, std::random_access_iterator_tag)
+	{
+		return assign_fwd_iterator(first, last);
+	}
+
+	template <typename FwdIt>
+	void assign_fwd_iterator(FwdIt first, FwdIt last)
+	{
+		difference_type n = ft::distance(first, last);
+		if (n < 0)
+			return ; // STL apparently just casts dif_type into size_type, potentially
+				// getting a big number. And throws std::length_error for not being 
+				// able to allocate for bigger than max_size()
+				// And this is done before clearing the array.
+		clear();
+		if (static_cast<size_type>(n) > _capacity)
+		{
+			if (_array)
+				_allocator.deallocate(_array, _capacity);
+			_array = _allocator.allocate(n);
+			_capacity = n;
+		}
+		while (first != last)
+		{
+			_allocator.construct(&_array[_size], *first);
+			++_size;
+			++first;
+		}
+	}
+
+	template <typename InputIt>
+	void insert_dispatcher(iterator position, InputIt first, InputIt last,
+							std::input_iterator_tag)
+	{
+		while (first != last)
+		{
+			position = insert(position, *first++); // position is updated in case of reallocation
+			position++;
+		}
+	}
+
+
+	template <typename FwdIt>
+	void insert_dispatcher(iterator position, FwdIt first, FwdIt last,
+							std::forward_iterator_tag)
+	{
+		input_fwd_iterator(position, first, last);
+	}
+
+	template <typename BDIt>
+	void insert_dispatcher(iterator position, BDIt first, BDIt last,
+							std::bidirectional_iterator_tag)
+	{
+		input_fwd_iterator(position, first, last);
+	}
+
+	template <typename RAIt>
+	void insert_dispatcher(iterator position, RAIt first, RAIt last,
+							std::random_access_iterator_tag)
+	{
+		insert_fwd_iterator(position, first, last);
+	}
+
+	template <typename FwdIt>
+	void insert_fwd_iterator(iterator position, FwdIt first, FwdIt last)
+	{
+		difference_type n;
+		pointer insert_pos;
+
+		n = ft::distance(first, last);
+		if (n <= 0) // consider raising exception in case allocation must be too big
+			return ;
+		// insert_pos = make_room4insertion(position, static_cast<size_type>(n));
+		insert_pos = make_room4insertion(position, n);
+		while (n--)
+			_allocator.construct(insert_pos++, *first++);
 	}
 
 public:
@@ -341,40 +433,15 @@ public:
 		_size = n;
 	}
 
-	// cppreference: The behavior is undefined if either argument is an iterator into *this.
-	template < typename I >
-	typename ft::enable_if<!ft::is_integral<I>::value, void>::type	// return type: void
-	assign(I first, I last)
+	// cppreference: The behavior of assign is undefined if either argument
+	// is an iterator into *this.
+
+	template < typename It >
+	typename ft::enable_if<!is_integral<It>::value>::type	// return type: void
+	assign(It first, It last)
 	{
-		clear();
-		
-		// if iterator is not at least forward_iterator, push one by one
-		if (typeid(typename std::iterator_traits<I>::iterator_category)
-			== typeid(std::input_iterator_tag))
-		{
-			// std::cout << "Iterator has type input_iterator\n";	// debug message
-			while (first != last)
-				push_back(*first++);
-		}
-		else // should I test for fwd, bidir or rand_acc iterator??
-		{
-			difference_type n = ft::distance(first, last); // check for negative value?
-			if (n <= 0)
-				return ;
-			if (static_cast<size_type>(n) > _capacity)
-			{
-				if (_array)
-					_allocator.deallocate(_array, _capacity);
-				_array = _allocator.allocate(n);
-				_capacity = n;
-			}
-			while (first != last)
-			{
-				_allocator.construct(&_array[_size], *first);
-				++_size;
-				++first;
-			}
-		}
+		assign_dispatcher(first, last,
+			typename ft::iterator_traits<It>::iterator_category());
 	}
 
 	void push_back(value_type const & val)
@@ -446,28 +513,8 @@ public:
 	typename ft::enable_if<!ft::is_integral<I>::value, void>::type	// return type: void
 	insert(iterator position, I first, I last)
 	{
-		if (typeid(typename std::iterator_traits<I>::iterator_category)
-			== typeid(std::input_iterator_tag)) // shifting (coping) elements at every cycle :(
-		{
-			while (first != last)
-			{
-				position = insert(position, *first++); // position is updated in case of reallocation
-				position++;
-			}
-		}
-		else 	// assuming it's an iterator of cat at least forward_iterator
-		{
-			difference_type n;
-			pointer insert_pos;
-
-			n = ft::distance(first, last);
-			if (n <= 0)
-				return ;
-			// insert_pos = make_room4insertion(position, static_cast<size_type>(n));
-			insert_pos = make_room4insertion(position, n);
-			while (n--)
-				_allocator.construct(insert_pos++, *first++);
-		}
+		return (insert_dispatcher(position, first, last,
+				typename ft::iterator_traits<I>::iterator_category()));
 	}
 
 	void swap (vector& x)
@@ -500,7 +547,6 @@ void swap(vector<T> & x, vector<T> & y)
 {
 	x.swap(y);
 }
-
 
 
 /* Relational operators */

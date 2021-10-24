@@ -5,28 +5,28 @@
 
 namespace ft
 {
-	/* is_integral */
+	struct true_type {static bool const value = true;};
 
-	struct intTrue {static bool const value = true;};
+	/* is_integral */
 
 	template <typename T>
 	struct is_integral {static bool const value = false;};
 
-	template <>	struct is_integral<bool> : intTrue {}; // struct has public inheritance by default
-	template <>	struct is_integral<char> : intTrue {};
-	template <>	struct is_integral<unsigned char> : intTrue {};
-	template <>	struct is_integral<signed char> : intTrue {};
-	// template <>	struct is_integral<char16_t> : intTrue {};
-	// template <>	struct is_integral<char32_t> : intTrue {};
-	template <>	struct is_integral<wchar_t> : intTrue {};
-	template <>	struct is_integral<short> : intTrue {};
-	template <>	struct is_integral<unsigned short> : intTrue {};
-	template <>	struct is_integral<int> : intTrue {};
-	template <>	struct is_integral<unsigned int> : intTrue {};
-	template <>	struct is_integral<long> : intTrue {};
-	template <>	struct is_integral<unsigned long> : intTrue {};
-	template <>	struct is_integral<long long> : intTrue {};
-	template <>	struct is_integral<unsigned long long> : intTrue {};
+	template <>	struct is_integral<bool> : true_type {}; // struct has public inheritance by default
+	template <>	struct is_integral<char> : true_type {};
+	template <>	struct is_integral<unsigned char> : true_type {};
+	template <>	struct is_integral<signed char> : true_type {};
+	// template <>	struct is_integral<char16_t> : true_type {};
+	// template <>	struct is_integral<char32_t> : true_type {};
+	template <>	struct is_integral<wchar_t> : true_type {};
+	template <>	struct is_integral<short> : true_type {};
+	template <>	struct is_integral<unsigned short> : true_type {};
+	template <>	struct is_integral<int> : true_type {};
+	template <>	struct is_integral<unsigned int> : true_type {};
+	template <>	struct is_integral<long> : true_type {};
+	template <>	struct is_integral<unsigned long> : true_type {};
+	template <>	struct is_integral<long long> : true_type {};
+	template <>	struct is_integral<unsigned long long> : true_type {};
 	// TODO: const and volatile ?
 
 
@@ -161,33 +161,6 @@ namespace ft
 	}
 
 
-	/* class Node */
-
-	// template < typename ValueType >
-	// struct Node
-	// {
-	// 	Node *		left;
-	// 	Node *		right;
-	// 	Node *		parent;
-	// 	ValueType *	content;
-	// 	enum {red, black} color;
-
-	// 	Node(ValueType *content):
-	// 	left(NULL), right(NULL), parent(NULL), content(content)
-	// 	{
-	// 	}
-
-	// 	// default contructor - should not be used
-	// 	// Node():
-	// 	// left(NULL), right(NULL), parent(NULL), content(NULL)
-	// 	// {
-	// 	// }
-	// 	// ~Node() // implictily declared like this
-	// 	// {
-	// 	// }
-	// };
-
-
 	/* class less */
 
 	template <typename T>
@@ -199,17 +172,30 @@ namespace ft
 		}
 	};
 
-// my implementation of std::distance
+	/*	 Iterator_traits  */
+
+	template <typename Iterator>
+	class iterator_traits
+	{
+	public:
+		typedef typename Iterator::difference_type		difference_type;
+		typedef typename Iterator::value_type			value_type;
+		typedef typename Iterator::pointer				pointer;
+		typedef typename Iterator::reference			reference;
+		typedef typename Iterator::iterator_category	iterator_category;
+	};
+
+	// my implementation of std::distance
 
 	namespace distance_dispatcher
 	{
 
 	template<typename It, typename Tag>
-	typename std::iterator_traits<It>::difference_type
+	typename ft::iterator_traits<It>::difference_type
 	distance(It first, It last, Tag)
 	{
 		// std::cout << "not a RA iterator...\n";
-		typename std::iterator_traits<It>::difference_type n;
+		typename ft::iterator_traits<It>::difference_type n;
 
 		n = 0;
 		while (first != last)
@@ -221,9 +207,9 @@ namespace ft
 		return (n);
 	}
 
-	// specialization of distance for Random Access iterator
+	// specialization (overload) of distance for Random Access iterator
 	template<typename RAiterator>
-	typename std::iterator_traits<RAiterator>::difference_type
+	typename ft::iterator_traits<RAiterator>::difference_type
 	distance(RAiterator first, RAiterator last, std::random_access_iterator_tag)
 	{
 		// std::cout << "RA iterator!!!\n";
@@ -233,12 +219,15 @@ namespace ft
 	} // namespace distance_dipatcher
 
 	template<typename InputIterator>
-	typename std::iterator_traits<InputIterator>::difference_type
+	typename ft::iterator_traits<InputIterator>::difference_type
 	distance(InputIterator first, InputIterator last)
 	{
 		return (distance_dispatcher::distance(first, last, 
-			typename std::iterator_traits<InputIterator>::iterator_category()));
+			typename ft::iterator_traits<InputIterator>::iterator_category()));
 	}
+
+
+
 
 } // namespace ft
 

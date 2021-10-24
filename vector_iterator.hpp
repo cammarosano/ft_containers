@@ -10,7 +10,6 @@ template <typename T>
 class vector_iterator
 {
 public:
-	// iterator_traits: (alternatively, write a template specialization of std::iterator_traits for this type?)
 	typedef std::ptrdiff_t					difference_type;
 	typedef T								value_type;
 	typedef T *								pointer;
