@@ -1,9 +1,9 @@
 #include <criterion/criterion.h>
-#include "ft_stack.hpp"
+#include "stack.hpp"
 #include <iostream>
 #include <stack>
 #include <vector>
-#include "ft_vector.hpp"
+#include "vector.hpp"
 
 ft::stack<int> stk;
 

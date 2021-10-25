@@ -1,7 +1,7 @@
 #include <criterion/criterion.h>
 #include <iostream>
 #include <map>
-#include "ft_map.hpp"
+#include "map.hpp"
 
 
 std::map<int,std::string> std_map;

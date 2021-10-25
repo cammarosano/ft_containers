@@ -1,6 +1,6 @@
 #include <criterion/criterion.h>
 #include <iostream>
-#include "ft_map.hpp"
+#include "map.hpp"
 #include <string>
 #include <vector>
 #include <map>
@@ -727,9 +727,9 @@ Test(constructors, const_map, .init=setup)
 
 	while (cit != m_const.end())
 	{
-		std::cout << cit->first << " ";
+		// std::cout << cit->first << " ";
 		++cit;
 	}
-	std::cout << std::endl;
-	m_const.print_tree();
+	// std::cout << std::endl;
+	// m_const.print_tree();
 }
