@@ -1,9 +1,7 @@
+Vector: protect each allocate operation with a check for max_size
 
 check exceptions for vector
 
-compare speed with STL
-	{
-		write a main with a macro to be defined as ft or std (or templated test!)
-		output results and timing
-	}
+expand main to test "everything"
 
+write main to test set

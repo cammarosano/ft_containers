@@ -31,7 +31,6 @@ public:
 	size_type size() const
 	{
 		return (c.size());
-
 	}
 
 	value_type& top()

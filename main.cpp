@@ -112,8 +112,27 @@ int main(int argc, char** argv) {
 	}
 	std::cout << "should be constant with the same seed: " << sum << std::endl;
 
+	for (int i = 0; i < 10000; i++)
 	{
-		ft::map<int, int> copy = map_int;
+		ft::map<int,int>::iterator it = map_int.lower_bound(rand());
+		map_int.erase(it);
+	}
+	std::cout << "should be constant with the same seed: " << map_int.size() << std::endl;
+
+	{
+		ft::map<int, int> const copy = map_int;
+		if (copy.size() != map_int.size())
+			std::cerr << "Error: COPY MAP HAS DIFFERENT SIZE THAN SOURCE!!" << std::endl;
+		ft::map<int, int>::iterator it = map_int.begin();
+		ft::map<int, int>::const_iterator cit = copy.begin();
+		while (it != map_int.end())
+		{
+			if (*it != *cit)
+				std::cerr << "Error: MAPS ARE DIFFERENT!!" << std::endl;
+			++it;
+			cit++;
+		}
+
 	}
 	MutantStack<char> iterable_stack;
 	for (char letter = 'a'; letter <= 'z'; letter++)

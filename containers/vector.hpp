@@ -7,7 +7,6 @@
 # include "reverse_iterator.hpp"
 # include <stdexcept>
 # include <iterator> // iterator_tags
-# include <typeinfo> // type_info
 # include "utils.hpp"
 
 namespace ft
@@ -80,7 +79,7 @@ private:
 		}
 	}
 
-	// returns pointer to inserion position
+	// returns pointer to insertion position
 	pointer reallocate4insertion(pointer src, size_type shift)
 	{
 		size_type	new_capacity, n_1st_part;
@@ -115,7 +114,7 @@ private:
 	{
 		pointer p_position;
 		
-		p_position = _array + (it_position - begin()); // avoiding to derefence it to end
+		p_position = _array + (it_position - begin()); // avoiding to dereference it to end
 		if (_size + n <= _capacity) // shift elements by n (no realloc)
 			shift_right(p_position, n);
 		else
