@@ -75,6 +75,7 @@ namespace ft
 			_ptr = src._ptr;
 			return (*this);
 		}
+		virtual ~tree_iterator() {}
 
 		// iterator must be convertible to const_iterator
 		operator tree_iterator<const T>() const

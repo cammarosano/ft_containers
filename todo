@@ -1,13 +1,8 @@
-Vector: protect each allocate operation with a check for max_size
-
-check exceptions for vector
-
 expand main to test "everything"
 
 write main to test set
 
 Canonical form : virtual destructor? -> yes! watch out for Rbtree and iterators
 
-Static-assert for stack<T, Container<T> >
 
 Expand is_integral?

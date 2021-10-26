@@ -31,7 +31,7 @@ public:
 		vector_iterator(vector_iterator const & src): ptr(src.ptr) // copy constructor
 		{
 		}
-		~vector_iterator()
+		virtual ~vector_iterator()
 		{
 		}
 		// enabling implict conversion from normal it to const_iterator (cast operator)

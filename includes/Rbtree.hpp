@@ -83,7 +83,7 @@ public:
 	Rbtree(Compare const &comp_obj = Compare());
 	Rbtree(Rbtree const & src);
 	Rbtree & operator=(Rbtree const & rhs);
-	~Rbtree();
+	virtual ~Rbtree();
 
 	node const *	insert(value_type const &value);
 	node const *	insert(node * hint, value_type const &value);
