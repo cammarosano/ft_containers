@@ -6,13 +6,14 @@
 namespace ft
 {
 	struct true_type {static bool const value = true;};
+	struct false_type {static bool const value = false;};
 
 	/* is_integral */
 
 	template <typename T>
-	struct is_integral {static bool const value = false;};
+	struct is_integral : false_type {}; // struct has public inheritance by default
 
-	template <>	struct is_integral<bool> : true_type {}; // struct has public inheritance by default
+	template <>	struct is_integral<bool> : true_type {}; 
 	template <>	struct is_integral<char> : true_type {};
 	template <>	struct is_integral<unsigned char> : true_type {};
 	template <>	struct is_integral<signed char> : true_type {};
@@ -29,6 +30,24 @@ namespace ft
 	template <>	struct is_integral<unsigned long long> : true_type {};
 	// TODO: const and volatile ?
 
+	/* is_same */
+
+	template <typename T, typename U>
+	struct is_same: false_type {}; 
+
+	template <typename T>
+	struct is_same<T, T> : true_type {};
+
+	/* static_assert c++98 */
+	
+	template <bool expr>
+	struct _static_assert {};
+
+	template <>
+	struct _static_assert<true>
+	{
+		static char const test;
+	};
 
 	/* enable_if */
 
@@ -38,7 +57,8 @@ namespace ft
 	struct enable_if<true, T> {typedef T type;}; // template specialization
 
 
-	/* equal */ 
+	/* equal */
+
 	template < typename It_1, typename It_2 >
 	bool equal (It_1 first1, It_1 last1, It_2 first2)
 	{
@@ -78,6 +98,7 @@ namespace ft
 
 
 	/* class pair */
+	
 	template < typename T1, typename T2 >
 	struct pair
 	{

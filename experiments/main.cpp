@@ -1,12 +1,7 @@
 #include <iostream>
 #include <string>
 #include <deque>
-
-#ifndef STL
-# define STL 0
-#endif
-
-#if STL //CREATE A REAL STL EXAMPLE
+#if 1 //CREATE A REAL STL EXAMPLE
 	#include <map>
 	#include <stack>
 	#include <vector>
@@ -57,12 +52,6 @@ int main(int argc, char** argv) {
 		std::cerr << "Count value:" << COUNT << std::endl;
 		return 1;
 	}
-
-	if (STL)
-		std::cout << "Testing STL containers:" << std::endl;
-	else
-		std::cout << "Testing FT containers:" << std::endl;
-
 	const int seed = atoi(argv[1]);
 	srand(seed);
 
@@ -73,25 +62,18 @@ int main(int argc, char** argv) {
 	ft::stack<Buffer, std::deque<int> > stack_deq_buffer;
 	ft::map<int, int> map_int;
 
-	// Testing vector<Buffer>
-
-	// push_back()
 	for (int i = 0; i < COUNT; i++)
 	{
 		vector_buffer.push_back(Buffer());
 	}
 
-	// operator[]
 	for (int i = 0; i < COUNT; i++)
 	{
 		const int idx = rand() % COUNT;
 		vector_buffer[idx].idx = 5;
 	}
-
-	// swap() with and empty vector
 	ft::vector<Buffer>().swap(vector_buffer);
 
-	// at()
 	try
 	{
 		for (int i = 0; i < COUNT; i++)
@@ -106,15 +88,11 @@ int main(int argc, char** argv) {
 		//NORMAL ! :P
 	}
 	
-	// Testing map<int, int>
-
-	// insert()
 	for (int i = 0; i < COUNT; ++i)
 	{
 		map_int.insert(ft::make_pair(rand(), rand()));
 	}
 
-	// operator[]
 	int sum = 0;
 	for (int i = 0; i < 10000; i++)
 	{
@@ -123,39 +101,12 @@ int main(int argc, char** argv) {
 	}
 	std::cout << "should be constant with the same seed: " << sum << std::endl;
 
-	// erase() , lower_bound(), size()
-	for (int i = 0; i < 10000; i++)
 	{
-		ft::map<int,int>::iterator it = map_int.lower_bound(rand());
-		map_int.erase(it);
+		ft::map<int, int> copy = map_int;
 	}
-	std::cout << "should be constant with the same seed: " << map_int.size() << std::endl;
-
-	// copy constructor, iterator, const iterator
-	{
-		ft::map<int, int> const copy = map_int;
-		if (copy.size() != map_int.size())
-			std::cerr << "Error: COPY MAP HAS DIFFERENT SIZE THAN SOURCE!!" << std::endl;
-		ft::map<int, int>::iterator it = map_int.begin();
-		ft::map<int, int>::const_iterator cit = copy.begin();
-		while (it != map_int.end())
-		{
-			if (*it != *cit)
-				std::cerr << "Error: MAPS ARE DIFFERENT!!" << std::endl;
-			++it;
-			cit++;
-		}
-	}
-
-	// Testing stack<char>
-
 	MutantStack<char> iterable_stack;
-
-	// push()
 	for (char letter = 'a'; letter <= 'z'; letter++)
 		iterable_stack.push(letter);
-
-	// vector (underlying container) iterator
 	for (MutantStack<char>::iterator it = iterable_stack.begin(); it != iterable_stack.end(); it++)
 	{
 		std::cout << *it;

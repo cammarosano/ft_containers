@@ -9,6 +9,9 @@ namespace ft
 template <typename T, typename Container = vector<T> >
 class stack
 {
+private:
+
+
 public:
 	typedef T		 							value_type;
 	typedef Container							container_type;
@@ -18,9 +21,13 @@ protected:
 	container_type c;
 
 public:
+	// explicit stack(typename enable_if<is_same<value_type, typename container_type::value_type>::value, 
+		// const container_type&>::type ctnr = container_type()):
 	explicit stack (const container_type& ctnr = container_type()):
 	c(ctnr)
 	{
+		(void)_static_assert
+		<is_same<typename container_type::value_type, value_type>::value>::test;
 	}
 
 	bool empty() const
