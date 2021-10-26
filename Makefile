@@ -15,7 +15,6 @@ $(NAME):	$(SRC)
 test_stl:	$(SRC)
 			$(CC) $(CFLAGS) -std=c++98 -D STL=1 -o $@ $^ 
 
-
 all_unit_tests: clean_unit_tests vector_test map_test stack_test set_test rb_tree_test
 
 vector_test:
@@ -47,12 +46,11 @@ set_test:
 
 rb_tree_test:
 			@ echo "RbTree unit test"
-			@ $(CC) $(CFLAGS) unit_tests/set.cpp -o $@ $(CRITERION)
 			@ $(CC) $(CFLAGS) unit_tests/Rbtree.cpp -o $@ $(CRITERION)
 			@ ./$@
 
-# %.o:		%.cpp 
-			# $(CC) $(CFLAGS) -std=c++98 -c $< -o $@
+%.o:		%.cpp 
+			$(CC) $(CFLAGS) -std=c++98 -c $< -o $@
 
 clean:
 			rm -f $(OBJ)
