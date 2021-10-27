@@ -22,7 +22,7 @@ private:
 	iterator_type _base;
 
 public:
-	reverse_iterator(void): _base(iterator_type()) {}
+	reverse_iterator(void)  {} // not sure what to do with _base
 	reverse_iterator(iterator_type it): _base(it) {}
 
 	// the copy constructor and operator= overload are templated to
@@ -33,7 +33,6 @@ public:
 	reverse_iterator(reverse_iterator<Iter> const & src):
 	_base(src.base()) {}
 
-	// this overload is not present in c++98
 	template <typename Iter>
 	reverse_iterator & operator=(reverse_iterator<Iter> const & rhs)
 	{

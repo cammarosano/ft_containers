@@ -156,7 +156,10 @@ private:
 	{
 		difference_type n = ft::distance(first, last);
 		if (n < 0)
-			throw std::length_error("vector");
+			return ; // STL apparently just casts dif_type into size_type, potentially
+				// getting a big number. And throws std::length_error for not being 
+				// able to allocate for bigger than max_size()
+				// And this is done before clearing the array.
 		clear();
 		if (static_cast<size_type>(n) > _capacity)
 		{
@@ -213,8 +216,9 @@ private:
 		pointer insert_pos;
 
 		n = ft::distance(first, last);
-		if (n <= 0)
+		if (n <= 0) // consider raising exception in case allocation must be too big
 			return ;
+		// insert_pos = make_room4insertion(position, static_cast<size_type>(n));
 		insert_pos = make_room4insertion(position, n);
 		while (n--)
 			_allocator.construct(insert_pos++, *first++);
@@ -374,13 +378,13 @@ public:
 	reference at(size_type n)
 	{
 		if (n >= _size)
-			throw (std::out_of_range("vector"));
+			throw (std::out_of_range("ft_vector: out of range"));
 		return (_array[n]);
 	}
 	const_reference at(size_type n) const
 	{
 		if (n >= _size)
-			throw (std::out_of_range("vector"));
+			throw (std::out_of_range("ft_vector: out of range"));
 		return (_array[n]);
 	}
 
