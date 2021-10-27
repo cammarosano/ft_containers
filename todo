@@ -1,7 +1,13 @@
+review all prototypes
 
 expand main to test "everything"
 
 write main to test set
 
-
 Expand is_integral?
+
+use enable_if to avoid certain functions and overloads provided by
+reverse_iterator ? Make tests with map::reverse_iterator...
+NO! NO NEED!!
+
+remove weird comments
