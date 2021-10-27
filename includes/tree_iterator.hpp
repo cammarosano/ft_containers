@@ -49,7 +49,7 @@ namespace ft
 					return (ptr->parent);
 				ptr = ptr->parent;
 			}
-			return (ptr); // this line should not be reached
+			return (ptr);
 		}
 
 		// returns pointer to previous node of sorted sequence
@@ -70,6 +70,7 @@ namespace ft
 		tree_iterator() {}
 		tree_iterator(node const * address): _ptr(address) {}
 		tree_iterator(tree_iterator const & src): _ptr(src._ptr) {}
+		~tree_iterator() {};
 		tree_iterator & operator=(tree_iterator const & src)
 		{
 			_ptr = src._ptr;

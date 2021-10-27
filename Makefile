@@ -3,7 +3,7 @@ OBJ = $(SRC:.cpp=.o)  # not really in use...
 INCLUDE = -I includes -I containers
 CRITERION = -l criterion -I ~/.brew/include -L ~/.brew/lib -std=c++11
 CC = clang++
-CFLAGS = -Wall -Wextra -Werror $(INCLUDE) #-g -fsanitize=address 
+CFLAGS = -Wall -Wextra -Werror $(INCLUDE) -g -fsanitize=address 
 NAME = test_ft
 UNIT_TESTS = vector_test map_test_0 map_test_1 rb_tree_test set_test stack_test
 

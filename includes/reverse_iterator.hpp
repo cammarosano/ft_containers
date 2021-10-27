@@ -22,8 +22,8 @@ private:
 	iterator_type _base;
 
 public:
-	reverse_iterator(void)  {} // not sure what to do with _base
-	reverse_iterator(iterator_type it): _base(it) {}
+	reverse_iterator(void): _base(iterator_type()) {}
+	explicit reverse_iterator(iterator_type it): _base(it) {}
 
 	// the copy constructor and operator= overload are templated to
 	// allow a parameter of differente type (reverse_iterator, in case of
@@ -60,7 +60,7 @@ public:
 
 	reverse_iterator operator++(int) // post-increment
 	{
-		reverse_iterator temp(*this); // todo: copy constructor
+		reverse_iterator temp(*this);
 		--_base;
 		return (temp);
 	}

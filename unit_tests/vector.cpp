@@ -298,13 +298,6 @@ Test(iterator, reverse_iterator, .init= setup)
 		rit = rit + 2;
 	}
 	// std::cout << std::endl;
-	rit = v.end();
-	while (rit < rite)
-	{
-		// std::cout << *rit << " ";
-		rit = 3 + rit;
-	}
-	// std::cout << std::endl;
 }
 
 Test(iterator, overloads, .init=setup)
@@ -492,3 +485,17 @@ Test(assignation_op, test, .init=setup)
 		cr_expect(v2[i] == v[i]);
 }
 
+Test(assign, exception, .init=setup)
+{
+	ft::vector<int> v2;
+
+	try
+	{
+		v2.assign(v.end(), v.begin());
+		cr_expect(0);
+	}
+	catch (std::exception const &)
+	{
+		cr_expect(1);
+	}
+}
