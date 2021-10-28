@@ -20,20 +20,11 @@ private:
 	T *	ptr;
 
 public:
-		vector_iterator()
-		{
-			// std::cout << "iterator default constructor\n";
-		}
-		vector_iterator(value_type *address): ptr(address)
-		{
-			// std::cout << "iterator parameter constructor\n";
-		}
-		vector_iterator(vector_iterator const & src): ptr(src.ptr) // copy constructor
-		{
-		}
-		~vector_iterator()
-		{
-		}
+		vector_iterator() {}
+		vector_iterator(value_type *address): ptr(address) {}
+		vector_iterator(vector_iterator const & src): ptr(src.ptr) {}
+		~vector_iterator() {}
+
 		// enabling implict conversion from normal it to const_iterator (cast operator)
 		operator vector_iterator<const T>() const
 		{
@@ -45,15 +36,18 @@ public:
 			ptr = rhs.ptr;
 			return (*this);
 		}
+
 		value_type & operator*() const
 		{
 			return (*ptr);
 		}
+
 		vector_iterator & operator++()	// prefix increment
 		{
-			ptr += 1; // pointer arithmetic must be supported by value_type *
+			ptr += 1;
 			return (*this);
 		}
+
 		vector_iterator operator++(int) // postfix increment (returns a new object)
 		{
 			vector_iterator temp(*this);
@@ -61,11 +55,13 @@ public:
 			ptr += 1;
 			return (temp);
 		}
+
 		vector_iterator & operator--()
 		{
 			ptr -= 1;
 			return (*this);
 		}
+
 		vector_iterator operator--(int)
 		{
 			vector_iterator temp(*this);
@@ -73,56 +69,69 @@ public:
 			ptr -= 1;
 			return (temp);
 		}
+
 		vector_iterator operator+(difference_type n) const 
 		{
 			return (vector_iterator(ptr + n));
 		}
+
 		vector_iterator operator-(difference_type n) const 
 		{
 			return (vector_iterator(ptr - n));
 		}
+
 		difference_type operator-(vector_iterator const & rhs) const
 		{
 			return (ptr - rhs.ptr);
 		}
+
 		bool operator==(vector_iterator const & rhs) const
 		{
 			return (ptr == rhs.ptr);
 		}
+
 		bool operator!=(vector_iterator const & rhs) const
 		{
 			return (ptr != rhs.ptr);
 		}
+
 		bool operator>(vector_iterator const & rhs) const
 		{
 			return (ptr > rhs.ptr);
 		}
+
 		bool operator<(vector_iterator const & rhs) const
 		{
 			return (ptr < rhs.ptr);
 		}
+
 		bool operator>=(vector_iterator const & rhs) const
 		{
 			return (ptr >= rhs.ptr);
 		}
+
 		bool operator<=(vector_iterator const & rhs) const
 		{
 			return (ptr <= rhs.ptr);
 		}
+
 		vector_iterator & operator+=(difference_type n)
 		{
 			ptr = ptr + n;
 			return (*this);
 		}	
+
 		vector_iterator & operator-=(difference_type n)
 		{
 			ptr = ptr - n;
 			return (*this);
 		}	
-		value_type & operator[](difference_type i)
+
+		value_type & operator[](difference_type i) const
 		{
 			return (ptr[i]);
 		}
+
 		pointer	operator->() const
 		{
 			return (ptr);

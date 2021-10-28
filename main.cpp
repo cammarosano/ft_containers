@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <deque>
+#include <ctime>
 
 #ifndef STL
 # define STL 0
@@ -49,31 +50,14 @@ public:
 	iterator end() { return this->c.end(); }
 };
 
-int main(int argc, char** argv) {
-	if (argc != 2)
-	{
-		std::cerr << "Usage: ./test seed" << std::endl;
-		std::cerr << "Provide a seed please" << std::endl;
-		std::cerr << "Count value:" << COUNT << std::endl;
-		return 1;
-	}
-
-	if (STL)
-		std::cout << "Testing STL containers:" << std::endl;
-	else
-		std::cout << "Testing FT containers:" << std::endl;
-
-	const int seed = atoi(argv[1]);
-	srand(seed);
-
+void test_vector(void)
+{
 	ft::vector<std::string> vector_str;
 	ft::vector<int> vector_int;
-	ft::stack<int> stack_int;
 	ft::vector<Buffer> vector_buffer;
-	ft::stack<Buffer, std::deque<int> > stack_deq_buffer;
-	ft::map<int, int> map_int;
 
-	// Testing vector<Buffer>
+	std::cout << "Vector:" << std::endl;
+	std::clock_t timer = std::clock();
 
 	// push_back()
 	for (int i = 0; i < COUNT; i++)
@@ -105,8 +89,71 @@ int main(int argc, char** argv) {
 	{
 		//NORMAL ! :P
 	}
-	
-	// Testing map<int, int>
+
+	// iterators
+	{
+		for (int i = 0; i < 10000; i++)
+			vector_int.push_back(rand());
+		ft::vector<int>::iterator it = vector_int.begin();
+		int sum = 0;
+		while (it != vector_int.end())
+			sum += *it++;
+		std::cout << "should be constant with the same seed: " << sum << std::endl;
+	}
+
+	// capacity functions
+	{
+		vector_int.reserve(100);
+		if (vector_int.capacity() == 100)
+			std::cerr << "Error: Vector should not shrink !!" << std::endl;
+		vector_int.reserve(20000);
+		if (vector_int.capacity() != 20000)
+			std::cerr << "Error: RESERVE FAILED!!" << std::endl;
+		vector_int.resize(12000, 42);
+		if (vector_int.size() != 12000)
+			std::cerr << "Error: RESIZE FAILED!!" << std::endl;
+		if (vector_int.empty())
+			std::cerr << "Error: EMPTY!!" << std::endl;
+	}
+
+	// insert, assign, erase
+	{
+		ft::vector<int> copy(vector_int);
+		copy.insert(copy.begin() + rand() % copy.size(), vector_int.begin(), vector_int.end());
+		ft::vector<int>().swap(vector_int);
+		vector_int.assign(copy.begin(), copy.end());
+		vector_int.erase(vector_int.begin() + 1000, vector_int.end() - 1000);
+	}
+
+	// pop_back
+	{
+		int sum = 0;
+		while (vector_int.size())
+		{
+			sum += vector_int.back();
+			vector_int.pop_back();
+		}
+		std::cout << "should be constant with the same seed: " << sum << std::endl;
+	}
+
+	// relational operators
+	{
+		vector_int.assign(5, 42);
+		ft::vector<int> copy(vector_int);
+		if (!(vector_int == copy) || vector_int != copy)
+			std::cerr << "Error: vector relational operator" << std::endl;
+		vector_int.push_back(19);
+		if (!(vector_int > copy))
+			std::cerr << "Error: vector relational operator" << std::endl;
+	}
+
+	std::cout << "Time: " << (std::clock() - timer) / (float)CLOCKS_PER_SEC <<
+				"s" << std::endl;
+}
+
+void test_map(void)
+{
+	ft::map<int, int> map_int;
 
 	// insert()
 	for (int i = 0; i < COUNT; ++i)
@@ -114,19 +161,19 @@ int main(int argc, char** argv) {
 		map_int.insert(ft::make_pair(rand(), rand()));
 	}
 
-	// operator[]
+	// operator[], lower_bound()
 	int sum = 0;
 	for (int i = 0; i < 10000; i++)
 	{
-		int access = rand();
+		int access = map_int.lower_bound(rand())->first;
 		sum += map_int[access];
 	}
 	std::cout << "should be constant with the same seed: " << sum << std::endl;
 
-	// erase() , lower_bound(), size()
-	for (int i = 0; i < 10000; i++)
+	// erase() , upper_bound(), size()
+	for (int i = 0; i < 1000; i++)
 	{
-		ft::map<int,int>::iterator it = map_int.lower_bound(rand());
+		ft::map<int,int>::iterator it = map_int.upper_bound(rand());
 		map_int.erase(it);
 	}
 	std::cout << "should be constant with the same seed: " << map_int.size() << std::endl;
@@ -146,9 +193,12 @@ int main(int argc, char** argv) {
 			cit++;
 		}
 	}
+}
 
-	// Testing stack<char>
-
+void test_stack(void)
+{
+	ft::stack<int> stack_int;
+	// ft::stack<Buffer, std::deque<int> > stack_deq_buffer; // wrong type for undelying container
 	MutantStack<char> iterable_stack;
 
 	// push()
@@ -161,5 +211,28 @@ int main(int argc, char** argv) {
 		std::cout << *it;
 	}
 	std::cout << std::endl;
+}
+
+int main(int argc, char** argv) {
+	if (argc != 2)
+	{
+		std::cerr << "Usage: ./test seed" << std::endl;
+		std::cerr << "Provide a seed please" << std::endl;
+		std::cerr << "Count value:" << COUNT << std::endl;
+		return 1;
+	}
+	if (STL)
+		std::cout	<< "\033[32m" << "Testing STL containers:"
+					<< "\033[0m" << std::endl;
+	else
+		std::cout	<< "\033[36m" << "Testing FT containers:"
+					<< "\033[0m" << std::endl;
+	const int seed = atoi(argv[1]);
+	srand(seed);
+
+	test_vector();
+	// test_map();
+	// test_stack();
+
 	return (0);
 }
