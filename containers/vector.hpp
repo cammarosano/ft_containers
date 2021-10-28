@@ -18,22 +18,24 @@ class vector
 public:
 	typedef T										value_type;
 	typedef std::allocator<T>						allocator_type;
-	typedef ft::vector_iterator<T>							iterator;
-	typedef ft::vector_iterator<T const>					const_iterator;
-	typedef ft::reverse_iterator<iterator>			reverse_iterator;
-	typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
-	typedef size_t									size_type;
 	typedef value_type &							reference;
 	typedef value_type const &						const_reference;
 	typedef value_type *							pointer;
 	typedef value_type const *						const_pointer;
+	typedef ft::vector_iterator<T>					iterator;
+	typedef ft::vector_iterator<T const>			const_iterator;
+	typedef ft::reverse_iterator<iterator>			reverse_iterator;
+	typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	typedef typename iterator::difference_type		difference_type;
+	typedef size_t									size_type;
 
 private:
 	pointer				_array;
 	size_type			_size;
 	size_type			_capacity;
 	allocator_type		_allocator;
+
+	/* ------------ Implementation detais ----------------- */
 
 	void reallocate(size_type new_capacity)
 	{
@@ -215,13 +217,14 @@ private:
 		n = ft::distance(first, last);
 		if (n <= 0)
 			return ;
-		// insert_pos = make_room4insertion(position, static_cast<size_type>(n));
 		insert_pos = make_room4insertion(position, n);
 		while (n--)
 			_allocator.construct(insert_pos++, *first++);
 	}
 
 public:
+
+	/*----------- Constructors, destructor and operator= ------------*/
 
 	// Default constructor
 	explicit vector(): _array(NULL), _size(0), _capacity(0)
@@ -240,7 +243,7 @@ public:
 	// Range constructor
 	template<typename I>
 	vector(typename ft::enable_if<!ft::is_integral<I>::value, I>::type first,
-			I last): _array(0), _size(0), _capacity(0)
+			I last): _array(NULL), _size(0), _capacity(0)
 	{
 		assign(first, last);
 	}
@@ -250,13 +253,6 @@ public:
 	_array(NULL), _size(0), _capacity(0)
 	{
 		*this = x;
-	}
-
-	// Assignation operator
-	vector & operator=(vector const & x)
-	{
-		assign(x.begin(), x.end());
-		return (*this);
 	}
 
 	// Destructor
@@ -270,7 +266,56 @@ public:
 		}
 	}
 
-	/* Capacity: */
+	// Assignation operator
+	vector & operator=(vector const & x)
+	{
+		assign(x.begin(), x.end());
+		return (*this);
+	}
+
+	/* --------------------- Iterators ----------------------- */
+
+	iterator begin(void)
+	{
+		return (iterator(_array));
+	}
+
+	const_iterator begin(void) const
+	{
+		return (const_iterator(_array));
+	}
+
+	iterator end(void)
+	{
+		return (iterator(_array + _size));
+	}
+
+	const_iterator end(void) const
+	{
+		return (const_iterator(_array + _size));
+	}
+
+	reverse_iterator rbegin(void)
+	{
+		return (reverse_iterator(end()));
+	}
+
+	const_reverse_iterator rbegin(void) const
+	{
+		return (const_reverse_iterator(end()));
+	}
+
+	reverse_iterator rend(void)
+	{
+		return (reverse_iterator(begin()));
+	}
+
+	const_reverse_iterator rend(void) const
+	{
+		return (const_reverse_iterator(begin()));
+	}
+
+	/* -------------- Capacity: ------------------ */
 
 	size_type size(void) const
 	{
@@ -319,54 +364,13 @@ public:
 		}
 	}
 
-	/* Iterators */
-
-	iterator begin(void)
-	{
-		return (iterator(_array));
-	}
-
-	const_iterator begin(void) const
-	{
-		return (const_iterator(_array));
-	}
-
-	iterator end(void)
-	{
-		return (iterator(_array + _size));
-	}
-
-	const_iterator end(void) const
-	{
-		return (const_iterator(_array + _size));
-	}
-
-	reverse_iterator rbegin(void)
-	{
-		return (reverse_iterator(end()));
-	}
-
-	const_reverse_iterator rbegin(void) const
-	{
-		return (const_reverse_iterator(end()));
-	}
-
-	reverse_iterator rend(void)
-	{
-		return (reverse_iterator(begin()));
-	}
-
-	const_reverse_iterator rend(void) const
-	{
-		return (const_reverse_iterator(begin()));
-	}
-
-	/* Element access */
+	/* -------------- Element access ---------------- */
 
 	reference operator[](size_type n)
 	{
 		return (_array[n]);
 	}
+
 	const_reference operator[](size_type n) const
 	{
 		return (_array[n]);
@@ -378,6 +382,7 @@ public:
 			throw (std::out_of_range("vector"));
 		return (_array[n]);
 	}
+
 	const_reference at(size_type n) const
 	{
 		if (n >= _size)
@@ -389,6 +394,7 @@ public:
 	{
 		return (_array[0]);
 	}
+
 	const_reference front(void) const
 	{
 		return (_array[0]);
@@ -398,18 +404,23 @@ public:
 	{
 		return (_array[_size - 1]);
 	}
+
 	const_reference back() const
 	{
 		return (_array[_size - 1]);
 	}
 	
-	/* Modifiers */
+	/* ---------------- Modifiers ------------------ */
 
-	void clear(void)
+	// cppreference: The behavior of assign is undefined if either argument
+	// is an iterator into *this.
+
+	template < typename It >
+	typename ft::enable_if<!is_integral<It>::value>::type	// return type: void
+	assign(It first, It last)
 	{
-		for (size_type i = 0; i < _size; i++)
-			_allocator.destroy(&_array[i]);
-		_size = 0;
+		assign_dispatcher(first, last,
+			typename ft::iterator_traits<It>::iterator_category());
 	}
 
 	void assign(size_type n, value_type const & val)
@@ -433,17 +444,6 @@ public:
 		_size = n;
 	}
 
-	// cppreference: The behavior of assign is undefined if either argument
-	// is an iterator into *this.
-
-	template < typename It >
-	typename ft::enable_if<!is_integral<It>::value>::type	// return type: void
-	assign(It first, It last)
-	{
-		assign_dispatcher(first, last,
-			typename ft::iterator_traits<It>::iterator_category());
-	}
-
 	void push_back(value_type const & val)
 	{
 		// reallocate if necessary
@@ -465,32 +465,6 @@ public:
 		_size -= 1;
 	}
 
-	iterator erase(iterator position)
-	{
-		return (erase(position, position + 1));
-	}
-
-	iterator erase(iterator first, iterator last)
-	{
-		pointer ptr = &(*first);
-		iterator it = first;
-		iterator ite = end();
-
-		while (it != last)
-		{
-			_allocator.destroy(&(*it++));
-			_size -= 1;
-		}
-		while (it != ite)
-		{
-			_allocator.construct(ptr, *it);
-			_allocator.destroy(&(*it));
-			++ptr;
-			++it;
-		}
-		return (first);
-	}
-
 	iterator insert(iterator position, value_type const & val)
 	{
 		pointer insert_position;
@@ -510,11 +484,37 @@ public:
 	}
 
 	template <typename I>
-	typename ft::enable_if<!ft::is_integral<I>::value, void>::type	// return type: void
+	typename ft::enable_if<!ft::is_integral<I>::value>::type  // return type: void
 	insert(iterator position, I first, I last)
 	{
 		return (insert_dispatcher(position, first, last,
 				typename ft::iterator_traits<I>::iterator_category()));
+	}
+
+	iterator erase(iterator position)
+	{
+		return (erase(position, position + 1));
+	}
+
+	iterator erase(iterator first, iterator last)
+	{
+		pointer ptr = _array + (first - begin());
+		iterator it = first;
+		iterator ite = end();
+
+		while (it != last)
+		{
+			_allocator.destroy(&(*it++));
+			_size -= 1;
+		}
+		while (it != ite)
+		{
+			_allocator.construct(ptr, *it);
+			_allocator.destroy(&(*it));
+			++ptr;
+			++it;
+		}
+		return (first);
 	}
 
 	void swap (vector& x)
@@ -532,24 +532,24 @@ public:
 		_capacity = x._capacity;
 		x._capacity = tmp_capacity;
 	}
-		
-	/* allocator */
+
+	void clear(void)
+	{
+		for (size_type i = 0; i < _size; i++)
+			_allocator.destroy(&_array[i]);
+		_size = 0;
+	}
+
+	/* ----------------- Allocator----------------------- */
+
 	allocator_type get_allocator(void) const
 	{
 		return (_allocator);
 	}
 };
 
-/* Non-member functions overloads */
 
-template<typename T>
-void swap(vector<T> & x, vector<T> & y)
-{
-	x.swap(y);
-}
-
-
-/* Relational operators */
+/* ----------------- Relational operators --------------------- */
 
 template <typename T>
 bool operator==(vector<T> const & lhs, vector<T> const & rhs)
@@ -590,23 +590,16 @@ bool operator>=(vector<T> const & lhs, vector<T> const & rhs)
 	return !(lhs < rhs);
 }
 
+/* ----------------- Non-member functions overloads ----------------- */
+
+template<typename T>
+void swap(vector<T> & x, vector<T> & y)
+{
+	x.swap(y);
+}
 
 
 } // namespace ft
-
-
-
-
-
-// overload for debug and test
-template<typename T>
-std::ostream & operator<<(std::ostream & out, ft::vector<T> const & v)
-{
-	for (size_t i = 0; i < v.size(); i++)
-		out << v[i] << " ";
-	out << std::endl;
-	return (out);
-}
 
 
 #endif

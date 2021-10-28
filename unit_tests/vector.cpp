@@ -7,6 +7,17 @@
 #include <csignal>
 #include <set>
 
+
+// overload for debug and test
+template<typename T>
+std::ostream & operator<<(std::ostream & out, ft::vector<T> const & v)
+{
+	for (size_t i = 0; i < v.size(); i++)
+		out << v[i] << " ";
+	out << std::endl;
+	return (out);
+}
+
 ft::vector<int> v;
 std::vector<int> stl_vector;
 
@@ -498,4 +509,36 @@ Test(assign, exception, .init=setup)
 	{
 		cr_expect(1);
 	}
+}
+
+Test(erase, range, .init=setup)
+{
+	v.erase(v.begin(), v.begin() + 5);
+	cr_expect(v[0] == 5);
+	v.erase(v.begin() + 1, v.begin() + 5);
+	cr_expect(v[1] == 10);
+	// std::cout << v << std::endl;
+}
+
+Test(erase, position, .init=setup)
+{
+	v.erase(v.begin() + 10);
+	cr_expect(v[10] = 11);
+	v.erase(v.end() - 1);
+	cr_expect(v.size() == 18);
+	// std::cout << v << std::endl;
+}
+
+Test(bool, test)
+{
+	ft::vector<bool> v;
+
+	v.push_back(true);
+	v.push_back(false);
+	v.push_back(true);
+	v.push_back(false);
+
+	cr_expect(v.size() == 4);
+	cr_expect(v.front() == true);
+	cr_expect(v.back() == false);
 }
