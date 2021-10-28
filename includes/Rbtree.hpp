@@ -4,6 +4,7 @@
 # include <iostream>
 # include <string> // print function for debugging
 # include <memory> // std::allocator
+# include <stack.hpp>
 
 enum e_rbnode_color
 {
@@ -29,7 +30,7 @@ class Rbtree
 private:
 	typedef	T					value_type;
 	typedef	std::size_t			size_type;
-	typedef	RbNode<T>				node; 
+	typedef	RbNode<T>			node; 
 
 	std::allocator<T>		_value_allocator;
 	std::allocator<node>	_node_allocator;
@@ -47,7 +48,6 @@ private:
 
 	// clear
 	void	clear_node(node* &x);
-	void	clear_tree(node* &root);
 
 	// helpers and utils
 	bool	is_left_child(node *x) const;
@@ -534,25 +534,28 @@ void Rbtree<T,C>::clear_node(node* &x)
 	x = NULL;
 }
 
-template<typename T, typename C>
-void Rbtree<T,C>::clear_tree(node* &root)
-{
-	if (root)
-	{
-		clear_tree(root->left);
-		clear_tree(root->right);
-		clear_node(root);
-	}
-}
-
+// new approach: iterative + stack
 template<typename T, typename C>
 void Rbtree<T,C>::clear()
 {
-	clear_tree(_root);
+	ft::stack<node *> stack;
+	node *ptr;
+	if (_root)
+		stack.push(_root);
+	while (!stack.empty())
+	{
+		ptr = stack.top();
+		stack.pop();
+		if (ptr->left)
+			stack.push(ptr->left);
+		if (ptr->right)
+			stack.push(ptr->right);
+		clear_node(ptr);
+	}
+	_root = NULL;
 	update_end();
 	_size = 0;
 }
-
 
 template<typename T, typename C>
 typename Rbtree<T,C>::node const *

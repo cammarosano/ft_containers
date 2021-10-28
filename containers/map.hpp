@@ -20,30 +20,35 @@ public:
 	typedef	Key										key_type;
 	typedef	T										mapped_type;
 	typedef pair<const key_type, mapped_type>		value_type;
-	typedef std::size_t								size_type;
+	typedef Compare									key_compare;
+	typedef std::allocator<value_type>				allocator_type;
+	typedef value_type&								reference;
+	typedef value_type const &						const_reference;
+	typedef value_type*								pointer;
+	typedef value_type const *						const_pointer;
 	typedef ft::tree_iterator<value_type>			iterator;
 	typedef ft::tree_iterator<const value_type>		const_iterator;
 	typedef ft::reverse_iterator<iterator>			reverse_iterator;
 	typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
-	typedef Compare									key_compare;
-	typedef std::allocator<value_type>				allocator_type;
-
-	// some typedefs are missing
+	typedef std::ptrdiff_t							difference_type;
+	typedef std::size_t								size_type;
 
 	class value_compare
 	{
 	private:
-		key_compare _compare;
+		key_compare comp;
 	
 	public:
-		value_compare(key_compare c): _compare(c) {} // made it public to avoid the use of friend
+		value_compare(key_compare c): comp(c) {} 
 
 		bool operator() (value_type const & x, value_type const & y) const
 		{
-			return (_compare(x.first, y.first));
+			return (comp(x.first, y.first));
 		}
 
-		// some typedefs here (see reference)
+		typedef bool		result_type;
+		typedef value_type	first_argument_type;
+		typedef value_type	second_argument_type;
 	};
 
 private:
@@ -51,8 +56,13 @@ private:
 	typedef	RbNode<value_type>	node;
 	typedef Rbtree<value_type, value_compare> tree_type;
 
-	key_compare _key_comp;
-	tree_type _tree;
+	key_compare	_key_comp;
+	tree_type	_tree;
+
+	node * node_ptr(iterator const & it)
+	{
+		return (*reinterpret_cast<node * const *>(&it));
+	}
 
 public:
 
@@ -213,7 +223,6 @@ public:
 		_tree.swap(x._tree);
 	}
 
-
 	void clear()
 	{
 		_tree.clear();
@@ -300,18 +309,6 @@ public:
 		return (_tree.get_allocator());
 	}
 
-
-
-
-	// +++++++++ DEBUG UTILS ++++++++++++ // 
-	void print_tree() const;
-
-private:
-	node * node_ptr(iterator const & it)
-	{
-		return (*reinterpret_cast<node * const *>(&it));
-	}
-
 };
 
 // ---------- Relational Operators (map) ------------ //
@@ -361,7 +358,6 @@ bool operator>=(map<Key, T, Compare> const & lhs,
 	return (!(lhs < rhs));
 }
 
-
 //------------- Swap overload ------------------- //
 
 template<typename Key, typename T, typename Compare>
@@ -370,31 +366,7 @@ void swap(map<Key, T, Compare> & x, map<Key, T, Compare> & y)
 	x.swap(y);
 }
 
-
-
-// Debug utils
-
-template <typename K, typename T, typename C>
-void map<K,T,C>::print_tree() const
-{
-	_tree.print();
-}
-
-template <typename T1, typename T2>
-std::ostream & operator<<(std::ostream & o, ft::pair<T1,T2> const & pair)
-{
-	o << "(" << pair.first << ", " << pair.second << ")";
-	return (o);
-}
-
-
-
-
-
 } // namespace ft
-
-
-
 
 
 #endif

@@ -11,3 +11,8 @@ reverse_iterator ? Make tests with map::reverse_iterator...
 NO! NO NEED!!
 
 remove weird comments
+
+
+Questions:
+- removing elements of the beginning of the vector: all is moved or just
+	the pointer to beggining of array is moved?

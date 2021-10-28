@@ -6,6 +6,14 @@
 #include <map>
 
 
+template <typename T1, typename T2>
+std::ostream & operator<<(std::ostream & o, ft::pair<T1,T2> const & pair)
+{
+	o << "(" << pair.first << ", " << pair.second << ")";
+	return (o);
+}
+
+
 ft::map<int, std::string> m;
 
 void setup(void)

@@ -4,6 +4,14 @@
 #include "map.hpp"
 
 
+template <typename T1, typename T2>
+std::ostream & operator<<(std::ostream & o, ft::pair<T1,T2> const & pair)
+{
+	o << "(" << pair.first << ", " << pair.second << ")";
+	return (o);
+}
+
+
 std::map<int,std::string> std_map;
 ft::map<int,std::string> m;
 ft::map<int,std::string>::iterator it;
