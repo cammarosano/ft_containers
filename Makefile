@@ -1,19 +1,24 @@
 SRC = main.cpp
 OBJ = $(SRC:.cpp=.o)  # not really in use...
+CONTAINERS = map.hpp set.hpp stack.hpp vector.hpp
+HEADERS = Rbtree.hpp reverse_iterator.hpp tree_iterator.hpp utils.hpp vector_iterator.hpp
+HEADER = $(addprefix containers/,$(CONTAINERS)) $(addprefix includes/,$(HEADERS))
 INCLUDE = -I includes -I containers
 CRITERION = -l criterion -I ~/.brew/include -L ~/.brew/lib -std=c++11
 CC = clang++
 CFLAGS = -Wall -Wextra -Werror $(INCLUDE) -g -fsanitize=address 
 NAME = test_ft
 UNIT_TESTS = vector_test map_test_0 map_test_1 rb_tree_test set_test stack_test
-
 all:		$(NAME) test_stl
 
-$(NAME):	$(SRC)
-			$(CC) $(CFLAGS) -std=c++98 -D STL=0 -o $@ $^ 
+$(NAME):	$(SRC) $(HEADER)
+			$(CC) $(CFLAGS) -std=c++98 -D STL=0 -o $@ $(SRC) 
 
 test_stl:	$(SRC)
 			$(CC) $(CFLAGS) -std=c++98 -D STL=1 -o $@ $^ 
+
+run_test:	$(NAME) test_stl
+			time ./$(NAME) $$SEED ; time ./test_stl $$SEED
 
 all_unit_tests: clean_unit_tests vector_test map_test stack_test set_test rb_tree_test
 

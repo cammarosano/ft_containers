@@ -4,7 +4,9 @@
 # include <iostream>
 # include <string> // print function for debugging
 # include <memory> // std::allocator
+# include <vector.hpp>
 # include <stack.hpp>
+# include <cmath>
 
 enum e_rbnode_color
 {
@@ -538,8 +540,13 @@ void Rbtree<T,C>::clear_node(node* &x)
 template<typename T, typename C>
 void Rbtree<T,C>::clear()
 {
-	ft::stack<node *> stack;
+	std::cout << "hello" << std::endl;
 	node *ptr;
+	ft::vector<node *> v;
+	// if (_size >= 2)
+		// v.reserve(floor(2 * log2(_size)));
+	ft::stack<node *> stack(v);
+
 	if (_root)
 		stack.push(_root);
 	while (!stack.empty())

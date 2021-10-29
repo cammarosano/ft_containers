@@ -259,13 +259,15 @@ void test_stack(void)
 void test_map_clear()
 {
 	ft::map<int,int> m;
-
-	for (int i = 0; i < 1000000; i++)
-		m[rand()] = rand();
-	
 	std::clock_t timer = std::clock();
+
+	for (int i = 0; i < 2000000; i++)
+		m[rand()] = rand();
+	std::cout << "Insertion time: " << (std::clock() - timer) / (float)CLOCKS_PER_SEC <<
+				"s" << std::endl;
+	
 	m.clear();
-	std::cout << "Time: " << (std::clock() - timer) / (float)CLOCKS_PER_SEC <<
+	std::cout << "Clear time: " << (std::clock() - timer) / (float)CLOCKS_PER_SEC <<
 				"s" << std::endl;
 }
 
@@ -286,10 +288,10 @@ int main(int argc, char** argv) {
 	const int seed = atoi(argv[1]);
 	srand(seed);
 
-	test_vector();
-	test_map();
-	test_stack();
-	// test_map_clear();
+	// test_vector();
+	// test_map();
+	// test_stack();
+	test_map_clear();
 
 	return (0);
 }
