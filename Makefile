@@ -12,10 +12,10 @@ UNIT_TESTS = vector_test map_test_0 map_test_1 rb_tree_test set_test stack_test
 all:		$(NAME) test_stl
 
 $(NAME):	$(SRC) $(HEADER)
-			$(CC) $(CFLAGS) -std=c++98 -D STL=0 -o $@ $(SRC) 
+			$(CC) $(CFLAGS) -O2 -std=c++98 -D STL=0 -o $@ $(SRC) 
 
 test_stl:	$(SRC)
-			$(CC) $(CFLAGS) -std=c++98 -D STL=1 -o $@ $^ 
+			$(CC) $(CFLAGS) -O2 -std=c++98 -D STL=1 -o $@ $^ 
 
 run_test:	$(NAME) test_stl
 			time ./$(NAME) $$SEED ; time ./test_stl $$SEED

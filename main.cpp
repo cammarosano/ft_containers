@@ -238,7 +238,7 @@ void test_stack(void)
 
 	{
 		ft::stack<int> stack_int;
-		// ft::stack<Buffer, std::deque<int> > stack_deq_buffer; // wrong type for undelying container
+		ft::stack<Buffer, std::deque<Buffer> > stack_deq_buffer;
 		MutantStack<char> iterable_stack;
 
 		// push()
@@ -251,6 +251,31 @@ void test_stack(void)
 			std::cout << *it;
 		}
 		std::cout << std::endl;
+
+		// pop, empty, top
+		int sum = 0;
+		for (int i = 0; i < COUNT; i++)
+		{
+			int number = rand();
+			if (number % 3)
+				stack_int.push(number);
+			else if (!stack_int.empty())
+			{
+				sum += stack_int.top();
+				stack_int.pop();
+			}
+		}
+		std::cout << "should be constant with the same seed: " << sum << std::endl;
+
+		// stack using an STL container, size()
+		for (int i = 0; i < COUNT; i++)
+		{
+			stack_deq_buffer.push(Buffer());
+		}
+		while (stack_deq_buffer.size())
+		{
+			stack_deq_buffer.pop();
+		}
 	}
 	std::cout << "Time: " << (std::clock() - timer) / (float)CLOCKS_PER_SEC <<
 				"s" << std::endl;
@@ -288,10 +313,10 @@ int main(int argc, char** argv) {
 	const int seed = atoi(argv[1]);
 	srand(seed);
 
-	// test_vector();
-	// test_map();
-	// test_stack();
-	test_map_clear();
+	test_vector();
+	test_map();
+	test_stack();
+	// test_map_clear();
 
 	return (0);
 }

@@ -29,11 +29,38 @@ struct RbNode
 template <typename T, typename Compare>
 class Rbtree
 {
-private:
+public:
 	typedef	T					value_type;
 	typedef	std::size_t			size_type;
 	typedef	RbNode<T>			node; 
 
+	Rbtree(Compare const &comp_obj = Compare());
+	Rbtree(Rbtree const & src);
+	Rbtree & operator=(Rbtree const & rhs);
+	~Rbtree();
+
+	node const *	insert(value_type const &value);
+	node const *	insert(node * hint, value_type const &value);
+	size_type		erase(value_type const &value);
+	void			erase(node * target);
+	void 			clear();
+	node const *	find(value_type const &value) const;
+	size_type		size() const;
+	size_type		max_size() const;
+	node const *	min() const;
+	node const *	max() const;
+	node const *	lower_bound(value_type const &value) const;
+	node const *	upper_bound(value_type const &value) const;
+	node const *	end() const;
+	void			swap(Rbtree & x);
+
+	std::allocator<T> get_allocator() const;
+
+	// debug tools
+	void 			print() const;
+	bool			check_rb() const;
+
+private:
 	std::allocator<T>		_value_allocator;
 	std::allocator<node>	_node_allocator;
 	Compare					_comp; // templated comparision object
@@ -81,32 +108,6 @@ private:
 	// debug utils
 	void	print(node* root, int space) const;
 	
-public:
-	Rbtree(Compare const &comp_obj = Compare());
-	Rbtree(Rbtree const & src);
-	Rbtree & operator=(Rbtree const & rhs);
-	~Rbtree();
-
-	node const *	insert(value_type const &value);
-	node const *	insert(node * hint, value_type const &value);
-	size_type		erase(value_type const &value);
-	void			erase(node * target);
-	void 			clear();
-	node const *	find(value_type const &value) const;
-	size_type		size() const;
-	size_type		max_size() const;
-	node const *	min() const;
-	node const *	max() const;
-	node const *	lower_bound(value_type const &value) const;
-	node const *	upper_bound(value_type const &value) const;
-	node const *	end() const;
-	void			swap(Rbtree & x);
-
-	std::allocator<T> get_allocator() const;
-
-	// debug tools
-	void 			print() const;
-	bool			check_rb() const;
 };
 
 
@@ -540,11 +541,10 @@ void Rbtree<T,C>::clear_node(node* &x)
 template<typename T, typename C>
 void Rbtree<T,C>::clear()
 {
-	std::cout << "hello" << std::endl;
 	node *ptr;
 	ft::vector<node *> v;
-	// if (_size >= 2)
-		// v.reserve(floor(2 * log2(_size)));
+	if (_size >= 2)
+		v.reserve(floor(2 * log2(_size)));
 	ft::stack<node *> stack(v);
 
 	if (_root)
