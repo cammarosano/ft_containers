@@ -135,6 +135,7 @@ Test(remove, random)
 		delete_count += t.erase(v[index]);
 		v.erase(v.begin() + index);
 		cr_expect(t.check_rb());
+		cr_expect(t.check_bst());
 		if (index % 2)
 		{
 			new_nb = std::rand() % n;
@@ -142,10 +143,11 @@ Test(remove, random)
 			t.insert(new_nb);
 			insert_count += t.size() > tree_size;
 			cr_expect(t.check_rb());
+			cr_expect(t.check_bst());
 			v.push_back(new_nb);
 		}
 	}
-	std::cout << "remove test with randon numbers: "
+	std::cout << "remove test with random numbers: "
 		<< delete_count << " deletions and "
 		<< insert_count << " insertions" << std::endl;
 

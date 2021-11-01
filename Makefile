@@ -73,7 +73,7 @@ clean_map_tests:
 			@ rm -f map_test_0 map_test_1
 
 fclean:		clean clean_unit_tests
-			rm -f $(NAME) test_stl 
+			rm -f $(NAME) test_stl bonus_test_ft bonus_test_stl
 
 re:			fclean all
 

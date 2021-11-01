@@ -52,7 +52,7 @@ public:
 
 void test_vector(void)
 {
-	std::cout << "Vector:" << std::endl;
+	std::cout << "----------------- Vector ----------------" << std::endl;
 	std::clock_t timer = std::clock();
 	{
 
@@ -156,7 +156,7 @@ void test_vector(void)
 
 void test_map(void)
 {
-	std::cout << "Map:" << std::endl;
+	std::cout << "----------------- Map -------------------" << std::endl;
 	std::clock_t timer = std::clock();
 	
 	{
@@ -233,7 +233,7 @@ void test_map(void)
 
 void test_stack(void)
 {
-	std::cout << "Stack:" << std::endl;
+	std::cout << "----------------- Stack -----------------" << std::endl;
 	std::clock_t timer = std::clock();
 
 	{
@@ -281,21 +281,6 @@ void test_stack(void)
 				"s" << std::endl;
 }
 
-void test_map_clear()
-{
-	ft::map<int,int> m;
-	std::clock_t timer = std::clock();
-
-	for (int i = 0; i < 2000000; i++)
-		m[rand()] = rand();
-	std::cout << "Insertion time: " << (std::clock() - timer) / (float)CLOCKS_PER_SEC <<
-				"s" << std::endl;
-	
-	m.clear();
-	std::cout << "Clear time: " << (std::clock() - timer) / (float)CLOCKS_PER_SEC <<
-				"s" << std::endl;
-}
-
 int main(int argc, char** argv) {
 	if (argc != 2)
 	{
@@ -316,7 +301,6 @@ int main(int argc, char** argv) {
 	test_vector();
 	test_map();
 	test_stack();
-	// test_map_clear();
 
 	return (0);
 }

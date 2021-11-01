@@ -53,12 +53,12 @@ public:
 	node const *	upper_bound(value_type const &value) const;
 	node const *	end() const;
 	void			swap(Rbtree & x);
-
 	std::allocator<T> get_allocator() const;
 
 	// debug tools
 	void 			print() const;
 	bool			check_rb() const;
+	bool			check_bst() const;
 
 private:
 	std::allocator<T>		_value_allocator;
@@ -107,6 +107,7 @@ private:
 
 	// debug utils
 	void	print(node* root, int space) const;
+	bool	check_bst(node *root) const;
 	
 };
 
@@ -906,6 +907,24 @@ bool check_reds(RbNode<T> *root, int parent_color)
 		return false;
 	return (check_reds(root->left, node_color)
 			&& check_reds(root->right, node_color));
+}
+
+template<typename T, typename C>
+bool Rbtree<T,C>::check_bst(node *root) const
+{
+	if (!root)
+		return true;
+	if (root->left && !_comp(*root->left->value, *root->value))
+		return false;
+	if (root->right && !_comp(*root->value, *root->right->value))
+		return false;
+	return (check_bst(root->left) && check_bst(root->right));
+}
+
+template<typename T, typename C>
+bool Rbtree<T,C>::check_bst() const
+{
+	return (check_bst(_root));
 }
 
 template<typename T, typename C>

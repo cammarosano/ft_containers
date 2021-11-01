@@ -1,8 +1,6 @@
-review all prototypes
+review all prototypes: stack, set
 
-expand main to test "everything"
-
-write main to test set
+add relational operators to test
 
 Expand is_integral?
 
@@ -10,7 +8,7 @@ use enable_if to avoid certain functions and overloads provided by
 reverse_iterator ? Make tests with map::reverse_iterator...
 NO! NO NEED!!
 
-remove weird comments
+remove weird comments and rbtree debug prints
 
 
 Questions:

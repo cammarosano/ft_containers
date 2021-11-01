@@ -6,6 +6,7 @@
 #include <string>
 #include <csignal>
 #include <set>
+#include "utils.hpp"
 
 
 // overload for debug and test
@@ -541,4 +542,31 @@ Test(bool, test)
 	cr_expect(v.size() == 4);
 	cr_expect(v.front() == true);
 	cr_expect(v.back() == false);
+}
+
+bool pred_func(int a, int b)
+{
+	if (a % 2)
+		return (b % 2);
+	return (!(b % 2));
+}
+
+class Predicate
+{
+public:
+	bool operator()(int a, int b)
+	{
+		if (a % 2)
+			return (b % 2);
+		return (!(b % 2));
+	}
+};
+
+Test(equal, predicate)
+{
+	ft::vector<int> v2(v);
+	cr_expect(ft::equal(v.begin(), v.end(), v2.begin(), pred_func));
+	cr_expect(ft::equal(v.begin(), v.end(), v2.begin(), Predicate()));
+
+
 }
