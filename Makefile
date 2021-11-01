@@ -1,4 +1,5 @@
 SRC = main.cpp
+SRC_BONUS = main_bonus.cpp
 OBJ = $(SRC:.cpp=.o)  # not really in use...
 CONTAINERS = map.hpp set.hpp stack.hpp vector.hpp
 HEADERS = Rbtree.hpp reverse_iterator.hpp tree_iterator.hpp utils.hpp vector_iterator.hpp
@@ -12,13 +13,18 @@ UNIT_TESTS = vector_test map_test_0 map_test_1 rb_tree_test set_test stack_test
 all:		$(NAME) test_stl
 
 $(NAME):	$(SRC) $(HEADER)
-			$(CC) $(CFLAGS) -O2 -std=c++98 -D STL=0 -o $@ $(SRC) 
+			$(CC) $(CFLAGS) -std=c++98 -D STL=0 -o $@ $(SRC) 
 
 test_stl:	$(SRC)
-			$(CC) $(CFLAGS) -O2 -std=c++98 -D STL=1 -o $@ $^ 
+			$(CC) $(CFLAGS) -std=c++98 -D STL=1 -o $@ $^ 
 
-run_test:	$(NAME) test_stl
-			time ./$(NAME) $$SEED ; time ./test_stl $$SEED
+bonus:		bonus_test_ft bonus_test_stl
+
+bonus_test_ft:	$(SRC_BONUS) $(HEADER)
+			$(CC) $(CFLAGS) -std=c++98 -D STL=0 -o $@ $(SRC_BONUS) 
+
+bonus_test_stl:	$(SRC_BONUS)
+			$(CC) $(CFLAGS) -std=c++98 -D STL=1 -o $@ $^ 
 
 all_unit_tests: clean_unit_tests vector_test map_test stack_test set_test rb_tree_test
 
