@@ -562,11 +562,20 @@ public:
 	}
 };
 
-Test(equal, predicate)
+Test(equal, predicate, .init = setup)
 {
 	ft::vector<int> v2(v);
 	cr_expect(ft::equal(v.begin(), v.end(), v2.begin(), pred_func));
 	cr_expect(ft::equal(v.begin(), v.end(), v2.begin(), Predicate()));
+}
 
+Test(lexic_comp, custom, .init = setup)
+{
+	ft::vector<int> v2(v);
+	cr_expect(!ft::lexicographical_compare(v.begin(), v.end(),
+				v2.begin(), v2.end(), pred_func));
+	cr_expect(!ft::lexicographical_compare(v.begin(), v.end(),
+				v2.begin(), v2.end(), Predicate()));
+	
 
 }

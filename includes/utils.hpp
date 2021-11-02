@@ -106,6 +106,21 @@ namespace ft
 		return (first2 != last2);
 	}
 
+	template < typename It_1, typename It_2, typename C >
+	bool lexicographical_compare(It_1 first1, It_1 last1,
+									It_2 first2, It_2 last2, C comp)
+	{
+		while (first1 != last1)
+		{
+			if (first2 == last2 || comp(*first2, *first1))
+				return (false);
+			if (comp(*first1, *first2))
+				return (true);
+			++first1;
+			++first2;
+		}
+		return (first2 != last2);
+	}
 
 	/* class pair */
 	
