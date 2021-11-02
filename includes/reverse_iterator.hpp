@@ -6,7 +6,7 @@
 /*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/02 19:37:57 by rcammaro          #+#    #+#             */
-/*   Updated: 2021/11/02 19:37:58 by rcammaro         ###   ########.fr       */
+/*   Updated: 2021/11/02 21:52:03 by rcammaro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,12 +45,12 @@ public:
 	reverse_iterator(reverse_iterator<Iter> const & src):
 	_base(src.base()) {}
 
-	template <typename Iter>
-	reverse_iterator & operator=(reverse_iterator<Iter> const & rhs)
-	{
-		_base = rhs.base(); // will work if const_iterator = iterator, and not otherwise
-		return (*this);
-	}
+	// template <typename Iter>
+	// reverse_iterator & operator=(reverse_iterator<Iter> const & rhs)
+	// {
+	// 	_base = rhs.base(); // will work if const_iterator = iterator, and not otherwise
+	// 	return (*this);
+	// }
 
 	iterator_type base(void) const
 	{
