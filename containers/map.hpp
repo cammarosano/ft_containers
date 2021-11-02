@@ -1,5 +1,17 @@
-#ifndef FT_MAP
-# define FT_MAP
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   map.hpp                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/11/02 19:34:37 by rcammaro          #+#    #+#             */
+/*   Updated: 2021/11/02 19:34:38 by rcammaro         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef MAP_HPP
+# define MAP_HPP
 
 #include <string> // debug
 #include <iostream> // for debug messages

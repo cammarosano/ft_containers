@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.hpp                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/11/02 19:38:05 by rcammaro          #+#    #+#             */
+/*   Updated: 2021/11/02 19:44:52y rcammaro         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef FT_IS_INTEGRAL_HPP
 # define FT_IS_INTEGRAL_HPP
 
@@ -146,37 +158,25 @@ namespace ft
 	template < typename T1, typename T2 >
 	struct pair
 	{
-		T1 first;
-		T2 second;
+		typedef T1	first_type;
+		typedef T2	second_type;
 
-		pair():  first(T1()), second(T2()) // is this value-initialization ?
+		first_type	first;
+		second_type	second;
+
+		pair():  first(first_type()), second(second_type())
 		{
-			// std::cout << "pair default constructor\n";
 		}
 
-		pair(T1 const & a, T2 const & b): first(a), second(b)
-		{
-			// std::cout << "pair initialization constructor\n";
-		}
-
-		template<typename U, typename V> pair(pair<U,V> const & pr):
+		template<typename U, typename V>
+		pair(pair<U,V> const & pr):
 		first(pr.first), second(pr.second)
 		{
 		}
 
-	// raises deprecated error. It compiles with std=c++98 (reference says this is implicit declared)
-		// pair & operator=(pair const & rhs)
-		// {
-		// 	first = rhs.first;
-		// 	second = rhs.second;
-		// 	return (*this);
-		// }
-
-		// enable convertion from pair<T1, T2> to pair<const T1, T2>
-		// operator pair<const T1, T2>() const
-		// {
-		// 	return (pair<const T1, T2>(first, second));
-		// }
+		pair(first_type const & a, second_type const & b): first(a), second(b)
+		{
+		}
 	};
 
 	/* Relational operators(pair) */
@@ -219,6 +219,7 @@ namespace ft
 
 
 	/* make_pair */
+
 	template <typename T1, typename T2>
 	pair<T1, T2> make_pair(T1 x, T2 y)
 	{
@@ -250,7 +251,7 @@ namespace ft
 		typedef typename Iterator::iterator_category	iterator_category;
 	};
 
-	// my implementation of std::distance
+	/* distance */
 
 	namespace distance_dispatcher
 	{
@@ -290,9 +291,6 @@ namespace ft
 		return (distance_dispatcher::distance(first, last, 
 			typename ft::iterator_traits<InputIterator>::iterator_category()));
 	}
-
-
-
 
 } // namespace ft
 

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Rbtree.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/11/02 19:37:45 by rcammaro          #+#    #+#             */
+/*   Updated: 2021/11/02 19:37:46 by rcammaro         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef RBTREE_HPP
 # define RBTREE_HPP
 
@@ -21,9 +33,7 @@ struct RbNode
 	bool color;
 
 	RbNode(value_type *val): value(val),
-	left(0), right(0), parent(0), color(rbt_red)
-	{
-	}
+	left(0), right(0), parent(0), color(rbt_red) {}
 };
 
 template <typename T, typename Compare>

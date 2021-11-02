@@ -1,5 +1,17 @@
-#ifndef FT_SET_HPP
-# define FT_SET_HPP
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   set.hpp                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/11/02 19:34:40 by rcammaro          #+#    #+#             */
+/*   Updated: 2021/11/02 20:33:50 by rcammaro         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef SET_HPP
+# define SET_HPP
 
 # include "Rbtree.hpp"
 # include "tree_iterator.hpp"
@@ -8,7 +20,6 @@
 
 namespace ft
 {
-
 
 template < typename T, typename Compare = ft::less<T> >
 class set
@@ -19,19 +30,23 @@ public:
 	typedef Compare									key_compare;
 	typedef Compare									value_compare;
 	typedef std::allocator<value_type>				allocator_type;
+	typedef value_type&								reference;
+	typedef const value_type&						const_reference;
+	typedef value_type*								pointer;
+	typedef const value_type*						const_pointer;
 	typedef tree_iterator<const value_type>			iterator;
 	typedef tree_iterator<const value_type>			const_iterator;
 	typedef ft::reverse_iterator<iterator>			reverse_iterator;
 	typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
+	typedef std::ptrdiff_t							difference_type;
 	typedef std::size_t								size_type;
 
 private:
 	typedef tree_iterator<value_type>				temp_iterator;
+	typedef RbNode<value_type>						node;
+	typedef Rbtree<value_type, value_compare>		tree_type;
 
-	typedef RbNode<value_type>	node;
-	typedef Rbtree<value_type, value_compare> tree_type;
-
-	key_compare _key_comp;
+	key_compare	_key_comp;
 	tree_type	_tree;
 
 public:
@@ -44,13 +59,6 @@ public:
 	{
 	}
 
-	// Copy constructor
-	set(set const & x):
-	_key_comp(x._key_comp), _tree(_key_comp)
-	{
-		*this = x;
-	}
-
 	// Range constructor
 	template<typename It>
 	set (It first, It last, key_compare const & comp = key_compare()):
@@ -59,15 +67,22 @@ public:
 		insert(first, last);
 	}
 
+	// Copy constructor
+	set(set const & x):
+	_key_comp(x._key_comp), _tree(_key_comp)
+	{
+		*this = x;
+	}
+
+	// Destructor
+	~set() {}	
+
 	// Assignation operator overload
 	set & operator=(set const & x)
 	{
 		_tree = x._tree;
 		return (*this);
 	}
-
-	// Destructor
-	~set() {}	
 
 	// --------------- Iterators -------------------------- //
 
@@ -191,12 +206,12 @@ public:
 
 	// ----------- Observers ----------------- //
 
-	key_compare key_comp(void) const
+	key_compare key_comp() const
 	{
 		return (_key_comp);
 	}
 
-	value_compare value_comp(void) const
+	value_compare value_comp() const
 	{
 		return (_key_comp);
 	}
@@ -239,14 +254,6 @@ public:
 		return (_tree.get_allocator());
 	}
 
-
-	// Debug utils ==========================================
-
-	void print_tree() const
-	{
-		_tree.print();
-	}
-	// =======================================================
 
 private:
 	node * node_ptr(iterator const & it)

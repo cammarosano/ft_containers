@@ -6,12 +6,12 @@
 /*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/02 18:59:03 by rcammaro          #+#    #+#             */
-/*   Updated: 2021/11/02 19:03:56 by rcammaro         ###   ########.fr       */
+/*   Updated: 2021/11/02 19:34:33 by rcammaro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_VECTOR_HPP
-# define FT_VECTOR_HPP
+#ifndef VECTOR_HPP
+# define VECTOR_HPP
 
 # include <memory>
 # include "vector_iterator.hpp"
