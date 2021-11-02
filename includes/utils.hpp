@@ -5,29 +5,48 @@
 
 namespace ft
 {
-	struct true_type {static bool const value = true;};
-	struct false_type {static bool const value = false;};
+	/* true and false types */
+
+	template <typename T, T v>
+	struct integral_constant
+	{
+		static const T value = v;
+		typedef T value_type;
+		typedef integral_constant<T,v> type;
+		operator T() const {return v;}
+	};
+
+	typedef integral_constant<bool, true>	true_type;
+	typedef integral_constant<bool, false>	false_type;
+
+	/* remove_cv */
+
+	template <typename T> struct remove_cv 				{ typedef T type; };
+	template <typename T> struct remove_cv<const T>		{ typedef T type; };
+	template <typename T> struct remove_cv<volatile T>	{ typedef T type; };
+	template <typename T>
+	struct remove_cv<const volatile T>					{ typedef T type; };
 
 	/* is_integral */
 
+	template <typename T> struct is_int : false_type {};
+
+	template <>	struct is_int<bool> : true_type {}; 
+	template <>	struct is_int<char> : true_type {};
+	template <>	struct is_int<wchar_t> : true_type {};
+	template <>	struct is_int<signed char> : true_type {};
+	template <>	struct is_int<short int> : true_type {};
+	template <>	struct is_int<int> : true_type {};
+	template <>	struct is_int<long int> : true_type {};
+	template <>	struct is_int<long long int> : true_type {};
+	template <>	struct is_int<unsigned char> : true_type {};
+	template <>	struct is_int<unsigned short int> : true_type {};
+	template <>	struct is_int<unsigned int> : true_type {};
+	template <>	struct is_int<unsigned long int> : true_type {};
+	template <>	struct is_int<unsigned long long int> : true_type {};
+
 	template <typename T>
-	struct is_integral : false_type {};
-
-	template <>	struct is_integral<bool> : true_type {}; 
-	template <>	struct is_integral<char> : true_type {};
-	template <>	struct is_integral<unsigned char> : true_type {};
-	template <>	struct is_integral<signed char> : true_type {};
-	template <>	struct is_integral<wchar_t> : true_type {};
-	template <>	struct is_integral<short> : true_type {};
-	template <>	struct is_integral<unsigned short> : true_type {};
-	template <>	struct is_integral<int> : true_type {};
-	template <>	struct is_integral<unsigned int> : true_type {};
-	template <>	struct is_integral<long> : true_type {};
-	template <>	struct is_integral<unsigned long> : true_type {};
-	template <>	struct is_integral<long long> : true_type {};
-	template <>	struct is_integral<unsigned long long> : true_type {};
-
-	// TODO: const and volatile ?
+	struct is_integral : is_int<typename remove_cv<T>::type> {};
 
 	/* is_same */
 

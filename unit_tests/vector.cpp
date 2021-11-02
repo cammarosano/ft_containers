@@ -576,6 +576,24 @@ Test(lexic_comp, custom, .init = setup)
 				v2.begin(), v2.end(), pred_func));
 	cr_expect(!ft::lexicographical_compare(v.begin(), v.end(),
 				v2.begin(), v2.end(), Predicate()));
-	
+}
 
+enum e_test
+{
+	e_1, e_2, e_3
+};
+
+Test(is_integral, const_volatile)
+{
+	cr_expect(ft::is_integral<bool>::value);
+	cr_expect(ft::is_integral<char>::value);
+	cr_expect(ft::is_integral<signed char>::value);
+	cr_expect(ft::is_integral<wchar_t>::value);
+	cr_expect(ft::is_integral<short>::value);
+	cr_expect(ft::is_integral<int>::value);
+
+	cr_expect(!ft::is_integral<float>::value);
+	cr_expect(!ft::is_integral<double>::value);
+	cr_expect(!ft::is_integral<double>::value);
+	cr_expect(!ft::is_integral<e_test>::value);
 }

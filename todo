@@ -1,16 +1,3 @@
 review all prototypes: stack, set
 
-add relational operators to test
-
-Expand is_integral?
-
-use enable_if to avoid certain functions and overloads provided by
-reverse_iterator ? Make tests with map::reverse_iterator...
-NO! NO NEED!!
-
 remove weird comments and rbtree debug prints
-
-
-Questions:
-- removing elements of the beginning of the vector: all is moved or just
-	the pointer to beggining of array is moved?

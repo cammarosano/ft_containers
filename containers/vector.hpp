@@ -1,8 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   vector.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/11/02 18:59:03 by rcammaro          #+#    #+#             */
+/*   Updated: 2021/11/02 19:03:56 by rcammaro         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef FT_VECTOR_HPP
 # define FT_VECTOR_HPP
 
 # include <memory>
-# include <iostream> // debug messages
 # include "vector_iterator.hpp"
 # include "reverse_iterator.hpp"
 # include <stdexcept>
@@ -181,11 +192,11 @@ private:
 	{
 		while (first != last)
 		{
-			position = insert(position, *first++); // position is updated in case of reallocation
+			// position might be invalidated in case of reallocation
+			position = insert(position, *first++);
 			position++;
 		}
 	}
-
 
 	template <typename FwdIt>
 	void insert_dispatcher(iterator position, FwdIt first, FwdIt last,

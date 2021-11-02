@@ -289,12 +289,7 @@ int main(int argc, char** argv) {
 		std::cerr << "Count value:" << COUNT << std::endl;
 		return 1;
 	}
-	if (STL)
-		std::cout	<< "\033[32m" << "Testing STL containers:"
-					<< "\033[0m" << std::endl;
-	else
-		std::cout	<< "\033[36m" << "Testing FT containers:"
-					<< "\033[0m" << std::endl;
+	
 	const int seed = atoi(argv[1]);
 	srand(seed);
 

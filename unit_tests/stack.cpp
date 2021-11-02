@@ -59,3 +59,26 @@ Test(relational_operators, test)
 	cr_expect(stk2 != stk);
 }
 
+Test(top, const_stack)
+{
+	stk.push(1);
+	stk.push(1);
+	stk.push(21);
+	ft::stack<int> const stk_copy(stk); // implicit copy constructor
+	cr_expect(stk_copy.top() == 21);
+
+}
+
+Test(constructor, non_empty_container)
+{
+	ft::vector<int> v(5, 42);
+	ft::stack<int> s(v);
+
+	int n = 5;
+	while (n--)
+	{
+		cr_expect(s.top() == 42);
+		s.pop();
+	}
+	cr_expect(s.empty() && s.size() == 0);
+}

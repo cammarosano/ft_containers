@@ -21,7 +21,6 @@
 
 #define COUNT (MAX_RAM / BUFFER_SIZE)
 
-
 void test_set(void)
 {
 	std::cout << "Set:" << std::endl;
@@ -98,7 +97,8 @@ void test_set(void)
 				"s" << std::endl;
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
 	if (argc != 2)
 	{
 		std::cerr << "Usage: ./test seed" << std::endl;
@@ -106,12 +106,6 @@ int main(int argc, char** argv) {
 		std::cerr << "Count value:" << COUNT << std::endl;
 		return 1;
 	}
-	if (STL)
-		std::cout	<< "\033[32m" << "Testing STL containers:"
-					<< "\033[0m" << std::endl;
-	else
-		std::cout	<< "\033[36m" << "Testing FT containers:"
-					<< "\033[0m" << std::endl;
 	const int seed = atoi(argv[1]);
 	srand(seed);
 
