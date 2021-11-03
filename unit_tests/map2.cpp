@@ -240,3 +240,13 @@ Test(get_allocator, test, .init=setup)
 	my_allocator.destroy(pair + 1);
 	my_allocator.deallocate(pair, 2);
 }
+
+Test(iterator, const_int_comp, .init=setup)
+{
+	it = m.begin();
+	cit = m.begin();
+
+	cr_expect(it == cit);
+	cr_expect(!(it != cit));
+
+}

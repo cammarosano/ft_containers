@@ -64,7 +64,7 @@ rb_tree_test:
 			$(CC) $(CFLAGS) -std=c++98 -c $< -o $@
 
 clean:
-			rm -f $(OBJ)
+			rm -rf $(OBJ) *.dSYM
 
 clean_unit_tests:
 			@ rm -f $(UNIT_TESTS)

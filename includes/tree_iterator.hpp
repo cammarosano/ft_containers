@@ -6,7 +6,7 @@
 /*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/02 19:38:00 by rcammaro          #+#    #+#             */
-/*   Updated: 2021/11/02 19:38:01 by rcammaro         ###   ########.fr       */
+/*   Updated: 2021/11/03 15:53:47 by rcammaro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,14 +134,16 @@ namespace ft
 			return (temp);
 		}
 
-		bool operator==(tree_iterator const & rhs)
+		friend
+		bool operator==(tree_iterator const & lhs, tree_iterator const & rhs)
 		{
-			return (_ptr == rhs._ptr);
+			return (lhs._ptr == rhs._ptr);
 		}
 
-		bool operator!=(tree_iterator const & rhs)
+		friend
+		bool operator!=(tree_iterator const & lhs, tree_iterator const & rhs)
 		{
-			return (_ptr != rhs._ptr);
+			return (lhs._ptr != rhs._ptr);
 		}
 	};
 
