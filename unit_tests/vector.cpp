@@ -597,3 +597,20 @@ Test(is_integral, const_volatile)
 	cr_expect(!ft::is_integral<double>::value);
 	cr_expect(!ft::is_integral<e_test>::value);
 }
+
+Test(iterator, comp_const_it, .init=setup)
+{
+	ft::vector<int>::iterator it = v.begin();
+	ft::vector<int>::const_iterator cit = v.begin();
+
+	cr_expect(it == cit);
+	cr_expect(*it == *cit);
+
+	ft::vector<int>::const_iterator cite = v.end();
+	while (it < cite && it != cite)
+	{
+		cr_expect(it == cit);
+		it++;
+		++cit;
+	}
+}

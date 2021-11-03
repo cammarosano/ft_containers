@@ -6,7 +6,7 @@
 /*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/02 19:39:22 by rcammaro          #+#    #+#             */
-/*   Updated: 2021/11/02 19:39:23 by rcammaro         ###   ########.fr       */
+/*   Updated: 2021/11/03 14:54:30 by rcammaro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,41 +92,6 @@ public:
 			return (vector_iterator(ptr - n));
 		}
 
-		difference_type operator-(vector_iterator const & rhs) const
-		{
-			return (ptr - rhs.ptr);
-		}
-
-		bool operator==(vector_iterator const & rhs) const
-		{
-			return (ptr == rhs.ptr);
-		}
-
-		bool operator!=(vector_iterator const & rhs) const
-		{
-			return (ptr != rhs.ptr);
-		}
-
-		bool operator>(vector_iterator const & rhs) const
-		{
-			return (ptr > rhs.ptr);
-		}
-
-		bool operator<(vector_iterator const & rhs) const
-		{
-			return (ptr < rhs.ptr);
-		}
-
-		bool operator>=(vector_iterator const & rhs) const
-		{
-			return (ptr >= rhs.ptr);
-		}
-
-		bool operator<=(vector_iterator const & rhs) const
-		{
-			return (ptr <= rhs.ptr);
-		}
-
 		vector_iterator & operator+=(difference_type n)
 		{
 			ptr = ptr + n;
@@ -148,6 +113,51 @@ public:
 		{
 			return (ptr);
 		}
+
+		/* Non-member functions overloads */
+
+		friend difference_type 
+		operator-(vector_iterator const & lhs, vector_iterator const & rhs)
+		{
+			return (lhs.ptr - rhs.ptr);
+		}
+
+		friend bool
+		operator==(vector_iterator const & lhs, vector_iterator const & rhs) 
+		{
+			return (lhs.ptr == rhs.ptr);
+		}
+
+		friend bool
+		operator!=(vector_iterator const & lhs, vector_iterator const & rhs)
+		{
+			return (lhs.ptr != rhs.ptr);
+		}
+		
+		friend bool
+		operator>(vector_iterator const & lhs, vector_iterator const & rhs) 
+		{
+			return (lhs.ptr > rhs.ptr);
+		}
+
+		friend bool
+		operator<(vector_iterator const & lhs, vector_iterator const & rhs) 
+		{
+			return (lhs.ptr < rhs.ptr);
+		}
+
+		friend bool
+		operator>=(vector_iterator const & lhs, vector_iterator const & rhs) 
+		{
+			return (lhs.ptr >= rhs.ptr);
+		}
+
+		friend bool
+		operator<=(vector_iterator const & lhs, vector_iterator const & rhs) 
+		{
+			return (lhs.ptr <= rhs.ptr);
+		}
+
 };
 
 template <typename T>
