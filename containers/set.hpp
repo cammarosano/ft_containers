@@ -6,13 +6,14 @@
 /*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/02 19:34:40 by rcammaro          #+#    #+#             */
-/*   Updated: 2021/11/02 20:33:50 by rcammaro         ###   ########.fr       */
+/*   Updated: 2021/11/09 00:08:06 by rcammaro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SET_HPP
 # define SET_HPP
 
+# include <memory>
 # include "Rbtree.hpp"
 # include "tree_iterator.hpp"
 # include "reverse_iterator.hpp"
@@ -21,30 +22,33 @@
 namespace ft
 {
 
-template < typename T, typename Compare = ft::less<T> >
+template <	typename T,
+			typename Compare = ft::less<T>,
+			typename Alloc = std::allocator<T>
+		>
 class set
 {
 public:
-	typedef T										key_type;
-	typedef T										value_type;
-	typedef Compare									key_compare;
-	typedef Compare									value_compare;
-	typedef std::allocator<value_type>				allocator_type;
-	typedef value_type&								reference;
-	typedef const value_type&						const_reference;
-	typedef value_type*								pointer;
-	typedef const value_type*						const_pointer;
-	typedef tree_iterator<const value_type>			iterator;
-	typedef tree_iterator<const value_type>			const_iterator;
-	typedef ft::reverse_iterator<iterator>			reverse_iterator;
-	typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
-	typedef std::ptrdiff_t							difference_type;
-	typedef std::size_t								size_type;
+	typedef T											key_type;
+	typedef T											value_type;
+	typedef Compare										key_compare;
+	typedef Compare										value_compare;
+	typedef Alloc										allocator_type;
+	typedef typename allocator_type::reference			reference;
+	typedef typename allocator_type::const_reference	const_reference;
+	typedef typename allocator_type::pointer			pointer;
+	typedef typename allocator_type::const_pointer		const_pointer;
+	typedef tree_iterator<const value_type>				iterator;
+	typedef tree_iterator<const value_type>				const_iterator;
+	typedef ft::reverse_iterator<iterator>				reverse_iterator;
+	typedef	ft::reverse_iterator<const_iterator>		const_reverse_iterator;
+	typedef std::ptrdiff_t								difference_type;
+	typedef std::size_t									size_type;
 
 private:
-	typedef tree_iterator<value_type>				temp_iterator;
-	typedef RbNode<value_type>						node;
-	typedef Rbtree<value_type, value_compare>		tree_type;
+	typedef tree_iterator<value_type>							temp_iterator;
+	typedef RbNode<value_type>									node;
+	typedef Rbtree<value_type, value_compare, allocator_type>	tree_type;
 
 	key_compare	_key_comp;
 	tree_type	_tree;
@@ -54,22 +58,24 @@ public:
 	// ------ Constructors, Assignation Operator and Destructor -------//
 
 	// Default constructor
-	explicit set(const key_compare& comp = key_compare()):
-	_key_comp(comp), _tree(_key_comp)
+	explicit set(const key_compare& comp = key_compare(),
+					allocator_type const & alloc = allocator_type()):
+	_key_comp(comp), _tree(_key_comp, alloc)
 	{
 	}
 
 	// Range constructor
 	template<typename It>
-	set (It first, It last, key_compare const & comp = key_compare()):
-	_key_comp(comp), _tree(_key_comp)
+	set (It first, It last, key_compare const & comp = key_compare(),
+			allocator_type const & alloc = allocator_type()):
+	_key_comp(comp), _tree(_key_comp, alloc)
 	{
 		insert(first, last);
 	}
 
 	// Copy constructor
 	set(set const & x):
-	_key_comp(x._key_comp), _tree(_key_comp)
+	_key_comp(x._key_comp), _tree(_key_comp, x.get_allocator())
 	{
 		*this = x;
 	}

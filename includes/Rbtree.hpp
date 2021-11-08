@@ -6,7 +6,7 @@
 /*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/02 19:37:45 by rcammaro          #+#    #+#             */
-/*   Updated: 2021/11/08 23:33:06 by rcammaro         ###   ########.fr       */
+/*   Updated: 2021/11/08 23:56:02 by rcammaro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -551,7 +551,7 @@ void Rbtree<T,C,A>::clear_node(node* &x)
 	x = NULL;
 }
 
-// Depth first traversal using ft::stack
+// Depth first traversal using a stack (not the call stack)
 template<typename T, typename C, typename A>
 void Rbtree<T,C,A>::clear()
 {

@@ -6,7 +6,7 @@
 /*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/02 19:34:37 by rcammaro          #+#    #+#             */
-/*   Updated: 2021/11/08 23:41:35 by rcammaro         ###   ########.fr       */
+/*   Updated: 2021/11/09 00:03:52 by rcammaro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,8 +70,8 @@ public:
 
 private:
 
-	typedef	RbNode<value_type>	node;
-	typedef Rbtree<value_type, value_compare> tree_type;
+	typedef	RbNode<value_type>									node;
+	typedef Rbtree<value_type, value_compare, allocator_type> 	tree_type;
 
 	key_compare	_key_comp;
 	tree_type	_tree;
