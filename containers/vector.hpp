@@ -6,7 +6,7 @@
 /*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/02 18:59:03 by rcammaro          #+#    #+#             */
-/*   Updated: 2021/11/08 16:34:11 by rcammaro         ###   ########.fr       */
+/*   Updated: 2021/11/08 16:47:22 by rcammaro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -238,13 +238,15 @@ public:
 	/*----------- Constructors, destructor and operator= ------------*/
 
 	// Default constructor
-	explicit vector(): _array(NULL), _size(0), _capacity(0)
+	explicit vector(allocator_type const & alloc = allocator_type()):
+	_array(NULL), _size(0), _capacity(0), _allocator(alloc)
 	{
 	} 
 
 	// Fill constructor
-	explicit vector(size_type n, value_type const & val = value_type()):
-	_size(n), _capacity(n)
+	explicit vector(size_type n, value_type const & val = value_type(),
+					allocator_type const & alloc = allocator_type()):
+	_size(n), _capacity(n), _allocator(alloc)
 	{
 		_array = _allocator.allocate(_capacity);
 		for (size_t i = 0; i < _size; i++)
@@ -254,14 +256,15 @@ public:
 	// Range constructor
 	template<typename I>
 	vector(typename ft::enable_if<!ft::is_integral<I>::value, I>::type first,
-			I last): _array(NULL), _size(0), _capacity(0)
+			I last, allocator_type const & alloc = allocator_type()):
+			_array(NULL), _size(0), _capacity(0), _allocator(alloc)
 	{
 		assign(first, last);
 	}
 
 	// Copy constructor
 	vector(vector const & x):
-	_array(NULL), _size(0), _capacity(0)
+	_array(NULL), _size(0), _capacity(0), _allocator(x._allocator)
 	{
 		*this = x;
 	}
