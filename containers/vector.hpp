@@ -6,7 +6,7 @@
 /*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/02 18:59:03 by rcammaro          #+#    #+#             */
-/*   Updated: 2021/11/02 19:34:33 by rcammaro         ###   ########.fr       */
+/*   Updated: 2021/11/08 16:34:11 by rcammaro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,22 +23,22 @@
 namespace ft
 {
 
-template <typename T>
+template <typename T, typename Alloc = std::allocator<T> >
 class vector
 {
 public:
-	typedef T										value_type;
-	typedef std::allocator<T>						allocator_type;
-	typedef value_type &							reference;
-	typedef value_type const &						const_reference;
-	typedef value_type *							pointer;
-	typedef value_type const *						const_pointer;
-	typedef ft::vector_iterator<T>					iterator;
-	typedef ft::vector_iterator<T const>			const_iterator;
-	typedef ft::reverse_iterator<iterator>			reverse_iterator;
-	typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
-	typedef typename iterator::difference_type		difference_type;
-	typedef size_t									size_type;
+	typedef T											value_type;
+	typedef Alloc										allocator_type;
+	typedef typename allocator_type::reference			reference;
+	typedef typename allocator_type::const_reference	const_reference;
+	typedef typename allocator_type::pointer			pointer;
+	typedef typename allocator_type::const_pointer		const_pointer;
+	typedef ft::vector_iterator<T>						iterator;
+	typedef ft::vector_iterator<T const>				const_iterator;
+	typedef ft::reverse_iterator<iterator>				reverse_iterator;
+	typedef ft::reverse_iterator<const_iterator>		const_reverse_iterator;
+	typedef typename iterator::difference_type			difference_type;
+	typedef size_t										size_type;
 
 private:
 	pointer				_array;
@@ -280,7 +280,19 @@ public:
 	// Assignation operator
 	vector & operator=(vector const & x)
 	{
-		assign(x.begin(), x.end());
+		if (this != &x)
+		{
+			clear();
+			if (_capacity < x._size)
+			{
+				_allocator.deallocate(_array, _capacity);
+				_array = _allocator.allocate(x._size);
+				_capacity = x._size;
+			}
+			for (size_type i = 0; i < x._size; i++)
+				_allocator.construct(_array + i, x._array[i]);
+			_size = x._size;
+		}
 		return (*this);
 	}
 
