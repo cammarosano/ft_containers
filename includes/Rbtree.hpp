@@ -6,7 +6,7 @@
 /*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/02 19:37:45 by rcammaro          #+#    #+#             */
-/*   Updated: 2021/11/02 19:37:46 by rcammaro         ###   ########.fr       */
+/*   Updated: 2021/11/08 17:27:31 by rcammaro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,15 +36,16 @@ struct RbNode
 	left(0), right(0), parent(0), color(rbt_red) {}
 };
 
-template <typename T, typename Compare>
+template <typename T, typename Compare, typename Alloc = std::allocator<T> >
 class Rbtree
 {
 public:
 	typedef	T					value_type;
 	typedef	std::size_t			size_type;
 	typedef	RbNode<T>			node; 
+	typedef Alloc				allocator_type;
 
-	Rbtree(Compare const &comp_obj = Compare());
+	Rbtree(Compare const &comp_obj = Compare(), allocator_type const &alloc = allocator_type());
 	Rbtree(Rbtree const & src);
 	Rbtree & operator=(Rbtree const & rhs);
 	~Rbtree();
@@ -63,7 +64,7 @@ public:
 	node const *	upper_bound(value_type const &value) const;
 	node const *	end() const;
 	void			swap(Rbtree & x);
-	std::allocator<T> get_allocator() const;
+	allocator_type	get_allocator() const;
 
 	// debug tools
 	void 			print() const;
@@ -71,12 +72,12 @@ public:
 	bool			check_bst() const;
 
 private:
-	std::allocator<T>		_value_allocator;
-	std::allocator<node>	_node_allocator;
-	Compare					_comp; // templated comparision object
-	node 					_end;	// stack variable
-	node *					&_root;	// reference to _end.left
-	size_type				_size;
+	allocator_type											_value_allocator;
+	typename allocator_type::template rebind<node>::other	_node_allocator;
+	Compare													_comp; // templated comparision object
+	node 													_end;	// stack variable
+	node *													&_root;	// reference to _end.left
+	size_type												_size;
 
 	// insertion
 	node *	insert(node* &root, node* parent, value_type const &value);
@@ -122,21 +123,23 @@ private:
 };
 
 
-template<typename T, typename C>
-Rbtree<T,C>::Rbtree(C const &comp_obj):
-_comp(comp_obj), _end(_value_allocator.allocate(1)), _root(_end.left), _size(0)
+template<typename T, typename C, typename A>
+Rbtree<T,C,A>::Rbtree(C const &comp_obj, allocator_type const & alloc):
+_value_allocator(alloc), _comp(comp_obj), _end(_value_allocator.allocate(1)),
+_root(_end.left), _size(0)
 {
 }
 
-template<typename T, typename C>
-Rbtree<T,C>::Rbtree(Rbtree const & src):
+template<typename T, typename C, typename A>
+Rbtree<T,C,A>::Rbtree(Rbtree const & src):
+_value_allocator(src._value_allocator), _node_allocator(src._node_allocator),
 _comp(src._comp), _end(_value_allocator.allocate(1)), _root(_end.left), _size(0)
 {
 	*this = src;
 }
 
-template<typename T, typename C>
-Rbtree<T,C> & Rbtree<T,C>::operator=(Rbtree const & rhs)
+template<typename T, typename C, typename A>
+Rbtree<T,C,A> & Rbtree<T,C,A>::operator=(Rbtree const & rhs)
 {
 	if (this != &rhs)
 	{
@@ -148,9 +151,9 @@ Rbtree<T,C> & Rbtree<T,C>::operator=(Rbtree const & rhs)
 	return (*this);
 }
 
-template<typename T, typename C>
+template<typename T, typename C, typename A>
 void
-Rbtree<T,C>::copy_tree(node * &dest, node const *src, node *parent)
+Rbtree<T,C,A>::copy_tree(node * &dest, node const *src, node *parent)
 {
 	if (!src)
 		dest = NULL;
@@ -164,8 +167,8 @@ Rbtree<T,C>::copy_tree(node * &dest, node const *src, node *parent)
 	}
 }
 
-template<typename T, typename C>
-void	Rbtree<T,C>::swap(Rbtree & x)
+template<typename T, typename C, typename A>
+void	Rbtree<T,C,A>::swap(Rbtree & x)
 {
 	// swap _roots
 	_root = x._root;
@@ -179,21 +182,21 @@ void	Rbtree<T,C>::swap(Rbtree & x)
 	x._size = temp_size;
 }
 
-template<typename T, typename C>
-Rbtree<T,C>::~Rbtree()
+template<typename T, typename C, typename A>
+Rbtree<T,C,A>::~Rbtree()
 {
 	clear();
 	_value_allocator.deallocate(_end.value, 1);
 }
 
-template<typename T, typename C>
-typename Rbtree<T,C>::size_type	Rbtree<T,C>::size() const
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::size_type	Rbtree<T,C,A>::size() const
 {
 	return (_size);
 }
 
-template<typename T, typename C>
-typename Rbtree<T,C>::size_type	Rbtree<T,C>::max_size() const
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::size_type	Rbtree<T,C,A>::max_size() const
 {
 	return (_node_allocator.max_size() * sizeof(node)
 	/ (sizeof(node) + sizeof(value_type)));
@@ -201,14 +204,14 @@ typename Rbtree<T,C>::size_type	Rbtree<T,C>::max_size() const
 
 // whenever the root changes, _end.left holds its address, but _end.right
 // needs to be updated
-template<typename T, typename C>
-void	Rbtree<T,C>::update_end()
+template<typename T, typename C, typename A>
+void	Rbtree<T,C,A>::update_end()
 {
 	_end.right = _end.left;
 }
 
-template<typename T, typename C>
-typename Rbtree<T,C>::node const * Rbtree<T,C>::min() const
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::node const * Rbtree<T,C,A>::min() const
 {
 	node const * ptr = &_end;
 	while (ptr->left)
@@ -216,8 +219,8 @@ typename Rbtree<T,C>::node const * Rbtree<T,C>::min() const
 	return (ptr);
 }
 
-template<typename T, typename C>
-typename Rbtree<T,C>::node const * Rbtree<T,C>::max() const
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::node const * Rbtree<T,C,A>::max() const
 {
 	node const * ptr = &_end;
 	while (ptr->right)
@@ -225,9 +228,9 @@ typename Rbtree<T,C>::node const * Rbtree<T,C>::max() const
 	return (ptr);
 }
 
-template<typename T, typename C>
-typename Rbtree<T,C>::node const *
-Rbtree<T,C>::lower_bound(node const * root, value_type const &value) const
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::node const *
+Rbtree<T,C,A>::lower_bound(node const * root, value_type const &value) const
 {
 	if (!root)
 		return (NULL);
@@ -242,9 +245,9 @@ Rbtree<T,C>::lower_bound(node const * root, value_type const &value) const
 	return (root);
 }
 
-template<typename T, typename C>
-typename Rbtree<T,C>::node const *
-Rbtree<T,C>::upper_bound(node const * root, value_type const &value) const
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::node const *
+Rbtree<T,C,A>::upper_bound(node const * root, value_type const &value) const
 {
 	if (!root)
 		return (NULL);
@@ -256,9 +259,9 @@ Rbtree<T,C>::upper_bound(node const * root, value_type const &value) const
 	return (root);
 }
 
-template<typename T, typename C>
-typename Rbtree<T,C>::node const *
-Rbtree<T,C>::lower_bound(value_type const &value) const
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::node const *
+Rbtree<T,C,A>::lower_bound(value_type const &value) const
 {
 	node const * lb = lower_bound(_root, value);
 	if (!lb)
@@ -266,9 +269,9 @@ Rbtree<T,C>::lower_bound(value_type const &value) const
 	return (lb);
 }
 
-template<typename T, typename C>
-typename Rbtree<T,C>::node const *
-Rbtree<T,C>::upper_bound(value_type const &value) const
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::node const *
+Rbtree<T,C,A>::upper_bound(value_type const &value) const
 {
 	node const * ub = upper_bound(_root, value);
 	if (!ub)
@@ -276,29 +279,29 @@ Rbtree<T,C>::upper_bound(value_type const &value) const
 	return (ub);
 }
 
-template<typename T, typename C>
-std::allocator<T> Rbtree<T,C>::get_allocator() const
+template<typename T, typename C, typename A>
+A Rbtree<T,C,A>::get_allocator() const
 {
 	return (_value_allocator);
 }
 
-template<typename T, typename C>
-typename Rbtree<T,C>::node const * Rbtree<T,C>::insert(T const &value)
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::node const * Rbtree<T,C,A>::insert(T const &value)
 {
 	return insert(_root, &_end, value);
 }
 
-template<typename T, typename C>
-typename Rbtree<T,C>::node const *
-Rbtree<T,C>::insert(node * hint, value_type const &value)
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::node const *
+Rbtree<T,C,A>::insert(node * hint, value_type const &value)
 {
 	if (validate_hint(hint, value))
 		return (insert(hint->right, hint, value));
 	return (insert(_root, &_end, value));
 }
 
-template<typename T, typename C>
-bool	Rbtree<T,C>::validate_hint(node const * hint, value_type const & value)
+template<typename T, typename C, typename A>
+bool	Rbtree<T,C,A>::validate_hint(node const * hint, value_type const & value)
 {
 	if (hint == &_end || !_comp(*hint->value, value))
 		return (false);
@@ -309,8 +312,8 @@ bool	Rbtree<T,C>::validate_hint(node const * hint, value_type const & value)
 }
 
 // returns the next node (in sorted order)
-template<typename T, typename C>
-typename Rbtree<T,C>::node const * Rbtree<T,C>::next(node const * ptr) const
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::node const * Rbtree<T,C,A>::next(node const * ptr) const
 {	
 	if (ptr->right)
 	{
@@ -328,9 +331,9 @@ typename Rbtree<T,C>::node const * Rbtree<T,C>::next(node const * ptr) const
 	return (ptr); 
 }
 
-template<typename T, typename C>
-typename Rbtree<T,C>::node *
-Rbtree<T,C>::insert(node* &root, node* parent, T const &value)
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::node *
+Rbtree<T,C,A>::insert(node* &root, node* parent, T const &value)
 {
 	if (!root)
 	{
@@ -350,8 +353,8 @@ Rbtree<T,C>::insert(node* &root, node* parent, T const &value)
 	return root;
 }
 
-template<typename T, typename C>
-void Rbtree<T,C>::insert_fix(node *x)
+template<typename T, typename C, typename A>
+void Rbtree<T,C,A>::insert_fix(node *x)
 {
 	node * uncle;
 
@@ -410,8 +413,8 @@ void Rbtree<T,C>::insert_fix(node *x)
 }
 
 // x cannot be null
-template<typename T, typename C>
-bool Rbtree<T,C>::is_left_child(node *x) const
+template<typename T, typename C, typename A>
+bool Rbtree<T,C,A>::is_left_child(node *x) const
 {
 	//////////////////////
 	if (!x)
@@ -426,8 +429,8 @@ bool Rbtree<T,C>::is_left_child(node *x) const
 }
 
 // x can be null
-template<typename T, typename C>
-bool	Rbtree<T,C>::is_red(node *x) const
+template<typename T, typename C, typename A>
+bool	Rbtree<T,C,A>::is_red(node *x) const
 {
 	if (x && x->color == rbt_red)
 		return true;
@@ -435,15 +438,15 @@ bool	Rbtree<T,C>::is_red(node *x) const
 }
 
 // x can be null
-template<typename T, typename C>
-bool	Rbtree<T,C>::is_black(node *x) const
+template<typename T, typename C, typename A>
+bool	Rbtree<T,C,A>::is_black(node *x) const
 {
 	return (!is_red(x));
 }
 
 // x->right cannot be NULL
-template<typename T, typename C>
-void Rbtree<T,C>::left_rotate(node * x)
+template<typename T, typename C, typename A>
+void Rbtree<T,C,A>::left_rotate(node * x)
 {
 	if (!x->right) // sanity check for debugging porpouses
 	{
@@ -470,8 +473,8 @@ void Rbtree<T,C>::left_rotate(node * x)
 }
 
 // x->left cannot be NULL
-template<typename T, typename C>
-void Rbtree<T,C>::right_rotate(node *x)
+template<typename T, typename C, typename A>
+void Rbtree<T,C,A>::right_rotate(node *x)
 {
 	if (!x->left) // debug
 	{
@@ -501,8 +504,8 @@ void Rbtree<T,C>::right_rotate(node *x)
 #define INCREM 5
 #define RED "\033[1;31m"
 #define NC "\033[0m"
-template<typename T, typename C>
-void Rbtree<T,C>::print(node *root, int space) const
+template<typename T, typename C, typename A>
+void Rbtree<T,C,A>::print(node *root, int space) const
 {
 	if (!root)
 		return;
@@ -515,15 +518,15 @@ void Rbtree<T,C>::print(node *root, int space) const
 	print(root->left, space + INCREM);
 }
 
-template<typename T, typename C>
-void Rbtree<T,C>::print() const
+template<typename T, typename C, typename A>
+void Rbtree<T,C,A>::print() const
 {
 	print(_root, 0);
 	std::cout << "---------------------------\n";
 }
 
-template<typename T, typename C>
-typename Rbtree<T,C>::node * Rbtree<T,C>::new_node(value_type const &value)
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::node * Rbtree<T,C,A>::new_node(value_type const &value)
 {
 	value_type * v = _value_allocator.allocate(1);
 	_value_allocator.construct(v, value);
@@ -534,8 +537,8 @@ typename Rbtree<T,C>::node * Rbtree<T,C>::new_node(value_type const &value)
 	return (n);
 }
 
-template<typename T, typename C>
-void Rbtree<T,C>::clear_node(node* &x)
+template<typename T, typename C, typename A>
+void Rbtree<T,C,A>::clear_node(node* &x)
 {
 	// destroy and deallocate value
 	_value_allocator.destroy(x->value);
@@ -549,8 +552,8 @@ void Rbtree<T,C>::clear_node(node* &x)
 }
 
 // new approach: iterative + stack
-template<typename T, typename C>
-void Rbtree<T,C>::clear()
+template<typename T, typename C, typename A>
+void Rbtree<T,C,A>::clear()
 {
 	node *ptr;
 	ft::vector<node *> v;
@@ -575,9 +578,9 @@ void Rbtree<T,C>::clear()
 	_size = 0;
 }
 
-template<typename T, typename C>
-typename Rbtree<T,C>::node const *
-Rbtree<T,C>::find(node *root, T const &value) const
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::node const *
+Rbtree<T,C,A>::find(node *root, T const &value) const
 {
 	if (!root)
 		return (&_end);
@@ -589,9 +592,9 @@ Rbtree<T,C>::find(node *root, T const &value) const
 }
 
 // this overload is necessary because erase needs a node * to remove it
-template<typename T, typename C>
-typename Rbtree<T,C>::node *
-Rbtree<T,C>::find(node *root, T const &value) 
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::node *
+Rbtree<T,C,A>::find(node *root, T const &value) 
 {
 	if (!root)
 		return (&_end);
@@ -603,22 +606,22 @@ Rbtree<T,C>::find(node *root, T const &value)
 }
 
 // returns pointer to _end if no match
-template<typename T, typename C>
-typename Rbtree<T,C>::node const * Rbtree<T,C>::find(T const &value) const
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::node const * Rbtree<T,C,A>::find(T const &value) const
 {
 	return (find(_root, value));
 }
 
 
-template<typename T, typename C>
-typename Rbtree<T,C>::node const * Rbtree<T,C>::end() const
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::node const * Rbtree<T,C,A>::end() const
 {
 	return (&_end);
 }
 
 
-template<typename T, typename C>
-typename Rbtree<T,C>::size_type	Rbtree<T,C>::erase(T const &value)
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::size_type	Rbtree<T,C,A>::erase(T const &value)
 {
 	node *target = find(_root, value);
 	if (target == &_end)
@@ -629,15 +632,15 @@ typename Rbtree<T,C>::size_type	Rbtree<T,C>::erase(T const &value)
 	return (1);
 }
 
-template<typename T, typename C>
-void Rbtree<T,C>::erase(node * target)
+template<typename T, typename C, typename A>
+void Rbtree<T,C,A>::erase(node * target)
 {
 	if (target != &_end)
 		remove_node(target);
 }
 
-template<typename T, typename C>
-void	Rbtree<T,C>::transplant(node *old, node *new_node)
+template<typename T, typename C, typename A>
+void	Rbtree<T,C,A>::transplant(node *old, node *new_node)
 {
 	// update parent
 	if (old == old->parent->left) // old is a left child
@@ -648,8 +651,8 @@ void	Rbtree<T,C>::transplant(node *old, node *new_node)
 	new_node->parent = old->parent;
 }
 
-template<typename T, typename C>
-void	Rbtree<T,C>::remove_node(node *target)
+template<typename T, typename C, typename A>
+void	Rbtree<T,C,A>::remove_node(node *target)
 {
 	node * replacement;
 	node * x;
@@ -687,8 +690,8 @@ void	Rbtree<T,C>::remove_node(node *target)
 	update_end();
 }
 
-template<typename T, typename C>
-void	Rbtree<T,C>::detach_nil_node(node & nil)
+template<typename T, typename C, typename A>
+void	Rbtree<T,C,A>::detach_nil_node(node & nil)
 {
 	if (nil.parent)
 	{
@@ -701,8 +704,8 @@ void	Rbtree<T,C>::detach_nil_node(node & nil)
 }
 
 // x->right cannot be NULL
-template<typename T, typename C>
-typename Rbtree<T,C>::node *	Rbtree<T,C>::successor(node *x) const
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::node *	Rbtree<T,C,A>::successor(node *x) const
 {
 	x = x->right;
 
@@ -713,8 +716,8 @@ typename Rbtree<T,C>::node *	Rbtree<T,C>::successor(node *x) const
 
 // Algorithm for deleting fix:
 // https://github.com/alenachang/red-black-deletion-steps
-template<typename T, typename C>
-void Rbtree<T,C>::fix_remove(node * deleted, node * replacement, node * x)
+template<typename T, typename C, typename A>
+void Rbtree<T,C,A>::fix_remove(node * deleted, node * replacement, node * x)
 {
 	if (deleted->color == rbt_red)
 	{
@@ -733,8 +736,8 @@ void Rbtree<T,C>::fix_remove(node * deleted, node * replacement, node * x)
 	}
 }
 
-template<typename T, typename C>
-typename Rbtree<T,C>::node * Rbtree<T,C>::sibling(node *x)
+template<typename T, typename C, typename A>
+typename Rbtree<T,C,A>::node * Rbtree<T,C,A>::sibling(node *x)
 {
 	if (x == _root) // debug only
 	{
@@ -746,8 +749,8 @@ typename Rbtree<T,C>::node * Rbtree<T,C>::sibling(node *x)
 	return (x->parent->left);
 }
 
-template<typename T, typename C>
-int Rbtree<T,C>::case_index(node *x)
+template<typename T, typename C, typename A>
+int Rbtree<T,C,A>::case_index(node *x)
 {
 	if (x->color == rbt_red)
 		return (0);
@@ -778,8 +781,8 @@ int Rbtree<T,C>::case_index(node *x)
 	}
 }
 
-template<typename T, typename C>
-void Rbtree<T,C>::run_case(int index, node * x)
+template<typename T, typename C, typename A>
+void Rbtree<T,C,A>::run_case(int index, node * x)
 {
 	if (index < 0 || index > 4) // debug
 	{
@@ -801,8 +804,8 @@ void Rbtree<T,C>::run_case(int index, node * x)
 }
 
 // 	Case 1: Node x is black and its sibling w is red
-template<typename T, typename C>
-void Rbtree<T,C>::case_1(node *x)
+template<typename T, typename C, typename A>
+void Rbtree<T,C,A>::case_1(node *x)
 {
 	node * w = sibling(x);
 
@@ -824,8 +827,8 @@ void Rbtree<T,C>::case_1(node *x)
 
 // Node x is black and its sibling w is black and both of w's children
 // are black
-template<typename T, typename C>
-void Rbtree<T,C>::case_2(node *x)
+template<typename T, typename C, typename A>
+void Rbtree<T,C,A>::case_2(node *x)
 {
 	node * w = sibling(x);
 	w->color = rbt_red;
@@ -836,8 +839,8 @@ void Rbtree<T,C>::case_2(node *x)
 		run_case(case_index(x), x);
 }
 
-template<typename T, typename C>
-void Rbtree<T,C>::case_3(node *x)
+template<typename T, typename C, typename A>
+void Rbtree<T,C,A>::case_3(node *x)
 {
 	node * w = sibling(x);
 
@@ -856,8 +859,8 @@ void Rbtree<T,C>::case_3(node *x)
 	run_case(4, x);
 }
 
-template<typename T, typename C>
-void Rbtree<T,C>::case_4(node *x)
+template<typename T, typename C, typename A>
+void Rbtree<T,C,A>::case_4(node *x)
 {
 	node * w = sibling(x);
 	
@@ -919,8 +922,8 @@ bool check_reds(RbNode<T> *root, int parent_color)
 			&& check_reds(root->right, node_color));
 }
 
-template<typename T, typename C>
-bool Rbtree<T,C>::check_bst(node *root) const
+template<typename T, typename C, typename A>
+bool Rbtree<T,C,A>::check_bst(node *root) const
 {
 	if (!root)
 		return true;
@@ -931,14 +934,14 @@ bool Rbtree<T,C>::check_bst(node *root) const
 	return (check_bst(root->left) && check_bst(root->right));
 }
 
-template<typename T, typename C>
-bool Rbtree<T,C>::check_bst() const
+template<typename T, typename C, typename A>
+bool Rbtree<T,C,A>::check_bst() const
 {
 	return (check_bst(_root));
 }
 
-template<typename T, typename C>
-bool Rbtree<T,C>::check_rb() const
+template<typename T, typename C, typename A>
+bool Rbtree<T,C,A>::check_rb() const
 {
 	bool black_depth = true;
 	bool consec_red = true;

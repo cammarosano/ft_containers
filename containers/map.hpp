@@ -6,7 +6,7 @@
 /*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/02 19:34:37 by rcammaro          #+#    #+#             */
-/*   Updated: 2021/11/02 19:34:38 by rcammaro         ###   ########.fr       */
+/*   Updated: 2021/11/08 17:46:24 by rcammaro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include <string> // debug
 #include <iostream> // for debug messages
+#include <memory>
 
 #include "Rbtree.hpp"
 #include "utils.hpp"
@@ -24,7 +25,11 @@
 namespace ft
 {
 
-template < typename Key, typename T, typename Compare = ft::less<Key> >
+template <	typename Key,
+			typename T,
+			typename Compare = ft::less<Key>,
+			typename Alloc = std::allocator<ft::pair<const Key,T> >
+		>
 class map
 {
 public:
@@ -33,7 +38,7 @@ public:
 	typedef	T										mapped_type;
 	typedef pair<const key_type, mapped_type>		value_type;
 	typedef Compare									key_compare;
-	typedef std::allocator<value_type>				allocator_type;
+	typedef Alloc									allocator_type;
 	typedef value_type&								reference;
 	typedef value_type const &						const_reference;
 	typedef value_type*								pointer;
@@ -81,8 +86,9 @@ public:
 	// ------ Constructors, Assignation Operator and Destructor -------//
 
 	// Default constructor
-	explicit map(key_compare const & comp = key_compare()):
-	_key_comp(comp), _tree(value_compare(_key_comp))
+	explicit map(key_compare const & comp = key_compare(),
+					allocator_type const & alloc = allocator_type()):
+	_key_comp(comp), _tree(value_compare(_key_comp), alloc)
 	{
 	}
 
