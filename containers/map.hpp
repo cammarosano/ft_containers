@@ -6,7 +6,7 @@
 /*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/02 19:34:37 by rcammaro          #+#    #+#             */
-/*   Updated: 2021/11/08 17:46:24 by rcammaro         ###   ########.fr       */
+/*   Updated: 2021/11/08 23:41:35 by rcammaro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,21 +34,21 @@ class map
 {
 public:
 
-	typedef	Key										key_type;
-	typedef	T										mapped_type;
-	typedef pair<const key_type, mapped_type>		value_type;
-	typedef Compare									key_compare;
-	typedef Alloc									allocator_type;
-	typedef value_type&								reference;
-	typedef value_type const &						const_reference;
-	typedef value_type*								pointer;
-	typedef value_type const *						const_pointer;
-	typedef ft::tree_iterator<value_type>			iterator;
-	typedef ft::tree_iterator<const value_type>		const_iterator;
-	typedef ft::reverse_iterator<iterator>			reverse_iterator;
-	typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
-	typedef std::ptrdiff_t							difference_type;
-	typedef std::size_t								size_type;
+	typedef	Key											key_type;
+	typedef	T											mapped_type;
+	typedef pair<const key_type, mapped_type>			value_type;
+	typedef Compare										key_compare;
+	typedef Alloc										allocator_type;
+	typedef typename allocator_type::reference			reference;
+	typedef typename allocator_type::const_reference	const_reference;
+	typedef typename allocator_type::pointer			pointer;
+	typedef typename allocator_type::const_pointer		const_pointer;
+	typedef ft::tree_iterator<value_type>				iterator;
+	typedef ft::tree_iterator<const value_type>			const_iterator;
+	typedef ft::reverse_iterator<iterator>				reverse_iterator;
+	typedef ft::reverse_iterator<const_iterator>		const_reverse_iterator;
+	typedef typename iterator::difference_type			difference_type;
+	typedef std::size_t									size_type;
 
 	class value_compare
 	{
@@ -94,15 +94,16 @@ public:
 
 	// Range constructor
 	template <typename It>
-	map(It first, It last, key_compare const & comp = key_compare()):
-	_key_comp(comp), _tree(value_compare(_key_comp))
+	map(It first, It last, key_compare const & comp = key_compare(),
+		allocator_type const & alloc = allocator_type()):
+	_key_comp(comp), _tree(value_compare(_key_comp), alloc)
 	{
 		insert(first, last);
 	}
 
 	// Copy constructor
 	map(map const & x):
-	_key_comp(x._key_comp), _tree(value_compare(_key_comp))
+	_key_comp(x._key_comp), _tree(value_compare(_key_comp), x.get_allocator())
 	{
 		*this = x;
 	}
@@ -119,7 +120,7 @@ public:
 	{
 	}
 	
-	// --------------- Iterators -------------------------- //
+	// --------------- Iterators ----------------------- //
 
 	iterator begin()
 	{

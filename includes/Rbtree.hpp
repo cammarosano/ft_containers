@@ -6,7 +6,7 @@
 /*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/02 19:37:45 by rcammaro          #+#    #+#             */
-/*   Updated: 2021/11/08 17:27:31 by rcammaro         ###   ########.fr       */
+/*   Updated: 2021/11/08 23:33:06 by rcammaro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,7 @@ _root(_end.left), _size(0)
 
 template<typename T, typename C, typename A>
 Rbtree<T,C,A>::Rbtree(Rbtree const & src):
-_value_allocator(src._value_allocator), _node_allocator(src._node_allocator),
+_value_allocator(src._value_allocator), 
 _comp(src._comp), _end(_value_allocator.allocate(1)), _root(_end.left), _size(0)
 {
 	*this = src;
@@ -551,7 +551,7 @@ void Rbtree<T,C,A>::clear_node(node* &x)
 	x = NULL;
 }
 
-// new approach: iterative + stack
+// Depth first traversal using ft::stack
 template<typename T, typename C, typename A>
 void Rbtree<T,C,A>::clear()
 {
