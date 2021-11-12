@@ -1,6 +1,5 @@
 SRC = main.cpp
 SRC_BONUS = main_bonus.cpp
-OBJ = $(SRC:.cpp=.o)  # not really in use...
 CONTAINERS = map.hpp set.hpp stack.hpp vector.hpp
 HEADERS = Rbtree.hpp reverse_iterator.hpp tree_iterator.hpp utils.hpp vector_iterator.hpp
 HEADER = $(addprefix containers/,$(CONTAINERS)) $(addprefix includes/,$(HEADERS))

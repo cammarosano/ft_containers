@@ -6,7 +6,7 @@
 /*   By: rcammaro <rcammaro@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/02 19:37:45 by rcammaro          #+#    #+#             */
-/*   Updated: 2021/11/08 23:56:02 by rcammaro         ###   ########.fr       */
+/*   Updated: 2021/11/12 20:05:05 by rcammaro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -448,12 +448,6 @@ bool	Rbtree<T,C,A>::is_black(node *x) const
 template<typename T, typename C, typename A>
 void Rbtree<T,C,A>::left_rotate(node * x)
 {
-	if (!x->right) // sanity check for debugging porpouses
-	{
-		std::cout << "left_rotate with x->right being NULL" << std::endl;
-		return ;
-	}
-
 	node * y;
 
 	y = x->right;
@@ -476,12 +470,6 @@ void Rbtree<T,C,A>::left_rotate(node * x)
 template<typename T, typename C, typename A>
 void Rbtree<T,C,A>::right_rotate(node *x)
 {
-	if (!x->left) // debug
-	{
-		std::cout << "right_rotate with x->left being NULL" << std::endl;
-		return ;
-	}
-
 	node * y;
 
 	y = x->left;
@@ -627,7 +615,6 @@ typename Rbtree<T,C,A>::size_type	Rbtree<T,C,A>::erase(T const &value)
 	if (target == &_end)
 		return (0);
 
-	// std::cout << "deleting " << value << std::endl;
 	remove_node(target);
 	return (1);
 }
@@ -739,11 +726,6 @@ void Rbtree<T,C,A>::fix_remove(node * deleted, node * replacement, node * x)
 template<typename T, typename C, typename A>
 typename Rbtree<T,C,A>::node * Rbtree<T,C,A>::sibling(node *x)
 {
-	if (x == _root) // debug only
-	{
-		std::cout << "sibling of root attempt ... " << std::endl;
-		return (NULL);
-	}
 	if (is_left_child(x))
 		return (x->parent->right);
 	return (x->parent->left);
@@ -756,11 +738,6 @@ int Rbtree<T,C,A>::case_index(node *x)
 		return (0);
 	// x is black
 	node * w = sibling(x);
-	if (!w) // debug
-	{
-		std::cout << "sibling is NULL!" << std::endl;
-		return (-1);
-	}
 	if (w->color == rbt_red)
 		return (1);
 	// w is black
@@ -784,13 +761,6 @@ int Rbtree<T,C,A>::case_index(node *x)
 template<typename T, typename C, typename A>
 void Rbtree<T,C,A>::run_case(int index, node * x)
 {
-	if (index < 0 || index > 4) // debug
-	{
-		std::cout << "bad index" << std::endl;
-		return ;
-	}
-	// std::cout << "case " << index << "\n";
-
 	if (index == 0)
 		x->color = rbt_black;
 	else if (index == 1)
@@ -817,11 +787,6 @@ void Rbtree<T,C,A>::case_1(node *x)
 		right_rotate(x->parent);
 	
 	int case_i = case_index(x);
-	if (case_i < 2)
-	{
-		std::cout << "case index should be 2, 3 or 4" << std::endl;
-		return ;
-	}
 	run_case(case_i, x);
 }
 
